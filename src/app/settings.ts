@@ -5,7 +5,8 @@ export const SETTINGS = {
   // все хардкодные значения должны быть здесь, для удобства их изменения
   PORT: 3003,
   PATH: {
-    VIDEOS: '/videos',
+    BLOGS: '/blogs',
+    POSTS: '/posts',
     TESTING: {
       ALL_DATA: '/testing/all-data',
     },
