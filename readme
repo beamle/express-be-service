@@ -1,0 +1,41 @@
+ssh -R 80:localhost:3003 serveo.net
+step1: yarn init --yes, // создание проекта внутри папки
+step2: yarn add express dotenv cors, // добавление express, библиотеки для работы с переменными окружения, библиотеки для управления "кому разрешено делать запрос на наш бэк"
+step3: yarn add nodemon typescript ts-node @types/node @types/express @types/cors jest ts-jest @types/jest supertest @types/supertest --dev, // добавление библиотек дебагинга, тайпскрипта, тестов
+step4: yarn tsc --init, // включение тайпскрипта
+yarn add express-validator
+
+minimal tsconfig:
+{
+    "compilerOptions": {
+        "target": "es2016",
+        "module": "commonjs",
+        "outDir": "./dist",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitReturns": true,
+        "skipLibCheck": true
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "**/*.test.ts"]
+}
+
+scripts:
+    "scripts": {
+        "watch": "tsc -w",
+        "dev": "yarn nodemon --inspect dist/index.js",
+        "jest": "jest -i",
+        "jest:coverage": "jest -i --coverage"
+    },
+
+
+setting tests:
+yarn ts-jest config:init
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testRegex: "__tests__/.*.e2e.test.ts$",
+}

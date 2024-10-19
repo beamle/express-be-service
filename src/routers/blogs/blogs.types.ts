@@ -13,3 +13,7 @@ export type BlogError = {
   message: string;
   field: string;
 }
+
+export type OutputErrorsType = {
+  errorsMessages: BlogError[]
+}
