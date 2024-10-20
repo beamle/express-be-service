@@ -148,15 +148,10 @@ describe("test /blogs path", () => {
       .set({ "Authorization": "Basic " + codedAdminCredentials })
       .send(inputForCreatingPost)
 
-    console.log(createdBlogInDb.body)
-    console.log(db)
-
     const deletedBlog = await req
       .delete(SETTINGS.PATH.BLOGS + `/${createdBlogInDb.body.id}`)
       .set({ "Authorization": "Basic " + codedAdminCredentials })
       .expect(204)
-
-    console.log(db, "DB AFTER")
 
     expect(db.blogs).toHaveLength(0)
     // expect(db.posts).toHaveLength(0)

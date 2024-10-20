@@ -17,6 +17,7 @@ postsRouter.get("/:id",
 postsRouter.post("/",
   authMiddleware,
   ...postInputValidators,
+  postBlogIdAsForeignKeyIdInputValidator,
   inputCheckErrorsFormatter,
   postsController.createPost
 )

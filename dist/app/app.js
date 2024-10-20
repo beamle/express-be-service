@@ -8,6 +8,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const settings_1 = require("./settings");
 const blogs_router_1 = require("../routers/blogs/blogs.router");
+const posts_router_1 = require("../routers/posts_/posts.router");
 exports.app = (0, express_1.default)();
 // app.use(cors()) // Allow request from all origins
 exports.app.options('*', (0, cors_1.default)()); // Enable preflight for all rou
@@ -22,4 +23,4 @@ exports.app.get('/', (req, res) => {
     res.status(200).json({ version: '1.0' });
 });
 exports.app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
-// app.use(SETTINGS.PATH.POSTS, postsRouter)
+exports.app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postsRouter);

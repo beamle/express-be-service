@@ -8,9 +8,14 @@ export const postsRepository = {
   },
 
   async create(input: CreatePostInput) {
+    const findBlog = db.blogs.find(blog => input.blogId)
+
+    if(!findBlog) { throw new Error("No blog with such id!")}
+
     const newPost = {
       id: String(db.posts.length + 1),
-      ...input
+      ...input,
+      blogName: findBlog.name
     }
 
     db.posts = [...db.posts, newPost]
@@ -33,6 +38,10 @@ export const postsRepository = {
     const { title, shortDescription, content, blogName } = dataForUpdate
 
     const post = db.posts.find(post => post.id === searchablePostId)
+    // TODO: vot tut esli proverku ubrath, to ypescrot rugatsja budet
+    if(!post) {
+      return false
+    }
 
     const postDto = new PostsDto(title, shortDescription, content, blogName)
 

@@ -5,8 +5,10 @@ export type CreatePostInput = {
   shortDescription: string
   content: string
   blogId: string
-  blogName: string
 };
+
+export type UpdatePostInput = CreatePostInput & { blogName: string}
+
 export type CreatePostOutput = PostType
 export type PostError = {
   message: string;

@@ -6,7 +6,7 @@ import {
   RequestWithRouteParamsAndBody,
   RoutePathWithIdParam
 } from "../../RequestTypes";
-import { CreatePostInput, CreatePostOutput, PostError } from "../posts.types";
+import { CreatePostInput, CreatePostOutput, PostError, UpdatePostInput } from "../posts.types";
 import postsController from "./posts.controller";
 import { postsRepository } from "../posts.repository";
 
@@ -36,7 +36,7 @@ class PostsController {
     }
   }
 
-  async updatePost(req: RequestWithRouteParamsAndBody<RoutePathWithIdParam, CreatePostInput>, res: Response) {
+  async updatePost(req: RequestWithRouteParamsAndBody<RoutePathWithIdParam, UpdatePostInput>, res: Response) {
     const updatedPost = await postsRepository.updatePost({ ...req.body }, String(req.params.id))
 
     if (!updatedPost) {

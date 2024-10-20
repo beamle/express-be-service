@@ -20,7 +20,11 @@ exports.postsRepository = {
     },
     create(input) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newPost = Object.assign({ id: String(db_1.db.posts.length + 1) }, input);
+            const findBlog = db_1.db.blogs.find(blog => input.blogId);
+            if (!findBlog) {
+                throw new Error("No blog with such id!");
+            }
+            const newPost = Object.assign(Object.assign({ id: String(db_1.db.posts.length + 1) }, input), { blogName: findBlog.name });
             db_1.db.posts = [...db_1.db.posts, newPost];
             return { createdPost: newPost };
         });
@@ -34,6 +38,10 @@ exports.postsRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const { title, shortDescription, content, blogName } = dataForUpdate;
             const post = db_1.db.posts.find(post => post.id === searchablePostId);
+            // TODO: vot tut esli proverku ubrath, to ypescrot rugatsja budet
+            if (!post) {
+                return false;
+            }
             const postDto = new posts_dto_1.PostsDto(title, shortDescription, content, blogName);
             Object.assign(post, postDto);
             return true;
