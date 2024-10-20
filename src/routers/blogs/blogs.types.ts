@@ -1,14 +1,11 @@
+import { BlogType } from "../../app/db";
+
 export type CreateBlogInput = {
   name: string;
   description: string;
   websiteUrl: string;
 };
-export type CreateBlogOutput = {
-  id: string;
-  name: string;
-  description: string;
-  websiteUrl: string;
-}
+export type CreateBlogOutput = BlogType
 export type BlogError = {
   message: string;
   field: string;

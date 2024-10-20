@@ -8,19 +8,14 @@ const express_1 = require("express");
 const blogs_controller_1 = __importDefault(require("./controller/blogs.controller"));
 const blogs_middlewares_1 = require("./blogs.middlewares");
 const authorization_middleware_1 = require("../../authorization/authorization.middleware");
-const validationHelpers_1 = require("../../helpers/validationHelpers");
 exports.blogsRouter = (0, express_1.Router)();
-// TODO: SPROSITJ. V .REPOSITORY sloe vooshe ne dolzhno byth proverok i vse proverki dolzny byth sdelany v middleware?
-// Togda polu4aetsa ja v middleware proverjaju estj li u nas v bazedannyh takoi post ili blog s id
-// esli da, to v REPOSIORY sloe opjatj delaju zapros v bazu dannyh, chto by uzhe sdelatj kakie to uzmenenija
-// To estj nuzhno li kakie-to try catchi ostavljatj v repository sloe? inache 2 raza poisk
 exports.blogsRouter.get("/", blogs_controller_1.default.getBlogs);
 exports.blogsRouter.get("/test-cord", (req, res) => {
     res.json({ message: 'CORS is working!' });
 });
 exports.blogsRouter.get("/:id", blogs_middlewares_1.blogIdInputValidator, blogs_controller_1.default.getBlogById);
-exports.blogsRouter.post("/", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.createBlog);
-exports.blogsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, blogs_middlewares_1.blogIdInputValidator, validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.updateBlog);
+exports.blogsRouter.post("/", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, blogs_middlewares_1.inputCheckErrorsFormatter, blogs_controller_1.default.createBlog);
+exports.blogsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, blogs_middlewares_1.blogIdInputValidator, blogs_middlewares_1.inputCheckErrorsFormatter, blogs_controller_1.default.updateBlog);
 // blogsRouter.put("/:id", (req, res) => blogsController.updateBlog(req, res)) // If you pass directly like that,
 // then THIS obj is lost, because This is because JavaScript’s default
 // behavior is that function references lose their original THIS context
@@ -29,5 +24,5 @@ exports.blogsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...bl
 // function declaration "THIS" depends on WHERE the function is called (context)
 // Not where its being declared. So i pass the METHOD without blogsController itself.
 // with callback i call updateBlog explicitly from blogsController object -> BINDS THIS no blogsController object.
-exports.blogsRouter.delete("/:id", authorization_middleware_1.authMiddleware, blogs_middlewares_1.blogIdInputValidator, blogs_controller_1.default.deleteBlog);
+exports.blogsRouter.delete("/:id", authorization_middleware_1.authMiddleware, blogs_controller_1.default.deleteBlog);
 // blogsRouter.delete("/:id", blogsController.deleteBlog.bind(blogsController))

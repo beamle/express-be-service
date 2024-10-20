@@ -13,21 +13,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const blogs_controller_1 = __importDefault(require("./blogs.controller"));
-const blogs_repository_1 = require("../blogs.repository");
+const posts_repository_1 = require("../posts.repository");
+const controllerValidation_1 = require("./controllerValidation");
 class BlogsController {
     getBlogs(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            res.status(200).json(yield blogs_repository_1.blogsRepository.getBlogs());
+            res.status(200).json(yield posts_repository_1.postsRepository.getBlogs());
         });
     }
     createBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const errors = createBlogValidation(req)
-            // if (errors.errorsMessages.length > 0) {
-            //   res.status(400).json(errors.errorsMessages[0])
-            //   return
-            // }
-            const { createdBlog } = yield blogs_repository_1.blogsRepository.create(req.body);
+            const errors = (0, controllerValidation_1.createBlogValidation)(req);
+            if (errors.errorsMessages.length > 0) {
+                res.status(400).json(errors.errorsMessages[0]);
+                return;
+            }
+            const { createdBlog } = yield posts_repository_1.postsRepository.create(req.body);
             res.status(201).json(createdBlog);
         });
     }
@@ -36,23 +37,23 @@ class BlogsController {
             const { id: searchableBlogId } = req.params;
             if (!searchableBlogId)
                 return yield blogs_controller_1.default.getBlogs(req, res); // if undefined
-            const blog = yield blogs_repository_1.blogsRepository.findBy(searchableBlogId);
+            const blog = yield posts_repository_1.postsRepository.findBy(searchableBlogId);
             if (blog) {
                 res.status(200).json(blog);
             }
-            // else {
-            //   res.status(404).json({ message: 'Blog with such id was not found', field: 'id' })
-            // }
+            else {
+                res.status(404).json({ message: 'Blog with such id was not found', field: 'id' });
+            }
         });
     }
     updateBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const errors = updateBlogValidation(req)
-            // if (errors.errorsMessages.length > 0) {
-            //   res.status(400).json(errors.errorsMessages[0])
-            //   return
-            // }
-            const updatedBlog = yield blogs_repository_1.blogsRepository.updateBlog(Object.assign({}, req.body), String(req.params.id));
+            const errors = (0, controllerValidation_1.updateBlogValidation)(req);
+            if (errors.errorsMessages.length > 0) {
+                res.status(400).json(errors.errorsMessages[0]);
+                return;
+            }
+            const updatedBlog = yield posts_repository_1.postsRepository.updateBlog(Object.assign({}, req.body), String(req.params.id));
             if (!updatedBlog) {
                 res.status(404).json({ message: "Blog not found", field: "id" });
                 return;
@@ -62,12 +63,12 @@ class BlogsController {
     }
     deleteBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const errors = validateDeleteBlog(String(req.params.id))
-            // if (errors.errorsMessages.length > 0) {
-            //   res.status(400).json(errors.errorsMessages[0])
-            //   return
-            // }
-            const blog = yield blogs_repository_1.blogsRepository.delete(req.params.id);
+            const errors = (0, controllerValidation_1.validateDeleteBlog)(String(req.params.id));
+            if (errors.errorsMessages.length > 0) {
+                res.status(400).json(errors.errorsMessages[0]);
+                return;
+            }
+            const blog = yield posts_repository_1.postsRepository.delete(req.params.id);
             if (!blog) {
                 res.status(404).json({ message: "Blog not found", field: "id" });
                 return;

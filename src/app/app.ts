@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { SETTINGS } from "./settings";
 import { blogsRouter } from "../routers/blogs/blogs.router";
+import { postsRouter } from "../routers/posts_/posts.router";
 
 export const app = express()
 // app.use(cors()) // Allow request from all origins

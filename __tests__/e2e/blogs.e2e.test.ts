@@ -1,8 +1,10 @@
 import { dummyBlogs, req } from "../test-helpers";
 import { SETTINGS } from "../../src/app/settings";
 import { db } from "../../src/app/db";
+import { ADMIN_AUTH } from "../../src/authorization/authorization.middleware";
 
 describe("test /blogs path", () => {
+  const codedAdminCredentials = Buffer.from(ADMIN_AUTH, 'utf8').toString("base64")
   afterEach(() => {
     db.blogs = []
   })
@@ -24,6 +26,7 @@ describe("test /blogs path", () => {
     }
     const createdBlogInDb = await req
       .post(SETTINGS.PATH.BLOGS)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
       .send(inputForCreatingBlog)
       .expect(201)
 
@@ -43,6 +46,7 @@ describe("test /blogs path", () => {
     }
     const response = await req
       .post(SETTINGS.PATH.BLOGS)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
       .send(inputForCreatingBlog)
       .expect(400);
 
@@ -66,6 +70,7 @@ describe("test /blogs path", () => {
     }
     const response = await req
       .post(SETTINGS.PATH.BLOGS)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
       .send(inputForCreatingBlog)
       .expect(400);
 
@@ -93,6 +98,7 @@ describe("test /blogs path", () => {
     }
     const createdBlogInDb = await req
       .post(SETTINGS.PATH.BLOGS)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
       .send(inputForCreatingBlog)
       .expect(201)
 
@@ -102,9 +108,9 @@ describe("test /blogs path", () => {
       websiteUrl: "https://example.com",
       randomProperty: "should not be added to db"
     }
-
     const updateBlog = await req
       .put(SETTINGS.PATH.BLOGS + `/${createdBlogInDb.body.id}`)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
       .send(inputForUpdatingBlog)
       .expect(204)
 
@@ -115,5 +121,45 @@ describe("test /blogs path", () => {
     expect(updatedBlog.body.websiteUrl).toEqual(inputForUpdatingBlog.websiteUrl);
     expect(updatedBlog.body.randomProperty).toBeUndefined();
     expect(updatedBlog.body.id).toBe(createdBlogInDb.body.id);
+  })
+
+  test("DELETE should remove both blog and its posts", async() => {
+    const inputForCreatingBlog = {
+      name: "banan1",
+      description: "tasty1",
+      websiteUrl: "https://example.com"
+    }
+
+    const createdBlogInDb = await req
+      .post(SETTINGS.PATH.BLOGS)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
+      .send(inputForCreatingBlog)
+
+    const inputForCreatingPost = {
+      title: "TITLE",
+      shortDescription: "Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum",
+      content: "xxx",
+      blogId: createdBlogInDb.body.id,
+      blogName: "xxx",
+    }
+
+    const createdPostInDb = await req
+      .post(SETTINGS.PATH.POSTS)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
+      .send(inputForCreatingPost)
+
+    console.log(createdBlogInDb.body)
+    console.log(db)
+
+    const deletedBlog = await req
+      .delete(SETTINGS.PATH.BLOGS + `/${createdBlogInDb.body.id}`)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
+      .expect(204)
+
+    console.log(db, "DB AFTER")
+
+    expect(db.blogs).toHaveLength(0)
+    // expect(db.posts).toHaveLength(0)
+    // expect(db.blogs).toHaveLength(0)
   })
 })

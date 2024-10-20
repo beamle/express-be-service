@@ -1,5 +1,4 @@
-import { NextFunction } from 'express'
-import { body, param, validationResult } from 'express-validator'
+import { body, param } from 'express-validator'
 import { urlRegex } from "./controller/controllerValidation";
 import { blogsRepository } from "./blogs.repository";
 
@@ -18,11 +17,12 @@ export const blogWebsiteUrlInputValidator = body('websiteUrl').isString().trim()
   .withMessage("Invalid URL format");
 
 export const blogIdInputValidator = param('id')
-  .optional()
+  // .optional()
   .custom(async (blogId) => {
+    debugger
     const blog = await blogsRepository.findBy(blogId)
     if (!blog && blogId !== undefined) {
-      return new Error('No blog with such id has been found!')
+      throw new Error('No blog with such id has been found!')
     }
     return true
   })
@@ -33,18 +33,3 @@ export const blogInputValidators = [
   blogDescriptionInputValidator,
   blogWebsiteUrlInputValidator,
 ]
-
-export const inputCheckErrorsFormatter = (req: any, res: any, next: NextFunction) => {
-  const errors = validationResult(req).array({ onlyFirstError: true })
-  if (errors.length > 0) {
-    const formattedErrors = errors.map((err: any) => {
-      console.log(errors, "ERRORS")
-      return {
-        message: err.msg,
-        field: err.path
-      }
-    });
-    return res.status(400).json({ errorsMessages: formattedErrors });
-  }
-  next();
-};

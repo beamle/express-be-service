@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogInputValidators = exports.blogIdInputValidator = exports.blogWebsiteUrlInputValidator = exports.blogDescriptionInputValidator = exports.blogTitleInputValidator = void 0;
+exports.inputCheckErrorsFormatter = exports.blogInputValidators = exports.blogIdInputValidator = exports.blogWebsiteUrlInputValidator = exports.blogDescriptionInputValidator = exports.blogTitleInputValidator = void 0;
 const express_validator_1 = require("express-validator");
 const controllerValidation_1 = require("./controller/controllerValidation");
-const blogs_repository_1 = require("./blogs.repository");
+const posts_repository_1 = require("./posts.repository");
 exports.blogTitleInputValidator = (0, express_validator_1.body)('name').trim().isString()
     .isLength({ min: 1, max: 15 })
     .withMessage("Name should exist and should be less or equal to 15 symbols");
@@ -25,12 +25,11 @@ exports.blogWebsiteUrlInputValidator = (0, express_validator_1.body)('websiteUrl
     .matches(controllerValidation_1.urlRegex)
     .withMessage("Invalid URL format");
 exports.blogIdInputValidator = (0, express_validator_1.param)('id')
-    // .optional()
+    .optional()
     .custom((blogId) => __awaiter(void 0, void 0, void 0, function* () {
-    debugger;
-    const blog = yield blogs_repository_1.blogsRepository.findBy(blogId);
+    const blog = yield posts_repository_1.postsRepository.findBy(blogId);
     if (!blog && blogId !== undefined) {
-        throw new Error('No blog with such id has been found!');
+        return new Error('No blog with such id has been found!');
     }
     return true;
 }));
@@ -39,3 +38,18 @@ exports.blogInputValidators = [
     exports.blogDescriptionInputValidator,
     exports.blogWebsiteUrlInputValidator,
 ];
+const inputCheckErrorsFormatter = (req, res, next) => {
+    const errors = (0, express_validator_1.validationResult)(req).array({ onlyFirstError: true });
+    if (errors.length > 0) {
+        const formattedErrors = errors.map((err) => {
+            console.log(errors, "ERRORS");
+            return {
+                message: err.msg,
+                field: err.path
+            };
+        });
+        return res.status(400).json({ errorsMessages: formattedErrors });
+    }
+    next();
+};
+exports.inputCheckErrorsFormatter = inputCheckErrorsFormatter;

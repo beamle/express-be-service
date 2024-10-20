@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { BlogType, db } from "../../../app/db";
+import { BlogType } from "../../../app/db";
 import {
   RequestWithBody,
   RequestWithRouteParams,
@@ -9,7 +9,6 @@ import {
 import { BlogError, CreateBlogInput, CreateBlogOutput } from "../blogs.types";
 import blogsController from "./blogs.controller";
 import { blogsRepository } from "../blogs.repository";
-import { createBlogValidation, updateBlogValidation, validateDeleteBlog } from "./controllerValidation";
 
 
 class BlogsController {
@@ -18,11 +17,11 @@ class BlogsController {
   }
 
   async createBlog(req: RequestWithBody<CreateBlogInput>, res: Response<CreateBlogOutput | BlogError>) {
-    const errors = createBlogValidation(req)
-    if (errors.errorsMessages.length > 0) {
-      res.status(400).json(errors.errorsMessages[0])
-      return
-    }
+    // const errors = createBlogValidation(req)
+    // if (errors.errorsMessages.length > 0) {
+    //   res.status(400).json(errors.errorsMessages[0])
+    //   return
+    // }
     const { createdBlog } = await blogsRepository.create(req.body)
     res.status(201).json(createdBlog)
   }
@@ -36,17 +35,18 @@ class BlogsController {
 
     if (blog) {
       res.status(200).json(blog)
-    } else {
-      res.status(404).json({ message: 'Blog with such id was not found', field: 'id' })
     }
+    // else {
+    //   res.status(404).json({ message: 'Blog with such id was not found', field: 'id' })
+    // }
   }
 
   async updateBlog(req: RequestWithRouteParamsAndBody<RoutePathWithIdParam, CreateBlogInput>, res: Response) {
-    const errors = updateBlogValidation(req)
-    if (errors.errorsMessages.length > 0) {
-      res.status(400).json(errors.errorsMessages[0])
-      return
-    }
+    // const errors = updateBlogValidation(req)
+    // if (errors.errorsMessages.length > 0) {
+    //   res.status(400).json(errors.errorsMessages[0])
+    //   return
+    // }
     const updatedBlog = await blogsRepository.updateBlog({...req.body}, String(req.params.id))
 
     if (!updatedBlog) {
@@ -59,11 +59,11 @@ class BlogsController {
   }
 
   async deleteBlog(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
-    const errors = validateDeleteBlog(String(req.params.id))
-    if (errors.errorsMessages.length > 0) {
-      res.status(400).json(errors.errorsMessages[0])
-      return
-    }
+    // const errors = validateDeleteBlog(String(req.params.id))
+    // if (errors.errorsMessages.length > 0) {
+    //   res.status(400).json(errors.errorsMessages[0])
+    //   return
+    // }
 
     const blog = await blogsRepository.delete(req.params.id)
 
