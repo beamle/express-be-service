@@ -4,6 +4,9 @@ import { SETTINGS } from "../../src/app/settings";
 import { db } from "../../src/app/db";
 
 describe('Basic Authorization', () => {
+  beforeAll(async () => {
+    await req.delete(SETTINGS.PATH.TESTING)
+  })
   test("POST should create new object", async () => {
     db.blogs = []
 

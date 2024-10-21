@@ -9,8 +9,6 @@ exports.SETTINGS = {
     PATH: {
         BLOGS: '/blogs',
         POSTS: '/posts',
-        TESTING: {
-            ALL_DATA: '/testing/all-data',
-        },
+        TESTING: '/testing',
     },
 };

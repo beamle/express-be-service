@@ -26,15 +26,15 @@ export const postBlogIdAsForeignKeyIdInputValidator = body('blogId')
     return true
   })
 
-export const postIdInputValidator = param('id')
-  .optional()
-  .custom(async (id) => {
-    const post = await postsRepository.findBy(id)
-    if (!post && id !== undefined) {
-      throw new Error('No post with such id has been found!')
-    }
-    return true
-  })
+// export const postIdInputValidator = param('id')
+//   .optional()
+//   .custom(async (id) => {
+//     const post = await postsRepository.findBy(id)
+//     if (!post && id !== undefined) {
+//       throw new Error('No post with such id has been found!')
+//     }
+//     return true
+//   })
 
 
 export const postInputValidators = [

@@ -9,9 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postInputValidators = exports.postIdInputValidator = exports.postBlogIdAsForeignKeyIdInputValidator = exports.postContentInputValidator = exports.postShortDescriptionInputValidator = exports.postTitleInputValidator = void 0;
+exports.postInputValidators = exports.postBlogIdAsForeignKeyIdInputValidator = exports.postContentInputValidator = exports.postShortDescriptionInputValidator = exports.postTitleInputValidator = void 0;
 const express_validator_1 = require("express-validator");
-const posts_repository_1 = require("./posts.repository");
 const blogs_repository_1 = require("../blogs/blogs.repository");
 exports.postTitleInputValidator = (0, express_validator_1.body)('title').trim().isString()
     .isLength({ min: 1, max: 30 })
@@ -33,15 +32,15 @@ exports.postBlogIdAsForeignKeyIdInputValidator = (0, express_validator_1.body)('
     }
     return true;
 }));
-exports.postIdInputValidator = (0, express_validator_1.param)('id')
-    .optional()
-    .custom((id) => __awaiter(void 0, void 0, void 0, function* () {
-    const post = yield posts_repository_1.postsRepository.findBy(id);
-    if (!post && id !== undefined) {
-        throw new Error('No post with such id has been found!');
-    }
-    return true;
-}));
+// export const postIdInputValidator = param('id')
+//   .optional()
+//   .custom(async (id) => {
+//     const post = await postsRepository.findBy(id)
+//     if (!post && id !== undefined) {
+//       throw new Error('No post with such id has been found!')
+//     }
+//     return true
+//   })
 exports.postInputValidators = [
     exports.postBlogIdAsForeignKeyIdInputValidator,
     exports.postTitleInputValidator,

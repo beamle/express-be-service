@@ -40,10 +40,10 @@ export const blogsRepository = {
   },
 
   async delete(blogId: string) {
-    // const blog = db.blogs.find(blog => blog.id === blogId)
-    // if(!blog) {
-    //   return false
-    // }
+    const blog = db.blogs.find(blog => blog.id === blogId)
+    if(!blog) {
+      return false
+    }
     db.blogs = db.blogs.filter(blog => blog.id !== blogId)
     db.posts = db.posts.filter(post => post.blogId !== blogId)
 

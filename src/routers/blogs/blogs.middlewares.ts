@@ -16,16 +16,15 @@ export const blogWebsiteUrlInputValidator = body('websiteUrl').isString().trim()
   .matches(urlRegex)
   .withMessage("Invalid URL format");
 
-export const blogIdInputValidator = param('id')
-  // .optional()
-  .custom(async (blogId) => {
-    debugger
-    const blog = await blogsRepository.findBy(blogId)
-    if (!blog && blogId !== undefined) {
-      throw new Error('No blog with such id has been found!')
-    }
-    return true
-  })
+// export const blogIdInputValidator = param('id')
+//   // .optional()
+//   .custom(async (id) => {
+//     const blog = await blogsRepository.findBy(id)
+//     if (!blog) {
+//       throw new Error('No blog with such id has been found!')
+//     }
+//     return true
+//   })
 
 
 export const blogInputValidators = [

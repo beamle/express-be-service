@@ -18,9 +18,13 @@ exports.blogsRouter.get("/", blogs_controller_1.default.getBlogs);
 exports.blogsRouter.get("/test-cord", (req, res) => {
     res.json({ message: 'CORS is working!' });
 });
-exports.blogsRouter.get("/:id", blogs_middlewares_1.blogIdInputValidator, blogs_controller_1.default.getBlogById);
+exports.blogsRouter.get("/:id", 
+// blogIdInputValidator,
+validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.getBlogById);
 exports.blogsRouter.post("/", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.createBlog);
-exports.blogsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, blogs_middlewares_1.blogIdInputValidator, validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.updateBlog);
+exports.blogsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, 
+// blogIdInputValidator,
+validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.updateBlog);
 // blogsRouter.put("/:id", (req, res) => blogsController.updateBlog(req, res)) // If you pass directly like that,
 // then THIS obj is lost, because This is because JavaScript’s default
 // behavior is that function references lose their original THIS context
@@ -29,5 +33,7 @@ exports.blogsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...bl
 // function declaration "THIS" depends on WHERE the function is called (context)
 // Not where its being declared. So i pass the METHOD without blogsController itself.
 // with callback i call updateBlog explicitly from blogsController object -> BINDS THIS no blogsController object.
-exports.blogsRouter.delete("/:id", authorization_middleware_1.authMiddleware, blogs_middlewares_1.blogIdInputValidator, blogs_controller_1.default.deleteBlog);
+exports.blogsRouter.delete("/:id", authorization_middleware_1.authMiddleware, 
+// blogIdInputValidator,
+validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.deleteBlog);
 // blogsRouter.delete("/:id", blogsController.deleteBlog.bind(blogsController))

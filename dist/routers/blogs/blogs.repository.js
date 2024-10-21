@@ -52,10 +52,10 @@ exports.blogsRepository = {
     },
     delete(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const blog = db.blogs.find(blog => blog.id === blogId)
-            // if(!blog) {
-            //   return false
-            // }
+            const blog = db_1.db.blogs.find(blog => blog.id === blogId);
+            if (!blog) {
+                return false;
+            }
             db_1.db.blogs = db_1.db.blogs.filter(blog => blog.id !== blogId);
             db_1.db.posts = db_1.db.posts.filter(post => post.blogId !== blogId);
             return true;

@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRepository = void 0;
 const db_1 = require("../../app/db");
-const posts_dto_1 = require("./posts.dto");
 exports.postsRepository = {
     getPosts() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -36,20 +35,22 @@ exports.postsRepository = {
     },
     updatePost(dataForUpdate, searchablePostId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { title, shortDescription, content, blogName } = dataForUpdate;
+            // const { title, shortDescription, content, blogName } = dataForUpdate
             const post = db_1.db.posts.find(post => post.id === searchablePostId);
-            // TODO: vot tut esli proverku ubrath, to ypescrot rugatsja budet
             if (!post) {
                 return false;
             }
-            const postDto = new posts_dto_1.PostsDto(title, shortDescription, content, blogName);
-            Object.assign(post, postDto);
+            // const postDto = new PostsDto(title, shortDescription, content, blogName)
+            Object.assign(post, dataForUpdate);
             return true;
         });
     },
     delete(postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const post = db.posts.find(post => post.id === postId)
+            const post = db_1.db.posts.find(post => post.id === postId);
+            if (!post) {
+                return false;
+            }
             db_1.db.posts = db_1.db.posts.filter(post => post.id !== postId);
             return true;
         });

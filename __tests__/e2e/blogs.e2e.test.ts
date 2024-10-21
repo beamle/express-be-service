@@ -4,6 +4,9 @@ import { db } from "../../src/app/db";
 import { ADMIN_AUTH } from "../../src/authorization/authorization.middleware";
 
 describe("test /blogs path", () => {
+  beforeAll(async () => {
+    await req.delete(SETTINGS.PATH.TESTING)
+  })
   const codedAdminCredentials = Buffer.from(ADMIN_AUTH, 'utf8').toString("base64")
   afterEach(() => {
     db.blogs = []
@@ -16,6 +19,15 @@ describe("test /blogs path", () => {
       .get(SETTINGS.PATH.BLOGS)
       .expect(200)
       .expect(dummyBlogs)
+  })
+
+  test("GET should return blog by id", async() => {
+    db.blogs = dummyBlogs
+
+    await req
+      .get(SETTINGS.PATH.BLOGS + `/${db.blogs[0].id}`)
+      .expect(200)
+      .expect(db.blogs[0])
   })
 
   test( "POST should create new blog", async() => {
@@ -156,5 +168,28 @@ describe("test /blogs path", () => {
     expect(db.blogs).toHaveLength(0)
     // expect(db.posts).toHaveLength(0)
     // expect(db.blogs).toHaveLength(0)
+  })
+
+  test("DELETE should throw error because blog with such id does not exist", async() => {
+
+    const deletedBlog = await req
+      .delete(SETTINGS.PATH.BLOGS + `/${11433434}`)
+      .set({ "Authorization": "Basic " + codedAdminCredentials })
+      .expect(404)
+
+    // const inputForCreatingBlog = {
+    //   name: "banan1",
+    //   description: "tasty1",
+    //   websiteUrl: "https://example.com"
+    // }
+    // const createdBlogInDb = await req
+    //   .post(SETTINGS.PATH.BLOGS)
+    //   .set({ "Authorization": "Basic " + codedAdminCredentials })
+    //   .send(inputForCreatingBlog)
+    //
+    // const getBlogById = await req
+    //   .get(SETTINGS.PATH.BLOGS + `/${createdBlogInDb.body.id}`)
+    //   .set({ "Authorization": "Basic " + codedAdminCredentials })
+    //   .expect(200)
   })
 })

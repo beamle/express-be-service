@@ -4,7 +4,6 @@ exports.inputCheckErrorsFormatter = void 0;
 const express_validator_1 = require("express-validator");
 const inputCheckErrorsFormatter = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req).array({ onlyFirstError: true });
-    debugger;
     if (errors.length > 0) {
         const formattedErrors = errors.map((err) => {
             console.log(errors, "ERRORS");
@@ -13,6 +12,11 @@ const inputCheckErrorsFormatter = (req, res, next) => {
                 field: err.path
             };
         });
+        // TODO: SPROSITJ KAK PRAVILJNO OBrabatyvatj v formatter raznye case oshibok
+        // debugger
+        // if (req.method === "DELETE" && formattedErrors.some(error => error.field === "id")) {
+        //   return res.status(404).json({ errorsMessages: formattedErrors });
+        // }
         return res.status(400).json({ errorsMessages: formattedErrors });
     }
     next();

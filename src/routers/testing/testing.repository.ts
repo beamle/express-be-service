@@ -1,7 +1,7 @@
 import { db } from "../../app/db";
 
 class TestingRepository {
-  clearAllData() {
+  async clearAllData() {
     db.blogs = []
     db.posts = []
   }

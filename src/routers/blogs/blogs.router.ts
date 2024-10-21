@@ -1,6 +1,6 @@
 import { Router } from "express";
 import blogsController from "./controller/blogs.controller";
-import { blogIdInputValidator, blogInputValidators } from "./blogs.middlewares";
+import { blogInputValidators } from "./blogs.middlewares";
 import { authMiddleware } from "../../authorization/authorization.middleware";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 
@@ -13,7 +13,8 @@ blogsRouter.get("/", blogsController.getBlogs)
 blogsRouter.get("/test-cord", (req, res) => {
   res.json({ message: 'CORS is working!' })})
 blogsRouter.get("/:id",
-  blogIdInputValidator,
+  // blogIdInputValidator,
+  inputCheckErrorsFormatter,
   blogsController.getBlogById)
 blogsRouter.post("/",
   authMiddleware,
@@ -24,7 +25,7 @@ blogsRouter.post("/",
 blogsRouter.put("/:id",
   authMiddleware,
   ...blogInputValidators,
-  blogIdInputValidator,
+  // blogIdInputValidator,
   inputCheckErrorsFormatter,
   blogsController.updateBlog
 )
@@ -39,6 +40,7 @@ blogsRouter.put("/:id",
 // with callback i call updateBlog explicitly from blogsController object -> BINDS THIS no blogsController object.
 blogsRouter.delete("/:id",
   authMiddleware,
-  blogIdInputValidator,
+  // blogIdInputValidator,
+  inputCheckErrorsFormatter,
   blogsController.deleteBlog)
 // blogsRouter.delete("/:id", blogsController.deleteBlog.bind(blogsController))

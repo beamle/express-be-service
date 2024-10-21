@@ -35,10 +35,12 @@ class BlogsController {
 
     if (blog) {
       res.status(200).json(blog)
+      return
     }
-    // else {
-    //   res.status(404).json({ message: 'Blog with such id was not found', field: 'id' })
-    // }
+    else {
+      res.status(404).json({ message: 'Blog with such id was not found', field: 'id' })
+      return
+    }
   }
 
   async updateBlog(req: RequestWithRouteParamsAndBody<RoutePathWithIdParam, CreateBlogInput>, res: Response) {

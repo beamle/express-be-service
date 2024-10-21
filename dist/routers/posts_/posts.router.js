@@ -11,7 +11,14 @@ const authorization_middleware_1 = require("../../authorization/authorization.mi
 const validationHelpers_1 = require("../../helpers/validationHelpers");
 exports.postsRouter = (0, express_1.Router)();
 exports.postsRouter.get("/", posts_controller_1.default.getPosts);
-exports.postsRouter.get("/:id", posts_middlewares_1.postIdInputValidator, posts_controller_1.default.getPostById);
+exports.postsRouter.get("/:id", 
+// postIdInputValidator,
+posts_controller_1.default.getPostById);
 exports.postsRouter.post("/", authorization_middleware_1.authMiddleware, ...posts_middlewares_1.postInputValidators, posts_middlewares_1.postBlogIdAsForeignKeyIdInputValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.createPost);
-exports.postsRouter.put("/:id", authorization_middleware_1.authMiddleware, posts_middlewares_1.postIdInputValidator, ...posts_middlewares_1.postInputValidators, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.updatePost);
-exports.postsRouter.delete("/:id", authorization_middleware_1.authMiddleware, posts_middlewares_1.postBlogIdAsForeignKeyIdInputValidator, posts_middlewares_1.postIdInputValidator, posts_controller_1.default.deletePost);
+exports.postsRouter.put("/:id", authorization_middleware_1.authMiddleware, 
+// postIdInputValidator,
+...posts_middlewares_1.postInputValidators, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.updatePost);
+exports.postsRouter.delete("/:id", authorization_middleware_1.authMiddleware, 
+// postIdInputValidator,
+// postBlogIdAsForeignKeyIdInputValidator,
+validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.deletePost);

@@ -12,12 +12,15 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 
   if(!auth.startsWith("Basic")) {
     res.status(401).json({message: "Invalid authorization type"})
+    return
   }
 
-  const encodedCredentials = Buffer.from(auth.slice(6), "base64").toString("utf8")
+  const codeToBase64Local = Buffer.from(ADMIN_AUTH).toString("base64")
 
-  if(ADMIN_AUTH === encodedCredentials) {
+  if(codeToBase64Local === auth.slice(6)) {
     next()
+  } else {
+    res.status(401).send()
   }
 
 }

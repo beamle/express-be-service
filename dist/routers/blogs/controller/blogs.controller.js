@@ -39,10 +39,12 @@ class BlogsController {
             const blog = yield blogs_repository_1.blogsRepository.findBy(searchableBlogId);
             if (blog) {
                 res.status(200).json(blog);
+                return;
             }
-            // else {
-            //   res.status(404).json({ message: 'Blog with such id was not found', field: 'id' })
-            // }
+            else {
+                res.status(404).json({ message: 'Blog with such id was not found', field: 'id' });
+                return;
+            }
         });
     }
     updateBlog(req, res) {
