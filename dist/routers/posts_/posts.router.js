@@ -9,7 +9,7 @@ const posts_controller_1 = __importDefault(require("./controller/posts.controlle
 const posts_middlewares_1 = require("./posts.middlewares");
 const authorization_middleware_1 = require("../../authorization/authorization.middleware");
 const validationHelpers_1 = require("../../helpers/validationHelpers");
-exports.postsRouter = (0, express_1.Router)();
+exports.postsRouter = (0, express_1.Router)({ mergeParams: true });
 exports.postsRouter.get("/", posts_controller_1.default.getPosts);
 exports.postsRouter.get("/:id", 
 // postIdInputValidator,
@@ -18,7 +18,7 @@ exports.postsRouter.post("/", authorization_middleware_1.authMiddleware, ...post
 exports.postsRouter.put("/:id", authorization_middleware_1.authMiddleware, 
 // postIdInputValidator,
 ...posts_middlewares_1.postInputValidators, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.updatePost);
-exports.postsRouter.delete("/:id", authorization_middleware_1.authMiddleware, 
+exports.postsRouter.delete("/:id", authorization_middleware_1.authMiddleware, posts_middlewares_1.middlewareObjectIdChecker, 
 // postIdInputValidator,
 // postBlogIdAsForeignKeyIdInputValidator,
 validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.deletePost);

@@ -9,7 +9,9 @@ const blogs_controller_1 = __importDefault(require("./controller/blogs.controlle
 const blogs_middlewares_1 = require("./blogs.middlewares");
 const authorization_middleware_1 = require("../../authorization/authorization.middleware");
 const validationHelpers_1 = require("../../helpers/validationHelpers");
-exports.blogsRouter = (0, express_1.Router)();
+const posts_middlewares_1 = require("../posts_/posts.middlewares");
+const posts_controller_1 = __importDefault(require("../posts_/controller/posts.controller"));
+exports.blogsRouter = (0, express_1.Router)({ mergeParams: true });
 // TODO: SPROSITJ. V .REPOSITORY sloe vooshe ne dolzhno byth proverok i vse proverki dolzny byth sdelany v middleware?
 // Togda polu4aetsa ja v middleware proverjaju estj li u nas v bazedannyh takoi post ili blog s id
 // esli da, to v REPOSIORY sloe opjatj delaju zapros v bazu dannyh, chto by uzhe sdelatj kakie to uzmenenija
@@ -21,6 +23,8 @@ exports.blogsRouter.get("/test-cord", (req, res) => {
 exports.blogsRouter.get("/:id", 
 // blogIdInputValidator,
 validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.getBlogById);
+exports.blogsRouter.get('/:blogId/posts', authorization_middleware_1.authMiddleware, blogs_middlewares_1.blogIdAsParamValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.getPosts);
+exports.blogsRouter.post("/:blogId/posts", authorization_middleware_1.authMiddleware, blogs_middlewares_1.blogIdAsParamValidator, posts_middlewares_1.postContentInputValidator, posts_middlewares_1.postShortDescriptionInputValidator, posts_middlewares_1.postTitleInputValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.createPost);
 exports.blogsRouter.post("/", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.createBlog);
 exports.blogsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, 
 // blogIdInputValidator,
@@ -33,7 +37,7 @@ validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.update
 // function declaration "THIS" depends on WHERE the function is called (context)
 // Not where its being declared. So i pass the METHOD without blogsController itself.
 // with callback i call updateBlog explicitly from blogsController object -> BINDS THIS no blogsController object.
-exports.blogsRouter.delete("/:id", authorization_middleware_1.authMiddleware, 
+exports.blogsRouter.delete("/:id", authorization_middleware_1.authMiddleware, posts_middlewares_1.middlewareObjectIdChecker, 
 // blogIdInputValidator,
 validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.deleteBlog);
 // blogsRouter.delete("/:id", blogsController.deleteBlog.bind(blogsController))

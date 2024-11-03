@@ -1,10 +1,14 @@
 import { Router } from "express";
 import postsController from "./controller/posts.controller";
-import { postBlogIdAsForeignKeyIdInputValidator, postInputValidators } from "./posts.middlewares";
+import {
+  middlewareObjectIdChecker,
+  postBlogIdAsForeignKeyIdInputValidator,
+  postInputValidators
+} from "./posts.middlewares";
 import { authMiddleware } from "../../authorization/authorization.middleware";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 
-export const postsRouter = Router();
+export const postsRouter = Router({ mergeParams: true });
 
 postsRouter.get("/", postsController.getPosts)
 postsRouter.get("/:id",
@@ -26,6 +30,7 @@ postsRouter.put("/:id",
 )
 postsRouter.delete("/:id",
   authMiddleware,
+  middlewareObjectIdChecker,
   // postIdInputValidator,
   // postBlogIdAsForeignKeyIdInputValidator,
   inputCheckErrorsFormatter,

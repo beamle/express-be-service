@@ -1,12 +1,13 @@
-import {config} from 'dotenv'
-config() // добавление переменных из файла .env в process.env
+import dotenv from 'dotenv'
+dotenv.config() // добавление переменных из файла .env в process.env
 
 export const SETTINGS = {
-  // все хардкодные значения должны быть здесь, для удобства их изменения
-  PORT: 3003,
+  PORT: process.env.PORT || 3004,
+  MONGO_URI: process.env.MONGO_URL || "",
   PATH: {
     BLOGS: '/blogs',
     POSTS: '/posts',
-    TESTING: '/testing/all-data',
+    TESTING: '/testing',
   },
+  DB_NAME: process.env.DB_NAME || "lesson-2-3"
 }

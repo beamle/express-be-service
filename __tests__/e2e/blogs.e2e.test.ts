@@ -1,33 +1,47 @@
 import { dummyBlogs, req } from "../test-helpers";
 import { SETTINGS } from "../../src/app/settings";
-import { db } from "../../src/app/db";
+import { blogsCollection, BlogType, runDb } from "../../src/app/db";
 import { ADMIN_AUTH } from "../../src/authorization/authorization.middleware";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
+let server: MongoMemoryServer;
 describe("test /blogs path", () => {
   beforeAll(async () => {
-    await req.delete(SETTINGS.PATH.TESTING)
+    server = await MongoMemoryServer.create()
+    const url = server.getUri()
+    await runDb(url)
+    await blogsCollection.drop()
+  })
+  afterAll(async () => {
+    await server.stop()
   })
   const codedAdminCredentials = Buffer.from(ADMIN_AUTH, 'utf8').toString("base64")
-  afterEach(() => {
-    db.blogs = []
+  afterEach(async() => {
+    await blogsCollection.drop()
   })
 
   test("GET should return all blogs", async() => {
-    db.blogs = dummyBlogs
+    await blogsCollection.insertMany(dummyBlogs)
+    const dummyBlogsWithoutId = dummyBlogs.map(({_id, ...rest}) => rest)
 
     await req
       .get(SETTINGS.PATH.BLOGS)
       .expect(200)
-      .expect(dummyBlogs)
+      .expect(dummyBlogsWithoutId)
   })
 
   test("GET should return blog by id", async() => {
-    db.blogs = dummyBlogs
+    await blogsCollection.insertMany(dummyBlogs)
+    const firstBlog = await blogsCollection.findOne({id: dummyBlogs[0].id}, {projection: {_id: 0}})
 
-    await req
-      .get(SETTINGS.PATH.BLOGS + `/${db.blogs[0].id}`)
-      .expect(200)
-      .expect(db.blogs[0])
+    expect(firstBlog).not.toBeNull();
+
+    if(firstBlog) {
+      await req
+        .get(SETTINGS.PATH.BLOGS + `/${dummyBlogs[0].id}`)
+        .expect(200)
+        .expect(firstBlog)
+    }
   })
 
   test( "POST should create new blog", async() => {
@@ -42,11 +56,13 @@ describe("test /blogs path", () => {
       .send(inputForCreatingBlog)
       .expect(201)
 
-    expect(db.blogs).toHaveLength(1);
-    expect(db.blogs[0].name).toBe(inputForCreatingBlog.name);
-    expect(db.blogs[0].description).toBe(inputForCreatingBlog.description);
-    expect(db.blogs[0].websiteUrl).toBe(inputForCreatingBlog.websiteUrl);
-    expect(db.blogs[0].id).toBeDefined()
+    const blogs = await blogsCollection.find({}).toArray()
+
+    expect(blogs).toHaveLength(1);
+    expect(blogs[0].name).toBe(inputForCreatingBlog.name);
+    expect(blogs[0].description).toBe(inputForCreatingBlog.description);
+    expect(blogs[0].websiteUrl).toBe(inputForCreatingBlog.websiteUrl);
+    expect(blogs[0].id).toBeDefined()
 
   })
 
@@ -70,8 +86,9 @@ describe("test /blogs path", () => {
       ]
     });
 
-    expect(db.blogs).toHaveLength(0);
+    const blogs = await blogsCollection.find({}).toArray()
 
+    expect(blogs).toHaveLength(0);
   })
 
   test( "POST should throw only one websiteUrl error", async() => {
@@ -98,7 +115,9 @@ describe("test /blogs path", () => {
       ]
     })
 
-    expect(db.blogs).toHaveLength(0)
+    const blogs = await blogsCollection.find({}).toArray()
+
+    expect(blogs).toHaveLength(0)
 
   })
 
@@ -165,7 +184,9 @@ describe("test /blogs path", () => {
       .set({ "Authorization": "Basic " + codedAdminCredentials })
       .expect(204)
 
-    expect(db.blogs).toHaveLength(0)
+    const blogs = await blogsCollection.find({}).toArray()
+
+    expect(blogs).toHaveLength(0)
     // expect(db.posts).toHaveLength(0)
     // expect(db.blogs).toHaveLength(0)
   })
@@ -173,7 +194,7 @@ describe("test /blogs path", () => {
   test("DELETE should throw error because blog with such id does not exist", async() => {
 
     const deletedBlog = await req
-      .delete(SETTINGS.PATH.BLOGS + `/${11433434}`)
+      .delete(SETTINGS.PATH.BLOGS + `11433434`)
       .set({ "Authorization": "Basic " + codedAdminCredentials })
       .expect(404)
 

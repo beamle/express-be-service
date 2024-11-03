@@ -13,7 +13,6 @@ const inputCheckErrorsFormatter = (req, res, next) => {
             };
         });
         // TODO: SPROSITJ KAK PRAVILJNO OBrabatyvatj v formatter raznye case oshibok
-        // debugger
         // if (req.method === "DELETE" && formattedErrors.some(error => error.field === "id")) {
         //   return res.status(404).json({ errorsMessages: formattedErrors });
         // }

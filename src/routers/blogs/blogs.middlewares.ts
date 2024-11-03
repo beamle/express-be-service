@@ -1,6 +1,7 @@
 import { body, param } from 'express-validator'
 import { urlRegex } from "./controller/controllerValidation";
 import { blogsRepository } from "./blogs.repository";
+import { middlewareObjectIdChecker } from "../posts_/posts.middlewares";
 
 export const blogTitleInputValidator = body('name').trim().isString()
     .isLength({min:1, max: 15})
@@ -16,6 +17,12 @@ export const blogWebsiteUrlInputValidator = body('websiteUrl').isString().trim()
   .matches(urlRegex)
   .withMessage("Invalid URL format");
 
+export const blogIdAsParamValidator = param('blogId').isString().trim()
+  .isLength({ min: 1, max: 100 })
+  .withMessage("Blog id is required")
+
+
+
 // export const blogIdInputValidator = param('id')
 //   // .optional()
 //   .custom(async (id) => {
@@ -28,6 +35,7 @@ export const blogWebsiteUrlInputValidator = body('websiteUrl').isString().trim()
 
 
 export const blogInputValidators = [
+  middlewareObjectIdChecker,
   blogTitleInputValidator,
   blogDescriptionInputValidator,
   blogWebsiteUrlInputValidator,

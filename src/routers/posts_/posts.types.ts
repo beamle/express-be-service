@@ -9,7 +9,7 @@ export type CreatePostInput = {
 
 export type UpdatePostInput = CreatePostInput & { blogName: string}
 
-export type CreatePostOutput = PostType
+export type CreatePostOutput = PostType | boolean
 export type PostError = {
   message: string;
   field: string;

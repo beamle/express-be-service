@@ -1,6 +1,7 @@
-import { body, param } from 'express-validator'
-import { postsRepository } from "./posts.repository";
+import { body } from 'express-validator'
 import { blogsRepository } from "../blogs/blogs.repository";
+import { ObjectId } from "mongodb";
+import { NextFunction, Request, Response } from "express";
 
 export const postTitleInputValidator = body('title').trim().isString()
     .isLength({min:1, max: 30})
@@ -16,15 +17,29 @@ export const postContentInputValidator = body('content').isString().trim()
 
 export const postBlogIdAsForeignKeyIdInputValidator = body('blogId')
   .trim()
-  .isLength({min: 1})
+  .isLength({min: 1, max: 24})
   .withMessage("No blog id provided!")
-  .custom(async (blogId) => {
-    const blog = await blogsRepository.findBy(blogId)
-    if (!blog) {
-      throw new Error('No blog with such id has been found!')
-    }
-    return true
-  })
+  // .custom(async (blogId) => {
+  //     const blog = await blogsRepository.findBy(new ObjectId(blogId))
+  //     if (!blog) {
+  //       throw new Error('No blog with such id has been found!')
+  //     }
+  //   })
+
+export const middlewareObjectIdChecker = (req: Request, res: Response, next: NextFunction) => {
+  // if(!ObjectId.isValid(req.params.id)){
+  //   res.status(404).json({message: "Not found", field: "id"})
+  //   return
+  // }
+  next()
+} // : TODO VYTASHI V ODNELINYJ FAIL
+  // .custom(async (blogId) => {
+  //   const blog = await blogsRepository.findBy(new ObjectId(blogId))
+  //   if (!blog) {
+  //     throw new Error('No blog with such id has been found!')
+  //   }
+  //   return true
+  // })
 
 // export const postIdInputValidator = param('id')
 //   .optional()
@@ -38,6 +53,7 @@ export const postBlogIdAsForeignKeyIdInputValidator = body('blogId')
 
 
 export const postInputValidators = [
+  middlewareObjectIdChecker,
   postBlogIdAsForeignKeyIdInputValidator,
   postTitleInputValidator,
   postShortDescriptionInputValidator,
