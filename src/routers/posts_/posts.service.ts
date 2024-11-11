@@ -6,7 +6,7 @@ import { blogsRepository } from "../blogs/blogs.repository";
 
 export const PostErrors = {
   NO_POSTS: { message: "Something went wrong, try again.", field: "", status: 404 },
-  NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "blogId", status: 400 },
+  NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "blogId", status: 404 },
   POST_NOT_CREATED: { message: "Post was not created!", field: "", status: 404 },
   NO_POST_WITH_SUCH_ID: { message: "Post with such id was not found!", field: "id", status: 404 },
   INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 }
@@ -25,26 +25,22 @@ export class CustomError extends Error {
 
 
 class PostsService {
-  async getPosts(sortingData: PostsSortingData): Promise<PostType[]> {
-    const posts = await postsRepository.getPosts(sortingData)
-    if (!posts) {
-      throw new CustomError(PostErrors.NO_POSTS)
-    }
-    return posts
-  }
+  async getPosts(sortingData: PostsSortingData, blogId?: ObjectId): Promise<PostType[]> {
+    if(blogId) {
+      const blog = await blogsRepository.findBy(new ObjectId(blogId))
 
-  async getPostsByBlogId(blogId: ObjectId, sortingData: PostsSortingData) {
-    const blog = await blogsRepository.findBy(new ObjectId(blogId))
-    if (!blog) {
-      throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
+      if (!blog) {
+        throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
+      }
+      const blogPosts = await postsRepository.getPosts(sortingData, blogId)
+      if (!blogPosts) {
+        throw new CustomError({ message: "no error description", field: "", status: 400 })
+      }
+      return blogPosts
     }
-    const blogPosts = await postsRepository.getPostsByBlogId(blogId, sortingData)
-    if (!blogPosts) {
-      throw new CustomError({ message: "no error description", field: "", status: 404 })
-    }
-    return blogPosts
-  }
 
+    return await postsRepository.getPosts(sortingData)
+  }
 
   async createPost(postCreatingInput: CreatePostInput): Promise<PostType> {
     const createdPostId = await postsRepository.create(postCreatingInput)
@@ -80,7 +76,7 @@ class PostsService {
   async getPostById(searchablePostId: ObjectId): Promise<PostType> {
     const post = await postsRepository.findBy(searchablePostId)
     if (!post) {
-      throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
+      throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID)
     }
     return post;
   }

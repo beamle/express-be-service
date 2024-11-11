@@ -13,11 +13,18 @@ export const postsRouter = Router({ mergeParams: true });
 postsRouter.get("/", postsController.getPosts)
 postsRouter.get("/:id",
   // postIdInputValidator,
+  // ...postInputValidators,
+  // inputCheckErrorsFormatter,
   postsController.getPostById)
 postsRouter.post("/",
   authMiddleware,
   ...postInputValidators,
-  postBlogIdAsForeignKeyIdInputValidator,
+  inputCheckErrorsFormatter,
+  postsController.createPost
+)
+postsRouter.post("/:blogId",
+  authMiddleware,
+  ...postInputValidators,
   inputCheckErrorsFormatter,
   postsController.createPost
 )

@@ -16,16 +16,36 @@ const blogs_controller_1 = __importDefault(require("./blogs.controller"));
 const mongodb_1 = require("mongodb");
 const blogs_service_1 = __importDefault(require("../blogs.service"));
 const posts_service_1 = require("../../posts_/posts.service");
+function generateSortingDataObject(req) {
+    let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1;
+    let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
+    let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt';
+    let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
+    let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : null;
+    return { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm };
+}
+function handleError(res, error) {
+    if (error.constructor.name === 'CustomError') {
+        res.status(error.status).json({ message: error.message, field: error.field });
+        return;
+    }
+    else {
+        res.status(500).json(posts_service_1.PostErrors.INTERNAL_SERVER_ERROR);
+        return;
+    }
+}
 class BlogsController {
     getBlogs(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1;
-            let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
-            let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt';
-            let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
-            let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : null;
-            const sortingData = { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm };
-            res.status(200).json(yield blogs_service_1.default.getBlogs(sortingData));
+            const sortingData = generateSortingDataObject(req);
+            const blogs = yield blogs_service_1.default.getBlogs(sortingData);
+            res.status(200).json({
+                pagesCount: Math.ceil(blogs.totalCount / sortingData.pageSize),
+                page: sortingData.pageNumber,
+                pageSize: sortingData.pageSize,
+                totalCount: blogs.totalCount,
+                items: blogs.blogs
+            });
             return;
         });
     }
@@ -37,14 +57,7 @@ class BlogsController {
                 return;
             }
             catch (error) {
-                if (error instanceof posts_service_1.CustomError) {
-                    res.status(error.status).json({ message: error.message, field: error.field });
-                    return;
-                }
-                else {
-                    res.status(500).json(posts_service_1.PostErrors.INTERNAL_SERVER_ERROR);
-                    return;
-                }
+                handleError(res, error);
             }
         });
     }
@@ -60,14 +73,7 @@ class BlogsController {
                 return;
             }
             catch (error) {
-                if (error instanceof posts_service_1.CustomError) {
-                    res.status(error.status).json({ message: error.message, field: error.field });
-                    return;
-                }
-                else {
-                    res.status(500).json(posts_service_1.PostErrors.INTERNAL_SERVER_ERROR);
-                    return;
-                }
+                handleError(res, error);
             }
         });
     }
@@ -79,14 +85,7 @@ class BlogsController {
                 return;
             }
             catch (error) {
-                if (error instanceof posts_service_1.CustomError) {
-                    res.status(error.status).json({ message: error.message, field: error.field });
-                    return;
-                }
-                else {
-                    res.status(500).json(posts_service_1.PostErrors.INTERNAL_SERVER_ERROR);
-                    return;
-                }
+                handleError(res, error);
             }
         });
     }
@@ -97,14 +96,7 @@ class BlogsController {
                 res.sendStatus(204);
             }
             catch (error) {
-                if (error instanceof posts_service_1.CustomError) {
-                    res.status(error.status).json({ message: error.message, field: error.field });
-                    return;
-                }
-                else {
-                    res.status(500).json(posts_service_1.PostErrors.INTERNAL_SERVER_ERROR);
-                    return;
-                }
+                handleError(res, error);
             }
         });
     }

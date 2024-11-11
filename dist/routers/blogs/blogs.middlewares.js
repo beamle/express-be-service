@@ -15,10 +15,11 @@ exports.blogWebsiteUrlInputValidator = (0, express_validator_1.body)('websiteUrl
     .withMessage("Website URL should exist and should be less or equal to 100 symbols")
     .matches(controllerValidation_1.urlRegex)
     .withMessage("Invalid URL format");
-exports.blogIdAsParamValidator = (0, express_validator_1.param)('blogId').isString().trim()
+exports.blogIdAsParamValidator = (0, express_validator_1.param)('blogId').isAlphanumeric().trim()
     .isLength({ min: 1, max: 100 })
     .withMessage("Blog id is required");
-// export const blogIdInputValidator = param('id')
+// export const blogIdAsParamValidator = param('blogId').toInt().isInt().withMessage("PROVERKA")
+// export const blogIdAsParamValidator = param('blogId')
 //   // .optional()
 //   .custom(async (id) => {
 //     const blog = await blogsRepository.findBy(id)

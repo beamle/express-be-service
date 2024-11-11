@@ -29,7 +29,12 @@ describe("test /posts path", () => {
     await req
       .get(SETTINGS.PATH.POSTS)
       .expect(200)
-      .expect(dummyPostsWithoutId)
+      .expect({
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 3,
+        items: dummyPostsWithoutId})
   })
 
   test( "POST should create new post", async() => {

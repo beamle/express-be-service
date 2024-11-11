@@ -17,13 +17,14 @@ export const blogWebsiteUrlInputValidator = body('websiteUrl').isString().trim()
   .matches(urlRegex)
   .withMessage("Invalid URL format");
 
-export const blogIdAsParamValidator = param('blogId').isString().trim()
+export const blogIdAsParamValidator = param('blogId').isAlphanumeric().trim()
   .isLength({ min: 1, max: 100 })
   .withMessage("Blog id is required")
 
+// export const blogIdAsParamValidator = param('blogId').toInt().isInt().withMessage("PROVERKA")
 
 
-// export const blogIdInputValidator = param('id')
+// export const blogIdAsParamValidator = param('blogId')
 //   // .optional()
 //   .custom(async (id) => {
 //     const blog = await blogsRepository.findBy(id)

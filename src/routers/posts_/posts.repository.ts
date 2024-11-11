@@ -4,11 +4,11 @@ import { blogsRepository } from "../blogs/blogs.repository";
 import { ObjectId } from "mongodb";
 
 export const postsRepository = {
-  async getPosts(sortingData: PostsSortingData) {
+  async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData
 
     const posts = await postsCollection
-      .find({}, { projection: { _id: 0 } })
+      .find(blogId ? { blogId: blogId.toString() } : {}, { projection: { _id: 0 } })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
@@ -17,7 +17,7 @@ export const postsRepository = {
     return posts
   },
 
-  async getPostsByBlogId(blogId, sortingData: PostsSortingData) {
+  async getPostsByBlogId(blogId: ObjectId, sortingData: PostsSortingData) {
 
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData
 
@@ -44,7 +44,7 @@ export const postsRepository = {
       id: String(Math.floor(Math.random() * 223)),
       ...input,
       blogName: blog.name,
-      blogId: input.blogId || blogIdAsParam.toString(),
+      blogId: input.blogId || String(blogIdAsParam),
       createdAt: new Date().toISOString()
     }
 

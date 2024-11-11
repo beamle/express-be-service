@@ -15,7 +15,7 @@ const mongodb_1 = require("mongodb");
 const blogs_repository_1 = require("../blogs/blogs.repository");
 exports.PostErrors = {
     NO_POSTS: { message: "Something went wrong, try again.", field: "", status: 404 },
-    NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "blogId", status: 400 },
+    NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "blogId", status: 404 },
     POST_NOT_CREATED: { message: "Post was not created!", field: "", status: 404 },
     NO_POST_WITH_SUCH_ID: { message: "Post with such id was not found!", field: "id", status: 404 },
     INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 }
@@ -29,26 +29,20 @@ class CustomError extends Error {
 }
 exports.CustomError = CustomError;
 class PostsService {
-    getPosts(sortingData) {
+    getPosts(sortingData, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const posts = yield posts_repository_1.postsRepository.getPosts(sortingData);
-            if (!posts) {
-                throw new CustomError(exports.PostErrors.NO_POSTS);
+            if (blogId) {
+                const blog = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(blogId));
+                if (!blog) {
+                    throw new CustomError(exports.PostErrors.NO_BLOG_WITH_SUCH_ID);
+                }
+                const blogPosts = yield posts_repository_1.postsRepository.getPosts(sortingData, blogId);
+                if (!blogPosts) {
+                    throw new CustomError({ message: "no error description", field: "", status: 400 });
+                }
+                return blogPosts;
             }
-            return posts;
-        });
-    }
-    getPostsByBlogId(blogId, sortingData) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(blogId));
-            if (!blog) {
-                throw new CustomError(exports.PostErrors.NO_BLOG_WITH_SUCH_ID);
-            }
-            const blogPosts = yield posts_repository_1.postsRepository.getPostsByBlogId(blogId, sortingData);
-            if (!blogPosts) {
-                throw new CustomError({ message: "no error description", field: "", status: 404 });
-            }
-            return blogPosts;
+            return yield posts_repository_1.postsRepository.getPosts(sortingData);
         });
     }
     createPost(postCreatingInput) {
@@ -81,7 +75,7 @@ class PostsService {
         return __awaiter(this, void 0, void 0, function* () {
             const post = yield posts_repository_1.postsRepository.findBy(searchablePostId);
             if (!post) {
-                throw new CustomError(exports.PostErrors.NO_BLOG_WITH_SUCH_ID);
+                throw new CustomError(exports.PostErrors.NO_POST_WITH_SUCH_ID);
             }
             return post;
         });

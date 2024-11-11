@@ -13,8 +13,11 @@ exports.postsRouter = (0, express_1.Router)({ mergeParams: true });
 exports.postsRouter.get("/", posts_controller_1.default.getPosts);
 exports.postsRouter.get("/:id", 
 // postIdInputValidator,
+// ...postInputValidators,
+// inputCheckErrorsFormatter,
 posts_controller_1.default.getPostById);
-exports.postsRouter.post("/", authorization_middleware_1.authMiddleware, ...posts_middlewares_1.postInputValidators, posts_middlewares_1.postBlogIdAsForeignKeyIdInputValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.createPost);
+exports.postsRouter.post("/", authorization_middleware_1.authMiddleware, ...posts_middlewares_1.postInputValidators, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.createPost);
+exports.postsRouter.post("/:blogId", authorization_middleware_1.authMiddleware, ...posts_middlewares_1.postInputValidators, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.createPost);
 exports.postsRouter.put("/:id", authorization_middleware_1.authMiddleware, 
 // postIdInputValidator,
 ...posts_middlewares_1.postInputValidators, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.updatePost);

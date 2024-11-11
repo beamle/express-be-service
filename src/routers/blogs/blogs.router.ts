@@ -1,35 +1,36 @@
 import { Router } from "express";
 import blogsController from "./controller/blogs.controller";
-import { blogDescriptionInputValidator, blogIdAsParamValidator, blogInputValidators } from "./blogs.middlewares";
+import { blogIdAsParamValidator, blogInputValidators } from "./blogs.middlewares";
 import { authMiddleware } from "../../authorization/authorization.middleware";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 import {
   middlewareObjectIdChecker,
   postContentInputValidator,
-  postInputValidators,
-  postShortDescriptionInputValidator, postTitleInputValidator
+  postShortDescriptionInputValidator,
+  postTitleInputValidator
 } from "../posts_/posts.middlewares";
 import postsController from "../posts_/controller/posts.controller";
 
 export const blogsRouter = Router({ mergeParams: true });
-// TODO: SPROSITJ. V .REPOSITORY sloe vooshe ne dolzhno byth proverok i vse proverki dolzny byth sdelany v middleware?
-// Togda polu4aetsa ja v middleware proverjaju estj li u nas v bazedannyh takoi post ili blog s id
-// esli da, to v REPOSIORY sloe opjatj delaju zapros v bazu dannyh, chto by uzhe sdelatj kakie to uzmenenija
-// To estj nuzhno li kakie-to try catchi ostavljatj v repository sloe? inache 2 raza poisk
+
 blogsRouter.get("/", blogsController.getBlogs)
+
 blogsRouter.get("/test-cord", (req, res) => {
   res.json({ message: 'CORS is working!' })
 })
-blogsRouter.get("/:id",
-  // blogIdInputValidator,
-  inputCheckErrorsFormatter,
-  blogsController.getBlogById)
+
 blogsRouter.get('/:blogId/posts',
-  authMiddleware,
+  // authMiddleware,
   blogIdAsParamValidator,
   inputCheckErrorsFormatter,
   postsController.getPosts
 )
+
+blogsRouter.get("/:id",
+  // blogIdInputValidator,
+  inputCheckErrorsFormatter,
+  blogsController.getBlogById)
+
 blogsRouter.post("/:blogId/posts",
   authMiddleware,
   blogIdAsParamValidator,
@@ -39,12 +40,14 @@ blogsRouter.post("/:blogId/posts",
   inputCheckErrorsFormatter,
   postsController.createPost
 )
+
 blogsRouter.post("/",
   authMiddleware,
   ...blogInputValidators,
   inputCheckErrorsFormatter,
   blogsController.createBlog
 )
+
 blogsRouter.put("/:id",
   authMiddleware,
   ...blogInputValidators,
@@ -63,7 +66,7 @@ blogsRouter.put("/:id",
 // with callback i call updateBlog explicitly from blogsController object -> BINDS THIS no blogsController object.
 blogsRouter.delete("/:id",
   authMiddleware,
-  middlewareObjectIdChecker,
+  // middlewareObjectIdChecker,
   // blogIdInputValidator,
   inputCheckErrorsFormatter,
   blogsController.deleteBlog)

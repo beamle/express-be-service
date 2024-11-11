@@ -5,11 +5,11 @@ import { CreateBlogInput } from "./blogs.types";
 import { ObjectId } from "mongodb";
 
 export const blogsRepository = {
-  async getBlogs(sortingData: BlogsSortingData) {
-    const { pageNumber, pageSize, sortBy, sortDirection } = sortingData
+  async getBlogs({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }: BlogsSortingData) {
+
     const filter: any = {}
-    if (sortingData.searchNameTerm) {
-      filter.name = { $regex: sortingData.searchNameTerm, $options: 'i' } // ignore Cc
+    if (searchNameTerm) {
+      filter.name = { $regex: searchNameTerm, $options: 'i' } // ignore Cc
     }
 
     const blogs = await blogsCollection
@@ -25,7 +25,6 @@ export const blogsRepository = {
   async create(input: CreateBlogInput): Promise<ObjectId> {
     const { name, description, websiteUrl } = input
     let newBlog: BlogType = {
-      id: String(Math.floor(Math.random() * 223)),
       name,
       description,
       websiteUrl,
@@ -44,12 +43,7 @@ export const blogsRepository = {
   },
 
   async findBy(searchableBlogId: ObjectId): Promise<BlogType | null> {
-    const result = await blogsCollection.findOne({ _id: searchableBlogId }, {projection: {_id: 0}})
-    if (!result) {
-      return null
-    }
-
-    return result
+    return await blogsCollection.findOne({ _id: searchableBlogId }, {projection: {_id: 0}})
   },
 
   async updateBlog(dataForUpdate: CreateBlogInput, searchableBlogId: ObjectId): Promise<boolean | number> {

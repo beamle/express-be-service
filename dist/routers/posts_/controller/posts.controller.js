@@ -32,6 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const db_1 = require("../../../app/db");
 const mongodb_1 = require("mongodb");
 const posts_service_1 = __importStar(require("../posts.service"));
 class PostsController {
@@ -44,9 +45,16 @@ class PostsController {
             let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
             try {
                 const posts = blogId
-                    ? yield posts_service_1.default.getPostsByBlogId(new mongodb_1.ObjectId(blogId), { pageNumber, pageSize, sortBy, sortDirection })
+                    ? yield posts_service_1.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, new mongodb_1.ObjectId(blogId))
                     : yield posts_service_1.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection });
-                res.status(200).json(posts);
+                const postsLength = yield db_1.postsCollection.countDocuments(blogId ? { blogId: blogId.toString() } : {});
+                res.status(200).json({
+                    pagesCount: Math.ceil(postsLength / pageSize),
+                    page: pageNumber,
+                    pageSize,
+                    totalCount: postsLength,
+                    items: posts
+                });
                 return;
             }
             catch (error) {
@@ -63,9 +71,11 @@ class PostsController {
     }
     //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
     //https://github.com/goldbergyoni/nodebestpractices
+    // async createPost(req: RequestWithRouteParamsAndBody<CreatePostInput, blogId>, res: Response<PostType | PostError>) {
     createPost(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { blogId } = req.params;
+            debugger;
             try {
                 let createdPost;
                 if (blogId) {
@@ -92,9 +102,13 @@ class PostsController {
     getPostById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id: searchablePostId } = req.params;
+            let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1;
+            let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
+            let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt';
+            let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
             if (!searchablePostId) { // if undefined
                 try {
-                    const posts = yield posts_service_1.default.getPosts();
+                    const posts = yield posts_service_1.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection });
                     res.status(200).json(posts);
                 }
                 catch (error) {

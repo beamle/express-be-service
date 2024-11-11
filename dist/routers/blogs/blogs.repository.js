@@ -14,12 +14,11 @@ exports.blogsRepository = void 0;
 // isolates how we work with database
 const db_1 = require("../../app/db");
 exports.blogsRepository = {
-    getBlogs(sortingData) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
+    getBlogs(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }) {
             const filter = {};
-            if (sortingData.searchNameTerm) {
-                filter.name = { $regex: sortingData.searchNameTerm, $options: 'i' }; // ignore Cc
+            if (searchNameTerm) {
+                filter.name = { $regex: searchNameTerm, $options: 'i' }; // ignore Cc
             }
             const blogs = yield db_1.blogsCollection
                 .find(filter, { projection: { _id: 0 } })
@@ -34,7 +33,6 @@ exports.blogsRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, description, websiteUrl } = input;
             let newBlog = {
-                id: String(Math.floor(Math.random() * 223)),
                 name,
                 description,
                 websiteUrl,
@@ -52,11 +50,7 @@ exports.blogsRepository = {
     },
     findBy(searchableBlogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.blogsCollection.findOne({ _id: searchableBlogId }, { projection: { _id: 0 } });
-            if (!result) {
-                return null;
-            }
-            return result;
+            return yield db_1.blogsCollection.findOne({ _id: searchableBlogId }, { projection: { _id: 0 } });
         });
     },
     updateBlog(dataForUpdate, searchableBlogId) {

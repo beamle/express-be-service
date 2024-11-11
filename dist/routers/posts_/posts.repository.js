@@ -14,11 +14,11 @@ const db_1 = require("../../app/db");
 const blogs_repository_1 = require("../blogs/blogs.repository");
 const mongodb_1 = require("mongodb");
 exports.postsRepository = {
-    getPosts(sortingData) {
+    getPosts(sortingData, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
             const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
             const posts = yield db_1.postsCollection
-                .find({}, { projection: { _id: 0 } })
+                .find(blogId ? { blogId: blogId.toString() } : {}, { projection: { _id: 0 } })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
@@ -49,7 +49,7 @@ exports.postsRepository = {
             if (!blog) {
                 return false;
             }
-            const newPost = Object.assign(Object.assign({ id: String(Math.floor(Math.random() * 223)) }, input), { blogName: blog.name, blogId: input.blogId || blogIdAsParam.toString(), createdAt: new Date().toISOString() });
+            const newPost = Object.assign(Object.assign({ id: String(Math.floor(Math.random() * 223)) }, input), { blogName: blog.name, blogId: input.blogId || String(blogIdAsParam), createdAt: new Date().toISOString() });
             const resultOfCreatingNewPost = yield db_1.postsCollection.insertOne(newPost);
             const updatePostId = yield db_1.postsCollection.updateOne({ _id: resultOfCreatingNewPost.insertedId }, {
                 $set: {

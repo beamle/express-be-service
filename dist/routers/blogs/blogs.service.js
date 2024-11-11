@@ -11,11 +11,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomError = exports.BlogErrors = void 0;
 const mongodb_1 = require("mongodb");
+const db_1 = require("../../app/db");
 const blogs_repository_1 = require("./blogs.repository");
 exports.BlogErrors = {
     NO_BLOGS: { message: "Something went wrong, try again.", field: "", status: 404 },
-    NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "id", status: 400 },
-    BLOG_NOT_CREATED: { message: "Blog was not created!", field: "", status: 404 },
+    NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "id", status: 404 },
+    BLOG_NOT_CREATED: { message: "Blog was not created!", field: "", status: 400 },
     INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 }
 };
 class CustomError extends Error {
@@ -30,10 +31,15 @@ class BlogsService {
     getBlogs(sortingData) {
         return __awaiter(this, void 0, void 0, function* () {
             const blogs = yield blogs_repository_1.blogsRepository.getBlogs(sortingData);
+            const filter = {};
+            if (sortingData.searchNameTerm) {
+                filter.name = { $regex: sortingData.searchNameTerm, $options: 'i' }; // ignore Cc
+            }
+            const blogsLength = yield db_1.blogsCollection.countDocuments(filter);
             if (!blogs) {
                 throw new CustomError(exports.BlogErrors.NO_BLOGS);
             }
-            return blogs;
+            return { blogs, totalCount: blogsLength };
         });
     }
     createBlog(blogCreatingInput) {
@@ -42,7 +48,7 @@ class BlogsService {
             if (!(createdBlogId instanceof mongodb_1.ObjectId)) {
                 throw new CustomError(exports.BlogErrors.NO_BLOG_WITH_SUCH_ID);
             }
-            const createdBlog = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(createdBlogId));
+            const createdBlog = yield blogs_repository_1.blogsRepository.findBy(createdBlogId);
             if (!createdBlog) {
                 throw new CustomError(exports.BlogErrors.BLOG_NOT_CREATED);
             }
@@ -70,6 +76,7 @@ class BlogsService {
     deleteBlog(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
             const blog = yield blogs_repository_1.blogsRepository.delete(blogId);
+            debugger;
             if (!blog) {
                 throw new CustomError(exports.BlogErrors.NO_BLOG_WITH_SUCH_ID);
             }
