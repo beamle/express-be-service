@@ -1,32 +1,72 @@
-import { db } from "../../app/db";
+import { postsCollection, PostsSortingData, PostType } from "../../app/db";
 import { CreatePostInput } from "./posts.types";
-import { PostsDto } from "./posts.dto";
+import { blogsRepository } from "../blogs/blogs.repository";
+import { ObjectId } from "mongodb";
 
 export const postsRepository = {
-  async getPosts() {
-    return db.posts
+  async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
+    const { pageNumber, pageSize, sortBy, sortDirection } = sortingData
+
+    const posts = await postsCollection
+      .find(blogId ? { blogId: blogId.toString() } : {}, { projection: { _id: 0 } })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
+      .toArray()
+
+    console.log(posts)
+    return posts
   },
 
-  async create(input: CreatePostInput) {
-    const findBlog = db.blogs.find(blog => input.blogId)
+  async getPostsByBlogId(blogId: ObjectId, sortingData: PostsSortingData) {
 
-    if (!findBlog) {
-      throw new Error("No blog with such id!")
+    const { pageNumber, pageSize, sortBy, sortDirection } = sortingData
+
+    return await postsCollection
+      .find({ blogId: blogId.toString() }, { projection: { _id: 0 } })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
+      .toArray()
+  },
+
+  async create(input: CreatePostInput, blogIdAsParam?: ObjectId): Promise<ObjectId | boolean> {
+    let blog;
+    if (blogIdAsParam) {
+      blog = await blogsRepository.findBy(blogIdAsParam)
+    } else {
+      blog = await blogsRepository.findBy(new ObjectId(input.blogId))
+    }
+    if (!blog) {
+      return false
     }
 
-    const newPost = {
-      id: String(db.posts.length + 1),
+    const newPost: PostType = {
+      id: String(Math.floor(Math.random() * 223)),
       ...input,
-      blogName: findBlog.name
+      blogName: blog.name,
+      blogId: input.blogId || String(blogIdAsParam),
+      createdAt: new Date().toISOString()
     }
 
-    db.posts = [...db.posts, newPost]
+    const resultOfCreatingNewPost = await postsCollection.insertOne(newPost)
 
-    return { createdPost: newPost }
+    const updatePostId = await postsCollection.updateOne({ _id: resultOfCreatingNewPost.insertedId }, {
+      $set: {
+        id: resultOfCreatingNewPost.insertedId.toString()
+      }
+    })
+
+    return resultOfCreatingNewPost.insertedId
   },
 
-  async findBy(searchablePostId: string) {
-    return db.posts.find(post => post.id === searchablePostId)
+  async findBy(searchablePostId: ObjectId): Promise<PostType | null> {
+    const post = await postsCollection.findOne({ _id: searchablePostId }, { projection: { _id: 0 } })
+    if (!post) {
+      return null
+    }
+
+    return post
   },
 
   async updatePost(dataForUpdate: {
@@ -35,31 +75,26 @@ export const postsRepository = {
     content: string,
     blogId: string,
     blogName: string
-  }, searchablePostId: string) {
-
-    // const { title, shortDescription, content, blogName } = dataForUpdate
-
-    const post = db.posts.find(post => post.id === searchablePostId)
+  }, searchablePostId: ObjectId) {
+    const post = await this.findBy(searchablePostId)
 
     if (!post) {
       return false
     }
 
-    // const postDto = new PostsDto(title, shortDescription, content, blogName)
+    const resultOfUpdatingPost = await postsCollection.updateOne({ _id: searchablePostId }, { $set: { ...dataForUpdate } })
 
-    Object.assign(post, dataForUpdate)
-
-    return true
+    return resultOfUpdatingPost.acknowledged
   },
 
-  async delete(postId: string) {
-    const post = db.posts.find(post => post.id === postId)
+  async delete(postId: ObjectId) {
+    const post = await postsCollection.findOne({ _id: postId })
+
     if (!post) {
       return false
     }
-    db.posts = db.posts.filter(post => post.id !== postId)
+    const resultOfDeletingPost = await postsCollection.deleteOne({ _id: postId })
 
-    return true
-
+    return resultOfDeletingPost.acknowledged
   }
 }

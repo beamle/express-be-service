@@ -8,73 +8,78 @@ import {
 } from "../../RequestTypes";
 import { BlogError, CreateBlogInput, CreateBlogOutput } from "../blogs.types";
 import blogsController from "./blogs.controller";
-import { blogsRepository } from "../blogs.repository";
+import { ObjectId, SortDirection } from "mongodb";
+import blogsService from "../blogs.service";
+import { CustomError, PostErrors } from "../../posts_/posts.service";
+import blogsQueryRepository from "../blogs.queryRepository";
+import BlogsQueryRepository from "../blogs.queryRepository";
+import { generateSortingDataObject } from "../../../helpers/objectGenerators";
 
+function handleError(res: Response, error: any) {
+  if (error.constructor.name === 'CustomError') {
+    res.status(error.status).json({ message: error.message, field: error.field });
+    return
+  } else {
+    res.status(500).json(PostErrors.INTERNAL_SERVER_ERROR);
+    return
+  }
+}
 
 class BlogsController {
   async getBlogs(req: Request, res: Response) {
-    res.status(200).json(await blogsRepository.getBlogs())
+
+    const sortingData = generateSortingDataObject(req)
+    try {
+      const blogs = await blogsQueryRepository.getBlogs(sortingData)
+      res.status(200).json(blogs)
+      return
+    } catch (error) {
+      handleError(res, error)
+    }
   }
 
   async createBlog(req: RequestWithBody<CreateBlogInput>, res: Response<CreateBlogOutput | BlogError>) {
-    // const errors = createBlogValidation(req)
-    // if (errors.errorsMessages.length > 0) {
-    //   res.status(400).json(errors.errorsMessages[0])
-    //   return
-    // }
-    const { createdBlog } = await blogsRepository.create(req.body)
-    res.status(201).json(createdBlog)
+    try {
+      const createdBlog = await blogsService.createBlog({ ...req.body })
+      res.status(201).json(createdBlog)
+      return
+    } catch (error) {
+      handleError(res, error)
+    }
   }
 
   async getBlogById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response<BlogType | BlogType[] | BlogError>) {
     const { id: searchableBlogId } = req.params
+    if (!searchableBlogId) {
+      return await blogsController.getBlogs(req, res)
+    }
 
-    if (!searchableBlogId) return await blogsController.getBlogs(req, res) // if undefined
-
-    const blog = await blogsRepository.findBy(searchableBlogId)
-
-    if (blog) {
+    try {
+      const blog = await BlogsQueryRepository.getBlogById(searchableBlogId)
       res.status(200).json(blog)
       return
-    }
-    else {
-      res.status(404).json({ message: 'Blog with such id was not found', field: 'id' })
-      return
+    } catch (error) {
+      handleError(res, error)
     }
   }
 
   async updateBlog(req: RequestWithRouteParamsAndBody<RoutePathWithIdParam, CreateBlogInput>, res: Response) {
-    // const errors = updateBlogValidation(req)
-    // if (errors.errorsMessages.length > 0) {
-    //   res.status(400).json(errors.errorsMessages[0])
-    //   return
-    // }
-    const updatedBlog = await blogsRepository.updateBlog({...req.body}, String(req.params.id))
-
-    if (!updatedBlog) {
-      res.status(404).json({ message: "Blog not found", field: "id" });
+    try {
+      const updatedBlog = await blogsService.updateBlog({ ...req.body }, new ObjectId(req.params.id))
+      res.sendStatus(204)
       return
+    } catch (error) {
+      handleError(res, error)
     }
-
-
-    res.sendStatus(204)
   }
 
   async deleteBlog(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
-    // const errors = validateDeleteBlog(String(req.params.id))
-    // if (errors.errorsMessages.length > 0) {
-    //   res.status(400).json(errors.errorsMessages[0])
-    //   return
-    // }
-
-    const blog = await blogsRepository.delete(req.params.id)
-
-    if (!blog) {
-      res.status(404).json({ message: "Blog not found", field: "id" });
-      return
+    try {
+      const blog = await blogsService.deleteBlog(new ObjectId(req.params.id))
+      res.sendStatus(204)
+    } catch (error) {
+      handleError(res, error)
     }
-
-    res.sendStatus(204)
   }
 }
 

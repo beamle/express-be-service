@@ -13,68 +13,85 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const blogs_controller_1 = __importDefault(require("./blogs.controller"));
-const blogs_repository_1 = require("../blogs.repository");
+const mongodb_1 = require("mongodb");
+const blogs_service_1 = __importDefault(require("../blogs.service"));
+const posts_service_1 = require("../../posts_/posts.service");
+const blogs_queryRepository_1 = __importDefault(require("../blogs.queryRepository"));
+const blogs_queryRepository_2 = __importDefault(require("../blogs.queryRepository"));
+const objectGenerators_1 = require("../../../helpers/objectGenerators");
+function handleError(res, error) {
+    if (error.constructor.name === 'CustomError') {
+        res.status(error.status).json({ message: error.message, field: error.field });
+        return;
+    }
+    else {
+        res.status(500).json(posts_service_1.PostErrors.INTERNAL_SERVER_ERROR);
+        return;
+    }
+}
 class BlogsController {
     getBlogs(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            res.status(200).json(yield blogs_repository_1.blogsRepository.getBlogs());
+            const sortingData = (0, objectGenerators_1.generateSortingDataObject)(req);
+            try {
+                const blogs = yield blogs_queryRepository_1.default.getBlogs(sortingData);
+                res.status(200).json(blogs);
+                return;
+            }
+            catch (error) {
+                handleError(res, error);
+            }
         });
     }
     createBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const errors = createBlogValidation(req)
-            // if (errors.errorsMessages.length > 0) {
-            //   res.status(400).json(errors.errorsMessages[0])
-            //   return
-            // }
-            const { createdBlog } = yield blogs_repository_1.blogsRepository.create(req.body);
-            res.status(201).json(createdBlog);
+            try {
+                const createdBlog = yield blogs_service_1.default.createBlog(Object.assign({}, req.body));
+                res.status(201).json(createdBlog);
+                return;
+            }
+            catch (error) {
+                handleError(res, error);
+            }
         });
     }
     getBlogById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id: searchableBlogId } = req.params;
-            if (!searchableBlogId)
-                return yield blogs_controller_1.default.getBlogs(req, res); // if undefined
-            const blog = yield blogs_repository_1.blogsRepository.findBy(searchableBlogId);
-            if (blog) {
+            if (!searchableBlogId) {
+                return yield blogs_controller_1.default.getBlogs(req, res);
+            }
+            try {
+                const blog = yield blogs_queryRepository_2.default.getBlogById(searchableBlogId);
                 res.status(200).json(blog);
                 return;
             }
-            else {
-                res.status(404).json({ message: 'Blog with such id was not found', field: 'id' });
-                return;
+            catch (error) {
+                handleError(res, error);
             }
         });
     }
     updateBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const errors = updateBlogValidation(req)
-            // if (errors.errorsMessages.length > 0) {
-            //   res.status(400).json(errors.errorsMessages[0])
-            //   return
-            // }
-            const updatedBlog = yield blogs_repository_1.blogsRepository.updateBlog(Object.assign({}, req.body), String(req.params.id));
-            if (!updatedBlog) {
-                res.status(404).json({ message: "Blog not found", field: "id" });
+            try {
+                const updatedBlog = yield blogs_service_1.default.updateBlog(Object.assign({}, req.body), new mongodb_1.ObjectId(req.params.id));
+                res.sendStatus(204);
                 return;
             }
-            res.sendStatus(204);
+            catch (error) {
+                handleError(res, error);
+            }
         });
     }
     deleteBlog(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            // const errors = validateDeleteBlog(String(req.params.id))
-            // if (errors.errorsMessages.length > 0) {
-            //   res.status(400).json(errors.errorsMessages[0])
-            //   return
-            // }
-            const blog = yield blogs_repository_1.blogsRepository.delete(req.params.id);
-            if (!blog) {
-                res.status(404).json({ message: "Blog not found", field: "id" });
-                return;
+            try {
+                const blog = yield blogs_service_1.default.deleteBlog(new mongodb_1.ObjectId(req.params.id));
+                res.sendStatus(204);
             }
-            res.sendStatus(204);
+            catch (error) {
+                handleError(res, error);
+            }
         });
     }
 }

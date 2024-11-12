@@ -1,52 +1,74 @@
-// dat access layer
-// isolates how we work with database
-import { db } from "../../app/db";
+import { blogsCollection, BlogsSortingData, BlogType, postsCollection, PostsSortingData } from "../../app/db";
 import { CreateBlogInput } from "./blogs.types";
-import { BlogDto } from "./blogs.dto";
+import { ObjectId } from "mongodb";
 
 export const blogsRepository = {
-  async getBlogs() {
-    return db.blogs
+  async getBlogs({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }: BlogsSortingData, filter: any) {
+    const blogs = await blogsCollection
+      .find(filter ? filter : {}, { projection: { _id: 0 } })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
+      .toArray()
+
+    return blogs
   },
 
-  async create(input: CreateBlogInput) {
+  async create(input: CreateBlogInput): Promise<ObjectId> {
     const { name, description, websiteUrl } = input
-    const newBlog = {
-      id: String(db.blogs.length + 1),
+    let newBlog: BlogType = {
       name,
       description,
-      websiteUrl
+      websiteUrl,
+      createdAt: new Date().toISOString(),
+      isMembership: false,
     }
 
-    db.blogs = [...db.blogs, newBlog]
+    const result = await blogsCollection.insertOne(newBlog)
+    const updateId =  await blogsCollection.updateOne({ _id: result.insertedId },{
+      $set: {
+        id: result.insertedId.toString()
+      }
+    })
 
-    return { createdBlog: newBlog }
+    return result.insertedId
   },
 
-  async findBy(searchableBlogId: string) {
-    return db.blogs.find(blog => blog.id === searchableBlogId)
+  async findBy(searchableBlogId: ObjectId): Promise<BlogType | null> {
+    return await blogsCollection.findOne({ _id: searchableBlogId }, {projection: {_id: 0}})
   },
 
-  async updateBlog(dataForUpdate: { name:string, description: string, websiteUrl: string} , searchableBlogId: string) {
+  async updateBlog(dataForUpdate: CreateBlogInput, searchableBlogId: ObjectId): Promise<boolean | number> {
     const { name, description, websiteUrl } = dataForUpdate
-    const blog = db.blogs.find(blog => blog.id === searchableBlogId)
-    if(!blog) {
+    const blog = await this.findBy(searchableBlogId)
+
+    if (!blog) {
       return false
     }
-    const blogDto = new BlogDto(name, description, websiteUrl)
-    Object.assign(blog, blogDto)
 
-    return true
+    const resultOfUpdatingBlog = await blogsCollection.updateOne({ _id: searchableBlogId },{
+      $set: {
+        name,
+        description,
+        websiteUrl
+      }
+    })
+
+    return resultOfUpdatingBlog.matchedCount;
   },
 
-  async delete(blogId: string) {
-    const blog = db.blogs.find(blog => blog.id === blogId)
-    if(!blog) {
+  async delete(blogId: ObjectId): Promise<boolean> {
+    const blog = await blogsCollection.findOne({ _id: blogId })
+    if (!blog) {
       return false
     }
-    db.blogs = db.blogs.filter(blog => blog.id !== blogId)
-    db.posts = db.posts.filter(post => post.blogId !== blogId)
 
-    return true
+    const deleteBlogResult = await blogsCollection.deleteOne({ _id: blogId })
+    if (deleteBlogResult.deletedCount === 0) {
+      return false
+    }
+
+    const deletePostsResult = await postsCollection.deleteMany({ blogId: blogId.toString() })
+    return deletePostsResult.acknowledged
   }
 }

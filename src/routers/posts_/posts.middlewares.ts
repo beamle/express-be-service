@@ -1,6 +1,10 @@
-import { body, param } from 'express-validator'
-import { postsRepository } from "./posts.repository";
+import { body } from 'express-validator'
 import { blogsRepository } from "../blogs/blogs.repository";
+import { ObjectId } from "mongodb";
+import { NextFunction, Request, Response } from "express";
+import { CustomError } from "./posts.service";
+import { type } from "os";
+import { BlogType } from "../../app/db";
 
 export const postTitleInputValidator = body('title').trim().isString()
     .isLength({min:1, max: 30})
@@ -16,15 +20,31 @@ export const postContentInputValidator = body('content').isString().trim()
 
 export const postBlogIdAsForeignKeyIdInputValidator = body('blogId')
   .trim()
-  .isLength({min: 1})
-  .withMessage("No blog id provided!")
+  .isLength({ min: 24, max: 24 })
+  .withMessage("Invalid blog ID length!")
+  .isHexadecimal()
+  .withMessage("Blog ID must be a valid hexadecimal value!")
   .custom(async (blogId) => {
-    const blog = await blogsRepository.findBy(blogId)
-    if (!blog) {
-      throw new Error('No blog with such id has been found!')
-    }
-    return true
-  })
+      const blog = await blogsRepository.findBy(new ObjectId(blogId))
+      if (!blog) {
+        throw new CustomError({ message: 'No blog with such id has been found!', field: 'blogId', status: 400 })
+      }
+    })
+
+export const middlewareObjectIdChecker = (req: Request, res: Response, next: NextFunction) => {
+  // if(!ObjectId.isValid(req.params.id)){
+  //   res.status(404).json({message: "Not found", field: "id"})
+  //   return
+  // }
+  next()
+} // : TODO VYTASHI V ODNELINYJ FAIL
+  // .custom(async (blogId) => {
+  //   const blog = await blogsRepository.findBy(new ObjectId(blogId))
+  //   if (!blog) {
+  //     throw new Error('No blog with such id has been found!')
+  //   }
+  //   return true
+  // })
 
 // export const postIdInputValidator = param('id')
 //   .optional()
@@ -38,8 +58,9 @@ export const postBlogIdAsForeignKeyIdInputValidator = body('blogId')
 
 
 export const postInputValidators = [
-  postBlogIdAsForeignKeyIdInputValidator,
+  middlewareObjectIdChecker,
   postTitleInputValidator,
   postShortDescriptionInputValidator,
+  postBlogIdAsForeignKeyIdInputValidator,
   postContentInputValidator,
 ]

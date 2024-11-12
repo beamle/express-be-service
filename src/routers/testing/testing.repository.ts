@@ -1,9 +1,9 @@
-import { db } from "../../app/db";
+import { blogsCollection, postsCollection } from "../../app/db";
 
 class TestingRepository {
   async clearAllData() {
-    db.blogs = []
-    db.posts = []
+    await postsCollection.deleteMany({})
+    await blogsCollection.deleteMany({})
   }
 }
 

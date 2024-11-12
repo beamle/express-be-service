@@ -10,55 +10,72 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRepository = void 0;
-// dat access layer
-// isolates how we work with database
 const db_1 = require("../../app/db");
-const blogs_dto_1 = require("./blogs.dto");
 exports.blogsRepository = {
-    getBlogs() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return db_1.db.blogs;
+    getBlogs(_a, filter_1) {
+        return __awaiter(this, arguments, void 0, function* ({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }, filter) {
+            const blogs = yield db_1.blogsCollection
+                .find(filter ? filter : {}, { projection: { _id: 0 } })
+                .skip((pageNumber - 1) * pageSize)
+                .limit(pageSize)
+                .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
+                .toArray();
+            return blogs;
         });
     },
     create(input) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, description, websiteUrl } = input;
-            const newBlog = {
-                id: String(db_1.db.blogs.length + 1),
+            let newBlog = {
                 name,
                 description,
-                websiteUrl
+                websiteUrl,
+                createdAt: new Date().toISOString(),
+                isMembership: false,
             };
-            db_1.db.blogs = [...db_1.db.blogs, newBlog];
-            return { createdBlog: newBlog };
+            const result = yield db_1.blogsCollection.insertOne(newBlog);
+            const updateId = yield db_1.blogsCollection.updateOne({ _id: result.insertedId }, {
+                $set: {
+                    id: result.insertedId.toString()
+                }
+            });
+            return result.insertedId;
         });
     },
     findBy(searchableBlogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return db_1.db.blogs.find(blog => blog.id === searchableBlogId);
+            return yield db_1.blogsCollection.findOne({ _id: searchableBlogId }, { projection: { _id: 0 } });
         });
     },
     updateBlog(dataForUpdate, searchableBlogId) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, description, websiteUrl } = dataForUpdate;
-            const blog = db_1.db.blogs.find(blog => blog.id === searchableBlogId);
+            const blog = yield this.findBy(searchableBlogId);
             if (!blog) {
                 return false;
             }
-            const blogDto = new blogs_dto_1.BlogDto(name, description, websiteUrl);
-            Object.assign(blog, blogDto);
-            return true;
+            const resultOfUpdatingBlog = yield db_1.blogsCollection.updateOne({ _id: searchableBlogId }, {
+                $set: {
+                    name,
+                    description,
+                    websiteUrl
+                }
+            });
+            return resultOfUpdatingBlog.matchedCount;
         });
     },
     delete(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = db_1.db.blogs.find(blog => blog.id === blogId);
+            const blog = yield db_1.blogsCollection.findOne({ _id: blogId });
             if (!blog) {
                 return false;
             }
-            db_1.db.blogs = db_1.db.blogs.filter(blog => blog.id !== blogId);
-            db_1.db.posts = db_1.db.posts.filter(post => post.blogId !== blogId);
-            return true;
+            const deleteBlogResult = yield db_1.blogsCollection.deleteOne({ _id: blogId });
+            if (deleteBlogResult.deletedCount === 0) {
+                return false;
+            }
+            const deletePostsResult = yield db_1.postsCollection.deleteMany({ blogId: blogId.toString() });
+            return deletePostsResult.acknowledged;
         });
     }
 };

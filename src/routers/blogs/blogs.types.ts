@@ -5,7 +5,7 @@ export type CreateBlogInput = {
   description: string;
   websiteUrl: string;
 };
-export type CreateBlogOutput = BlogType
+export type CreateBlogOutput = BlogType | boolean
 export type BlogError = {
   message: string;
   field: string;
