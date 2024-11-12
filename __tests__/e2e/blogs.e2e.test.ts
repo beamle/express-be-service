@@ -1,6 +1,6 @@
 import { dummyBlogs, req } from "../test-helpers";
 import { SETTINGS } from "../../src/app/settings";
-import { blogsCollection, BlogType, runDb } from "../../src/app/db";
+import { blogsCollection, runDb } from "../../src/app/db";
 import { ADMIN_AUTH } from "../../src/authorization/authorization.middleware";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
@@ -16,27 +16,32 @@ describe("test /blogs path", () => {
     await server.stop()
   })
   const codedAdminCredentials = Buffer.from(ADMIN_AUTH, 'utf8').toString("base64")
-  afterEach(async() => {
+  afterEach(async () => {
     await blogsCollection.drop()
   })
 
-  test("GET should return all blogs", async() => {
+  test("GET should return all blogs", async () => {
     await blogsCollection.insertMany(dummyBlogs)
-    const dummyBlogsWithoutId = dummyBlogs.map(({_id, ...rest}) => rest)
+    const dummyBlogsWithoutId = dummyBlogs.map(({ _id, ...rest }) => rest)
 
-    await req
+    const response = await req
       .get(SETTINGS.PATH.BLOGS)
       .expect(200)
-      .expect(dummyBlogsWithoutId)
+
+    expect(response.body.pagesCount).toBe(1);
+    expect(response.body.page).toBe(1);
+    expect(response.body.pageSize).toBe(10);
+    expect(response.body.totalCount).toBe(3);
+    expect(new Set(response.body.items)).toEqual(new Set(dummyBlogsWithoutId));
   })
 
-  test("GET should return blog by id", async() => {
+  test("GET should return blog by id", async () => {
     await blogsCollection.insertMany(dummyBlogs)
-    const firstBlog = await blogsCollection.findOne({id: dummyBlogs[0].id}, {projection: {_id: 0}})
+    const firstBlog = await blogsCollection.findOne({ id: dummyBlogs[0].id }, { projection: { _id: 0 } })
 
     expect(firstBlog).not.toBeNull();
 
-    if(firstBlog) {
+    if (firstBlog) {
       await req
         .get(SETTINGS.PATH.BLOGS + `/${dummyBlogs[0].id}`)
         .expect(200)
@@ -44,7 +49,7 @@ describe("test /blogs path", () => {
     }
   })
 
-  test( "POST should create new blog", async() => {
+  test("POST should create new blog", async () => {
     const inputForCreatingBlog = {
       name: "banan",
       description: "tasty",
@@ -66,7 +71,7 @@ describe("test /blogs path", () => {
 
   })
 
-  test( "POST should throw error", async() => {
+  test("POST should throw error", async () => {
     const inputForCreatingBlog = {
       name: "",
       description: "",
@@ -91,7 +96,7 @@ describe("test /blogs path", () => {
     expect(blogs).toHaveLength(0);
   })
 
-  test( "POST should throw only one websiteUrl error", async() => {
+  test("POST should throw only one websiteUrl error", async () => {
     const inputForCreatingBlog = {
       name: "saassa",
       description: "asassa",
@@ -121,7 +126,7 @@ describe("test /blogs path", () => {
 
   })
 
-  test("PUT should update existing blog",  async() => {
+  test("PUT should update existing blog", async () => {
     const inputForCreatingBlog = {
       name: "banan",
       description: "tasty",
@@ -154,7 +159,7 @@ describe("test /blogs path", () => {
     expect(updatedBlog.body.id).toBe(createdBlogInDb.body.id);
   })
 
-  test("DELETE should remove both blog and its posts", async() => {
+  test("DELETE should remove both blog and its posts", async () => {
     const inputForCreatingBlog = {
       name: "banan1",
       description: "tasty1",
@@ -191,7 +196,7 @@ describe("test /blogs path", () => {
     // expect(db.blogs).toHaveLength(0)
   })
 
-  test("DELETE should throw error because blog with such id does not exist", async() => {
+  test("DELETE should throw error because blog with such id does not exist", async () => {
 
     const deletedBlog = await req
       .delete(SETTINGS.PATH.BLOGS + `11433434`)

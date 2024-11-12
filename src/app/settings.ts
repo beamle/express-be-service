@@ -7,6 +7,7 @@ export const SETTINGS = {
   PATH: {
     BLOGS: '/blogs',
     POSTS: '/posts',
+    USERS: '/users',
     TESTING: '/testing',
   },
   DB_NAME: process.env.DB_NAME || "lesson-2-3"

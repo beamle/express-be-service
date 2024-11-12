@@ -10,18 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRepository = void 0;
-// dat access layer
-// isolates how we work with database
 const db_1 = require("../../app/db");
 exports.blogsRepository = {
-    getBlogs(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }) {
-            const filter = {};
-            if (searchNameTerm) {
-                filter.name = { $regex: searchNameTerm, $options: 'i' }; // ignore Cc
-            }
+    getBlogs(_a, filter_1) {
+        return __awaiter(this, arguments, void 0, function* ({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }, filter) {
             const blogs = yield db_1.blogsCollection
-                .find(filter, { projection: { _id: 0 } })
+                .find(filter ? filter : {}, { projection: { _id: 0 } })
                 .skip((pageNumber - 1) * pageSize)
                 .limit(pageSize)
                 .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })

@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomError = exports.PostErrors = void 0;
 const posts_repository_1 = require("../posts_/posts.repository");
 const mongodb_1 = require("mongodb");
-const blogs_repository_1 = require("../blogs/blogs.repository");
 exports.PostErrors = {
     NO_POSTS: { message: "Something went wrong, try again.", field: "", status: 404 },
     NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "blogId", status: 404 },
@@ -29,22 +28,21 @@ class CustomError extends Error {
 }
 exports.CustomError = CustomError;
 class PostsService {
-    getPosts(sortingData, blogId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (blogId) {
-                const blog = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(blogId));
-                if (!blog) {
-                    throw new CustomError(exports.PostErrors.NO_BLOG_WITH_SUCH_ID);
-                }
-                const blogPosts = yield posts_repository_1.postsRepository.getPosts(sortingData, blogId);
-                if (!blogPosts) {
-                    throw new CustomError({ message: "no error description", field: "", status: 400 });
-                }
-                return blogPosts;
-            }
-            return yield posts_repository_1.postsRepository.getPosts(sortingData);
-        });
-    }
+    // async getPosts(sortingData: PostsSortingData, blogId?: ObjectId): Promise<PostType[]> {
+    // if(blogId) {
+    //   const blog = await blogsRepository.findBy(blogId)
+    //
+    //   if (!blog) {
+    //     throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
+    //   }
+    //   const blogPosts = await postsRepository.getPosts(sortingData, blogId)
+    //   if (!blogPosts) {
+    //     throw new CustomError({ message: "no error description", field: "", status: 400 })
+    //   }
+    //   return blogPosts
+    // }
+    // return await postsRepository.getPosts(sortingData)
+    // }
     createPost(postCreatingInput) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdPostId = yield posts_repository_1.postsRepository.create(postCreatingInput);
@@ -71,15 +69,13 @@ class PostsService {
             return createdPost;
         });
     }
-    getPostById(searchablePostId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const post = yield posts_repository_1.postsRepository.findBy(searchablePostId);
-            if (!post) {
-                throw new CustomError(exports.PostErrors.NO_POST_WITH_SUCH_ID);
-            }
-            return post;
-        });
-    }
+    // async getPostById(searchablePostId: ObjectId): Promise<PostType> {
+    // const post = await postsRepository.findBy(searchablePostId)
+    // if (!post) {
+    //   throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID)
+    // }
+    // return post;
+    // }
     updatePost(dataForUpdate, postId) {
         return __awaiter(this, void 0, void 0, function* () {
             const updatedPost = yield posts_repository_1.postsRepository.updatePost(dataForUpdate, postId);

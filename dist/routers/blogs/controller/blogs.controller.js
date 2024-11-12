@@ -16,14 +16,9 @@ const blogs_controller_1 = __importDefault(require("./blogs.controller"));
 const mongodb_1 = require("mongodb");
 const blogs_service_1 = __importDefault(require("../blogs.service"));
 const posts_service_1 = require("../../posts_/posts.service");
-function generateSortingDataObject(req) {
-    let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1;
-    let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
-    let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt';
-    let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
-    let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : null;
-    return { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm };
-}
+const blogs_queryRepository_1 = __importDefault(require("../blogs.queryRepository"));
+const blogs_queryRepository_2 = __importDefault(require("../blogs.queryRepository"));
+const objectGenerators_1 = require("../../../helpers/objectGenerators");
 function handleError(res, error) {
     if (error.constructor.name === 'CustomError') {
         res.status(error.status).json({ message: error.message, field: error.field });
@@ -37,16 +32,15 @@ function handleError(res, error) {
 class BlogsController {
     getBlogs(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sortingData = generateSortingDataObject(req);
-            const blogs = yield blogs_service_1.default.getBlogs(sortingData);
-            res.status(200).json({
-                pagesCount: Math.ceil(blogs.totalCount / sortingData.pageSize),
-                page: sortingData.pageNumber,
-                pageSize: sortingData.pageSize,
-                totalCount: blogs.totalCount,
-                items: blogs.blogs
-            });
-            return;
+            const sortingData = (0, objectGenerators_1.generateSortingDataObject)(req);
+            try {
+                const blogs = yield blogs_queryRepository_1.default.getBlogs(sortingData);
+                res.status(200).json(blogs);
+                return;
+            }
+            catch (error) {
+                handleError(res, error);
+            }
         });
     }
     createBlog(req, res) {
@@ -65,10 +59,10 @@ class BlogsController {
         return __awaiter(this, void 0, void 0, function* () {
             const { id: searchableBlogId } = req.params;
             if (!searchableBlogId) {
-                return yield blogs_controller_1.default.getBlogs(req, res); // if undefined
+                return yield blogs_controller_1.default.getBlogs(req, res);
             }
             try {
-                const blog = yield blogs_service_1.default.getBlogById(new mongodb_1.ObjectId(searchableBlogId));
+                const blog = yield blogs_queryRepository_2.default.getBlogById(searchableBlogId);
                 res.status(200).json(blog);
                 return;
             }

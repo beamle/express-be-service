@@ -11,15 +11,9 @@ import blogsController from "./blogs.controller";
 import { ObjectId, SortDirection } from "mongodb";
 import blogsService from "../blogs.service";
 import { CustomError, PostErrors } from "../../posts_/posts.service";
-
-function generateSortingDataObject(req: Request) {
-  let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1
-  let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10
-  let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt'
-  let sortDirection: SortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc'
-  let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : null
-  return { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }
-}
+import blogsQueryRepository from "../blogs.queryRepository";
+import BlogsQueryRepository from "../blogs.queryRepository";
+import { generateSortingDataObject } from "../../../helpers/objectGenerators";
 
 function handleError(res: Response, error: any) {
   if (error.constructor.name === 'CustomError') {
@@ -33,16 +27,15 @@ function handleError(res: Response, error: any) {
 
 class BlogsController {
   async getBlogs(req: Request, res: Response) {
-    const sortingData = generateSortingDataObject(req)
-    const blogs = await blogsService.getBlogs(sortingData)
 
-    res.status(200).json({
-      pagesCount: Math.ceil(blogs.totalCount / sortingData.pageSize),
-      page: sortingData.pageNumber,
-      pageSize: sortingData.pageSize,
-      totalCount: blogs.totalCount,
-      items: blogs.blogs })
-    return
+    const sortingData = generateSortingDataObject(req)
+    try {
+      const blogs = await blogsQueryRepository.getBlogs(sortingData)
+      res.status(200).json(blogs)
+      return
+    } catch (error) {
+      handleError(res, error)
+    }
   }
 
   async createBlog(req: RequestWithBody<CreateBlogInput>, res: Response<CreateBlogOutput | BlogError>) {
@@ -58,11 +51,11 @@ class BlogsController {
   async getBlogById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response<BlogType | BlogType[] | BlogError>) {
     const { id: searchableBlogId } = req.params
     if (!searchableBlogId) {
-      return await blogsController.getBlogs(req, res) // if undefined
+      return await blogsController.getBlogs(req, res)
     }
 
     try {
-      const blog = await blogsService.getBlogById(new ObjectId(searchableBlogId))
+      const blog = await BlogsQueryRepository.getBlogById(searchableBlogId)
       res.status(200).json(blog)
       return
     } catch (error) {

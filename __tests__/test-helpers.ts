@@ -11,9 +11,9 @@ const dummyBlogID2 = new ObjectId()
 const dummyBlogID3 = new ObjectId()
 
 export const dummyBlogs = [
-  { _id: dummyBlogID1, id: dummyBlogID1.toString(), name: "blogdummy1", description: "desct1", websiteUrl: "https://someurl.com", isMembership: false, createdAt: new Date().toISOString(), },
-  {  _id: dummyBlogID2, id: dummyBlogID2.toString(), name: "blogdummy2", description: "desct2", websiteUrl: "https://someurl.com",  isMembership: false , createdAt: new Date().toISOString(),},
-  {  _id: dummyBlogID3, id: dummyBlogID3.toString(), name: "blogdummy3", description: "desct3", websiteUrl: "https://someurl.com",  isMembership: false, createdAt: new Date().toISOString(), }
+  { _id: dummyBlogID1, id: dummyBlogID1.toString(), name: "1", description: "desct1", websiteUrl: "https://someurl.com", isMembership: false, createdAt: new Date().toISOString(), },
+  {  _id: dummyBlogID2, id: dummyBlogID2.toString(), name: "2", description: "desct2", websiteUrl: "https://someurl.com",  isMembership: false , createdAt: new Date().toISOString(),},
+  {  _id: dummyBlogID3, id: dummyBlogID3.toString(), name: "3", description: "desct3", websiteUrl: "https://someurl.com",  isMembership: false, createdAt: new Date().toISOString(), }
 ]
 
 export const dummyPosts: PostType[] = [

@@ -23,6 +23,7 @@ exports.postsRepository = {
                 .limit(pageSize)
                 .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
                 .toArray();
+            console.log(posts);
             return posts;
         });
     },

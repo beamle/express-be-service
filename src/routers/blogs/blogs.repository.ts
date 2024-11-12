@@ -1,19 +1,11 @@
-// dat access layer
-// isolates how we work with database
 import { blogsCollection, BlogsSortingData, BlogType, postsCollection, PostsSortingData } from "../../app/db";
 import { CreateBlogInput } from "./blogs.types";
 import { ObjectId } from "mongodb";
 
 export const blogsRepository = {
-  async getBlogs({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }: BlogsSortingData) {
-
-    const filter: any = {}
-    if (searchNameTerm) {
-      filter.name = { $regex: searchNameTerm, $options: 'i' } // ignore Cc
-    }
-
+  async getBlogs({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }: BlogsSortingData, filter: any) {
     const blogs = await blogsCollection
-      .find(filter, { projection: { _id: 0 } })
+      .find(filter ? filter : {}, { projection: { _id: 0 } })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })

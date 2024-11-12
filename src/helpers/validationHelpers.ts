@@ -1,6 +1,7 @@
-import { NextFunction } from "express";
+import { NextFunction, Response } from "express";
 import { validationResult } from "express-validator";
 import { blogIdAsParamValidator } from "../routers/blogs/blogs.middlewares";
+import { PostErrors } from "../routers/posts_/posts.service";
 
 export const inputCheckErrorsFormatter = (req: any, res: any, next: NextFunction) => {
   const errors = validationResult(req).array({ onlyFirstError: true })
@@ -30,3 +31,14 @@ export const inputCheckErrorsFormatter = (req: any, res: any, next: NextFunction
   }
   next();
 };
+
+
+export function handleError(res: Response, error: any) {
+  if (error.constructor.name === 'CustomError') {
+    res.status(error.status).json({ message: error.message, field: error.field });
+    return
+  } else {
+    res.status(500).json(PostErrors.INTERNAL_SERVER_ERROR);
+    return
+  }
+}

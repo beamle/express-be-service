@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postsCollection = exports.blogsCollection = void 0;
+exports.usersCollection = exports.postsCollection = exports.blogsCollection = void 0;
 exports.runDb = runDb;
 const mongodb_1 = require("mongodb");
 const settings_1 = require("./settings");
@@ -31,6 +31,7 @@ function runDb(url) {
             console.log("Pinged your deployment. You successfully connected to MongoDB!");
             exports.postsCollection = db.collection(settings_1.SETTINGS.PATH.POSTS);
             exports.blogsCollection = db.collection(settings_1.SETTINGS.PATH.BLOGS);
+            exports.usersCollection = db.collection(settings_1.SETTINGS.PATH.USERS);
             console.log("Conntected to collections!");
         }
         catch (e) {
