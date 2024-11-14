@@ -3,11 +3,12 @@ import { PostsSortingData, PostType } from "../../../app/db";
 import { RequestWithRouteParams, RequestWithRouteParamsAndBody, RoutePathWithIdParam } from "../../RequestTypes";
 import { PostError, UpdatePostInput } from "../posts.types";
 import { ObjectId, SortDirection } from "mongodb";
-import postsService, { CustomError, PostErrors } from "../posts.service";
+import postsService, {  PostErrors } from "../posts.service";
 import blogsQueryRepository from "../posts.queryRepository";
 import postsQueryRepository from "../posts.queryRepository";
 import { handleError } from "../../../helpers/validationHelpers";
 import { blogsRepository } from "../../blogs/blogs.repository";
+import { CustomError } from "../../../helpers/CustomError";
 
 //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
 //https://github.com/goldbergyoni/nodebestpractices

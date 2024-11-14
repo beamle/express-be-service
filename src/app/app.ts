@@ -5,6 +5,7 @@ import { blogsRouter } from "../routers/blogs/blogs.router";
 import { postsRouter } from "../routers/posts_/posts.router";
 import { testingRouter } from "../routers/testing/testing.router";
 import { usersRouter } from "../routers/users/users.router";
+import { authRouter } from "../routers/auth/auth.router";
 
 export const app = express()
 app.options('*', cors()); // Enable preflight for all rou
@@ -19,4 +20,5 @@ app.get('/', (req, res) => {
 app.use(SETTINGS.PATH.BLOGS, blogsRouter)
 app.use(SETTINGS.PATH.POSTS, postsRouter)
 app.use(SETTINGS.PATH.USERS, usersRouter)
+app.use(SETTINGS.PATH.AUTH, authRouter)
 app.use(SETTINGS.PATH.TESTING, testingRouter )

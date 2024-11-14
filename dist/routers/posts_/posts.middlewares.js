@@ -13,7 +13,7 @@ exports.postInputValidators = exports.middlewareObjectIdChecker = exports.postBl
 const express_validator_1 = require("express-validator");
 const blogs_repository_1 = require("../blogs/blogs.repository");
 const mongodb_1 = require("mongodb");
-const posts_service_1 = require("./posts.service");
+const CustomError_1 = require("../../helpers/CustomError");
 exports.postTitleInputValidator = (0, express_validator_1.body)('title').trim().isString()
     .isLength({ min: 1, max: 30 })
     .withMessage("Title should exist and should be less or equal to 30 symbols");
@@ -32,7 +32,7 @@ exports.postBlogIdAsForeignKeyIdInputValidator = (0, express_validator_1.body)('
     .custom((blogId) => __awaiter(void 0, void 0, void 0, function* () {
     const blog = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(blogId));
     if (!blog) {
-        throw new posts_service_1.CustomError({ message: 'No blog with such id has been found!', field: 'blogId', status: 400 });
+        throw new CustomError_1.CustomError({ message: 'No blog with such id has been found!', field: 'blogId', status: 400 });
     }
 }));
 const middlewareObjectIdChecker = (req, res, next) => {

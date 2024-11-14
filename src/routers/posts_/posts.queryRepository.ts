@@ -1,9 +1,8 @@
-import { Request, Response } from "express";
-import { ObjectId, SortDirection } from "mongodb";
-import postsService, { CustomError, PostErrors } from "./posts.service";
+import { ObjectId } from "mongodb";
+import { PostErrors } from "./posts.service";
 import { postsCollection, PostsSortingData, PostType } from "../../app/db";
-import { blogsRepository } from "../blogs/blogs.repository";
 import { postsRepository } from "./posts.repository";
+import { CustomError } from "../../helpers/CustomError";
 
 class PostsQueryRepository {
 

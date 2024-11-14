@@ -1,9 +1,10 @@
 import { ObjectId } from "mongodb";
-import { BlogErrors, CustomError } from "./blogs.service";
+import { BlogErrors } from "./blogs.service";
 import { blogsCollection, BlogsModelView, BlogsSortingData, BlogType } from "../../app/db";
 import { blogsRepository } from "../blogs/blogs.repository";
 import { PostErrors } from "../posts_/posts.service";
 import { createFilter } from "../../helpers/objectGenerators";
+import { CustomError } from "../../helpers/CustomError";
 
 class BlogsQueryRepository {
 
@@ -11,7 +12,7 @@ class BlogsQueryRepository {
 
     const filter: any = createFilter(sortingData)
 
-    const blogsLength = await blogsCollection.countDocuments(filter)
+    const blogsLength = await blogsCollection.countDocuments(filter) // make aggregation?
     const blogs = await blogsRepository.getBlogs(sortingData, filter)
 
     if (!blogs) {

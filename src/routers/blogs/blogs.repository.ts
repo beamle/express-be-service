@@ -40,6 +40,7 @@ export const blogsRepository = {
 
   async updateBlog(dataForUpdate: CreateBlogInput, searchableBlogId: ObjectId): Promise<boolean | number> {
     const { name, description, websiteUrl } = dataForUpdate
+    // TODO: chtoby proshe bylo debazhitj to vse perenesti v Service
     const blog = await this.findBy(searchableBlogId)
 
     if (!blog) {

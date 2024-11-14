@@ -26,10 +26,27 @@ export type PostType = {
 
 export type UserType = {
   _id?: ObjectId
+  id?: any, // TODO: remove id
+  login: string,
+  email: string,
+  password: string,
+  // createdAt: string
+}
+
+// export type UserCreationInput = {
+//   _id?: ObjectId
+//   id?: any
+//   login: string,
+//   email: string,
+//   password: string,
+// }
+
+export type UserTypeViewModel = {
   id: string,
   login: string,
   email: string,
-  createdAt: string
+  password: string,
+  createdAt: Date
 }
 
 export type SortingDataBase = {
@@ -40,15 +57,18 @@ export type SortingDataBase = {
 }
 
 export type PostsSortingData = SortingDataBase
-export type BlogsSortingData = SortingDataBase & Partial<{ searchNameTerm: string | null }>
-export type UsersSortingData = SortingDataBase & Partial<{ searchLoginTerm: string | null }> & Partial<{ searchEmailTerm: string | null }>
+export type BlogsSortingData = SortingDataBase & Partial<{ searchNameTerm: string}>
+export type UsersSortingData = SortingDataBase & Partial<{ searchLoginTerm: string}> & Partial<{
+  searchEmailTerm: string
+}>
 
-export type BlogsModelView =  {
+export type BlogsModelView = {
   pagesCount: number,
   page: number,
   pageSize: number,
   totalCount: number,
-  items: BlogType[] }
+  items: BlogType[]
+}
 
 export let blogsCollection: Collection<BlogType>
 export let postsCollection: Collection<PostType>

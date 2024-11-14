@@ -3,6 +3,7 @@ import { CreatePostInput } from "./posts.types";
 import { ObjectId } from "mongodb";
 import { PostsSortingData, PostType } from "../../app/db";
 import { blogsRepository } from "../blogs/blogs.repository";
+import { CustomError } from "../../helpers/CustomError";
 
 export const PostErrors = {
   NO_POSTS: { message: "Something went wrong, try again.", field: "", status: 404 },
@@ -11,18 +12,6 @@ export const PostErrors = {
   NO_POST_WITH_SUCH_ID: { message: "Post with such id was not found!", field: "id", status: 404 },
   INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 }
 }
-
-export class CustomError extends Error {
-  status: number;
-  field: string;
-
-  constructor({ message, field, status }: { message: string, status: number, field: string }) {
-    super(message);
-    this.status = status;
-    this.field = field;
-  }
-}
-
 
 class PostsService {
   // async getPosts(sortingData: PostsSortingData, blogId?: ObjectId): Promise<PostType[]> {

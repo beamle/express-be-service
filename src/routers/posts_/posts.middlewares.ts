@@ -2,9 +2,7 @@ import { body } from 'express-validator'
 import { blogsRepository } from "../blogs/blogs.repository";
 import { ObjectId } from "mongodb";
 import { NextFunction, Request, Response } from "express";
-import { CustomError } from "./posts.service";
-import { type } from "os";
-import { BlogType } from "../../app/db";
+import { CustomError } from "../../helpers/CustomError";
 
 export const postTitleInputValidator = body('title').trim().isString()
     .isLength({min:1, max: 30})

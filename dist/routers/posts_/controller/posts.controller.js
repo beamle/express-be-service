@@ -41,6 +41,7 @@ const posts_queryRepository_1 = __importDefault(require("../posts.queryRepositor
 const posts_queryRepository_2 = __importDefault(require("../posts.queryRepository"));
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
 const blogs_repository_1 = require("../../blogs/blogs.repository");
+const CustomError_1 = require("../../../helpers/CustomError");
 //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
 //https://github.com/goldbergyoni/nodebestpractices
 class PostsController {
@@ -54,7 +55,7 @@ class PostsController {
             if (blogId) {
                 const blog = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(blogId)); // TODO: change to blogsQueryRepositry
                 if (!blog) {
-                    throw new posts_service_1.CustomError(posts_service_1.PostErrors.NO_BLOG_WITH_SUCH_ID);
+                    throw new CustomError_1.CustomError(posts_service_1.PostErrors.NO_BLOG_WITH_SUCH_ID);
                 }
             }
             try {

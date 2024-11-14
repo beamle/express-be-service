@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const users_queryRepository_1 = __importDefault(require("../users.queryRepository"));
 const objectGenerators_1 = require("../../../helpers/objectGenerators");
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
+const users_service_1 = __importDefault(require("../users.service"));
 class UsersController {
     getUsers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -22,9 +23,42 @@ class UsersController {
             try {
                 const users = yield users_queryRepository_1.default.getUsers(sortingData);
                 res.status(200).json(users);
+                return;
             }
             catch (e) {
-                (0, validationHelpers_1.handleError)(e, res);
+                (0, validationHelpers_1.handleError)(res, e);
+            }
+        });
+    }
+    createUser(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, password, login } = req.body;
+            try {
+                yield users_queryRepository_1.default.getUserBy({ email });
+                yield users_queryRepository_1.default.getUserBy({ login });
+                const createdUserId = yield users_service_1.default.createUser({ email, password, login });
+                const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
+                res.status(200).json(user);
+                return;
+            }
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
+            }
+        });
+    }
+    deleteUser(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.query;
+            try {
+                debugger;
+                yield users_queryRepository_1.default.getUserBy({ id });
+                yield users_service_1.default.deleteUser(id);
+                res.sendStatus(204);
+                debugger;
+                return;
+            }
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
             }
         });
     }

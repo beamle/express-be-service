@@ -50,6 +50,7 @@ exports.blogsRepository = {
     updateBlog(dataForUpdate, searchableBlogId) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, description, websiteUrl } = dataForUpdate;
+            // TODO: chtoby proshe bylo debazhitj to vse perenesti v Service
             const blog = yield this.findBy(searchableBlogId);
             if (!blog) {
                 return false;

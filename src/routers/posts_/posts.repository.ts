@@ -87,7 +87,7 @@ export const postsRepository = {
     return resultOfUpdatingPost.acknowledged
   },
 
-  async delete(postId: ObjectId) {
+  async delete(postId: ObjectId): Promise<boolean> {
     const post = await postsCollection.findOne({ _id: postId })
 
     if (!post) {

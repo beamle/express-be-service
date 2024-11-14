@@ -12,25 +12,28 @@ function generateSortingDataBase(req) {
 }
 function generateSortingDataObject(req) {
     const sortingDataBase = generateSortingDataBase(req);
-    let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : null;
+    let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : "";
     return Object.assign(Object.assign({}, sortingDataBase), { searchNameTerm });
 }
 function generateUsersSortingDataObject(req) {
     const sortingDataBase = generateSortingDataBase(req);
-    let searchLoginTerm = req.query.searchLoginTerm ? String(req.query.searchLoginTerm) : null;
-    let searchEmailTerm = req.query.searchEmailTerm ? String(req.query.searchEmailTerm) : null;
+    let searchLoginTerm = req.query.searchLoginTerm ? String(req.query.searchLoginTerm) : "";
+    let searchEmailTerm = req.query.searchEmailTerm ? String(req.query.searchEmailTerm) : "null";
     return Object.assign(Object.assign({}, sortingDataBase), { searchLoginTerm, searchEmailTerm });
 }
-function createFilter(sortingData) {
+function createFilter(filterData) {
     const filter = {};
-    if (sortingData.searchNameTerm) {
-        filter.name = { $regex: sortingData.searchNameTerm, $options: 'i' }; // ignore Cc
+    if (filterData.searchNameTerm) {
+        filter.name = { $regex: filterData.searchNameTerm, $options: 'i' }; // ignore Cc
     }
-    if (sortingData.searchEmailTerm) {
-        filter.email = { $regex: sortingData.searchEmailTerm, $options: 'i' };
+    if (filterData.searchEmailTerm) {
+        filter.email = { $regex: filterData.searchEmailTerm, $options: 'i' };
     }
-    if (sortingData.searchLoginTerm) {
-        filter.login = { $regex: sortingData.searchLoginTerm, $options: 'i' };
+    if (filterData.searchLoginTerm) {
+        filter.login = { $regex: filterData.searchLoginTerm, $options: 'i' };
+    }
+    if (filterData.id) {
+        filter._id = filterData.id;
     }
     return filter;
 }

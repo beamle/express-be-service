@@ -11,6 +11,7 @@ const blogs_router_1 = require("../routers/blogs/blogs.router");
 const posts_router_1 = require("../routers/posts_/posts.router");
 const testing_router_1 = require("../routers/testing/testing.router");
 const users_router_1 = require("../routers/users/users.router");
+const auth_router_1 = require("../routers/auth/auth.router");
 exports.app = (0, express_1.default)();
 exports.app.options('*', (0, cors_1.default)()); // Enable preflight for all rou
 exports.app.use((0, cors_1.default)());
@@ -21,4 +22,5 @@ exports.app.get('/', (req, res) => {
 exports.app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.USERS, users_router_1.usersRouter);
+exports.app.use(settings_1.SETTINGS.PATH.AUTH, auth_router_1.authRouter);
 exports.app.use(settings_1.SETTINGS.PATH.TESTING, testing_router_1.testingRouter);
