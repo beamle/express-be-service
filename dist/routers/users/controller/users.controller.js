@@ -38,7 +38,7 @@ class UsersController {
                 yield users_queryRepository_1.default.getUserBy({ login });
                 const createdUserId = yield users_service_1.default.createUser({ email, password, login });
                 const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
-                res.status(200).json(user);
+                res.status(201).json(user);
                 return;
             }
             catch (e) {
@@ -48,13 +48,11 @@ class UsersController {
     }
     deleteUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.query;
+            const { id } = req.params;
             try {
-                debugger;
                 yield users_queryRepository_1.default.getUserBy({ id });
                 yield users_service_1.default.deleteUser(id);
                 res.sendStatus(204);
-                debugger;
                 return;
             }
             catch (e) {

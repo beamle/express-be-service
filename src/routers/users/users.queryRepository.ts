@@ -26,18 +26,6 @@ class UsersQueryRepository {
     }
   }
 
-// TODO: get rid if UserTypeViewModel[]
-
-//   async getUserById(userId: ObjectId): Promise<UserTypeViewModel | UserTypeViewModel[]> {
-//     const user = await usersRepository.findUserById(userId)
-//
-//     if (!user) {
-//       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
-//     }
-//
-//     return this.mapUserOrUsersWithId(user)
-//   }
-
   async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | UserTypeViewModel[] | null> {
 
     if (id) {
@@ -69,13 +57,12 @@ class UsersQueryRepository {
   }
 
   mapUserOrUsersWithId(userOrUsers: UserType | UserType[]): UserTypeViewModel | UserTypeViewModel[] {
-    debugger
     if (Array.isArray(userOrUsers)) {
-      return userOrUsers.map(({ _id, ...restOfUser }) => ({ ...restOfUser, id: _id!.toString(), createdAt: new Date() }))
+      return userOrUsers.map(({ _id, password, ...restOfUser }) => ({ ...restOfUser, id: _id!.toString() } as UserTypeViewModel))
     }
 
-    const { _id, ...rest } = userOrUsers
-    return { ...rest, id: _id!.toString(), createdAt: new Date() } as UserTypeViewModel
+    const { _id, password, ...rest } = userOrUsers
+    return { ...rest, id: _id!.toString() } as UserTypeViewModel
   }
 }
 

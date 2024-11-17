@@ -18,12 +18,10 @@ class AuthController {
     authenticate(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                debugger;
                 const result = yield users_service_1.default.checkCredentials(req.body.loginOrEmail, req.body.password);
                 res.send(204);
             }
             catch (e) {
-                debugger;
                 (0, validationHelpers_1.handleError)(res, e);
             }
         });

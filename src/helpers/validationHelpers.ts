@@ -1,7 +1,5 @@
 import { NextFunction, Response } from "express";
 import { validationResult } from "express-validator";
-import { blogIdAsParamValidator } from "../routers/blogs/blogs.middlewares";
-import { PostErrors } from "../routers/posts_/posts.service";
 import { CustomError } from "./CustomError";
 
 export const inputCheckErrorsFormatter = (req: any, res: any, next: NextFunction) => {
@@ -35,7 +33,6 @@ export const inputCheckErrorsFormatter = (req: any, res: any, next: NextFunction
 
 
 export function handleError(res: Response, error: any) {
-  debugger
   if (error.name === 'CustomError') {
     res.status(error.status).json({ message: error.message, field: error.field });
     return

@@ -1,49 +1,24 @@
 import { Router } from "express";
 import usersController from "./controller/users.controller";
 import { authMiddleware } from "../../authorization/authorization.middleware";
+import { usersValidators } from "./users.middlewares";
+import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 
 export const usersRouter = Router({ mergeParams: true });
 
 usersRouter.get("/",
-  // authMiddleware,
   usersController.getUsers
 )
 
-// usersRouter.get("/:id",
-//   usersController.getPostById)
-//
 usersRouter.post("/",
-  // authMiddleware,
-  // ...postInputValidators,
-  // inputCheckErrorsFormatter,
+  authMiddleware,
+  ...usersValidators,
+  inputCheckErrorsFormatter,
   usersController.createUser
 )
 
-usersRouter.delete("/",
+usersRouter.delete("/:id",
   authMiddleware,
-  // ...postInputValidators,
-  // inputCheckErrorsFormatter,
+  inputCheckErrorsFormatter,
   usersController.deleteUser
 )
-
-// usersRouter.post("/:blogId",
-//   authMiddleware,
-//   ...postInputValidators,
-//   inputCheckErrorsFormatter,
-//   usersController.createPost
-// )
-// usersRouter.put("/:id",
-//   authMiddleware,
-//   // postIdInputValidator,
-//   ...postInputValidators,
-//   inputCheckErrorsFormatter,
-//   usersController.updatePost
-// )
-// usersRouter.delete("/:id",
-//   authMiddleware,
-//   middlewareObjectIdChecker,
-//   // postIdInputValidator,
-//   // postBlogIdAsForeignKeyIdInputValidator,
-//   inputCheckErrorsFormatter,
-//   usersController.deletePost
-// )

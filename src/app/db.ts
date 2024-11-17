@@ -30,7 +30,7 @@ export type UserType = {
   login: string,
   email: string,
   password: string,
-  // createdAt: string
+  createdAt: string
 }
 
 // export type UserCreationInput = {
@@ -45,7 +45,7 @@ export type UserTypeViewModel = {
   id: string,
   login: string,
   email: string,
-  password: string,
+  password?: string,
   createdAt: Date
 }
 

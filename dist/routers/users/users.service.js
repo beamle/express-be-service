@@ -24,7 +24,8 @@ class UsersService {
             const newUser = {
                 login: userData.login,
                 password: passwordHash,
-                email: userData.email
+                email: userData.email,
+                createdAt: new Date().toISOString()
             };
             const newUserId = yield users_repository_1.default.createUser(newUser);
             if (!newUserId) {

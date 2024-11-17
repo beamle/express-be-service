@@ -31,7 +31,6 @@ const inputCheckErrorsFormatter = (req, res, next) => {
 };
 exports.inputCheckErrorsFormatter = inputCheckErrorsFormatter;
 function handleError(res, error) {
-    debugger;
     if (error.name === 'CustomError') {
         res.status(error.status).json({ message: error.message, field: error.field });
         return;

@@ -14,16 +14,7 @@ import {  PostErrors } from "../../posts_/posts.service";
 import blogsQueryRepository from "../blogs.queryRepository";
 import BlogsQueryRepository from "../blogs.queryRepository";
 import { generateSortingDataObject } from "../../../helpers/objectGenerators";
-
-function handleError(res: Response, error: any) {
-  if (error.constructor.name === 'CustomError') {
-    res.status(error.status).json({ message: error.message, field: error.field });
-    return
-  } else {
-    res.status(500).json(PostErrors.INTERNAL_SERVER_ERROR);
-    return
-  }
-}
+import { handleError } from "../../../helpers/validationHelpers";
 
 class BlogsController {
   async getBlogs(req: Request, res: Response) {

@@ -24,7 +24,7 @@ class UsersController {
 
       const createdUserId = await usersService.createUser({ email, password, login })
       const user = await usersQueryRepository.getUserBy({ id: createdUserId.toString() })
-      res.status(200).json(user)
+      res.status(201).json(user)
       return
     } catch (e: any) {
       handleError(res, e)
@@ -32,13 +32,11 @@ class UsersController {
   }
 
   async deleteUser(req: Request, res: Response) {
-    const { id } = req.query
+    const { id } = req.params
     try {
-      debugger
       await usersQueryRepository.getUserBy({ id })
       await usersService.deleteUser(id as string)
       res.sendStatus(204)
-      debugger
       return
     } catch (e) {
       handleError(res, e)

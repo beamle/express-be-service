@@ -13,7 +13,8 @@ class UsersService {
     const newUser = {
       login: userData.login,
       password: passwordHash,
-      email: userData.email
+      email: userData.email,
+      createdAt: new Date().toISOString()
     }
 
     const newUserId = await usersRepository.createUser(newUser)
@@ -47,11 +48,11 @@ class UsersService {
     return true
   }
 
-  private async generateSalt(rounds) {
+  private async generateSalt(rounds: number) {
     return await bcrypt.genSalt(rounds);
   }
 
-  private async generateHash(password, rounds) {
+  private async generateHash(password: string, rounds: number) {
     const salt = await this.generateSalt(rounds)
     const hash = await bcrypt.hash(password, salt)
 

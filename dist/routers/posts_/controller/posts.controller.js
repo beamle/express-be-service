@@ -38,7 +38,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const posts_service_1 = __importStar(require("../posts.service"));
 const posts_queryRepository_1 = __importDefault(require("../posts.queryRepository"));
-const posts_queryRepository_2 = __importDefault(require("../posts.queryRepository"));
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
 const blogs_repository_1 = require("../../blogs/blogs.repository");
 const CustomError_1 = require("../../../helpers/CustomError");
@@ -52,14 +51,14 @@ class PostsController {
             let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
             let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt';
             let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
-            if (blogId) {
-                const blog = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(blogId)); // TODO: change to blogsQueryRepositry
-                if (!blog) {
-                    throw new CustomError_1.CustomError(posts_service_1.PostErrors.NO_BLOG_WITH_SUCH_ID);
-                }
-            }
             try {
-                const posts = yield posts_queryRepository_1.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, blogId);
+                if (blogId) {
+                    const blog = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(blogId)); // TODO: change to blogsQueryRepository
+                    if (!blog) {
+                        throw new CustomError_1.CustomError(posts_service_1.PostErrors.NO_BLOG_WITH_SUCH_ID);
+                    }
+                }
+                const posts = yield posts_queryRepository_1.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, blogId ? new mongodb_1.ObjectId(blogId) : undefined);
                 res.status(200).json(posts);
             }
             catch (error) {
@@ -96,7 +95,7 @@ class PostsController {
             let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
             if (!searchablePostId) {
                 try {
-                    const posts = yield posts_queryRepository_2.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, searchablePostId);
+                    const posts = yield posts_queryRepository_1.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, new mongodb_1.ObjectId(searchablePostId));
                     res.status(200).json(posts);
                 }
                 catch (error) {
@@ -104,7 +103,7 @@ class PostsController {
                 }
             }
             try {
-                const post = yield posts_queryRepository_2.default.getPostById(new mongodb_1.ObjectId(searchablePostId));
+                const post = yield posts_queryRepository_1.default.getPostById(new mongodb_1.ObjectId(searchablePostId));
                 res.status(200).json(post);
                 return;
             }

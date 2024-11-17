@@ -7,40 +7,9 @@ exports.usersRouter = void 0;
 const express_1 = require("express");
 const users_controller_1 = __importDefault(require("./controller/users.controller"));
 const authorization_middleware_1 = require("../../authorization/authorization.middleware");
+const users_middlewares_1 = require("./users.middlewares");
+const validationHelpers_1 = require("../../helpers/validationHelpers");
 exports.usersRouter = (0, express_1.Router)({ mergeParams: true });
-exports.usersRouter.get("/", 
-// authMiddleware,
-users_controller_1.default.getUsers);
-// usersRouter.get("/:id",
-//   usersController.getPostById)
-//
-exports.usersRouter.post("/", 
-// authMiddleware,
-// ...postInputValidators,
-// inputCheckErrorsFormatter,
-users_controller_1.default.createUser);
-exports.usersRouter.delete("/", authorization_middleware_1.authMiddleware, 
-// ...postInputValidators,
-// inputCheckErrorsFormatter,
-users_controller_1.default.deleteUser);
-// usersRouter.post("/:blogId",
-//   authMiddleware,
-//   ...postInputValidators,
-//   inputCheckErrorsFormatter,
-//   usersController.createPost
-// )
-// usersRouter.put("/:id",
-//   authMiddleware,
-//   // postIdInputValidator,
-//   ...postInputValidators,
-//   inputCheckErrorsFormatter,
-//   usersController.updatePost
-// )
-// usersRouter.delete("/:id",
-//   authMiddleware,
-//   middlewareObjectIdChecker,
-//   // postIdInputValidator,
-//   // postBlogIdAsForeignKeyIdInputValidator,
-//   inputCheckErrorsFormatter,
-//   usersController.deletePost
-// )
+exports.usersRouter.get("/", users_controller_1.default.getUsers);
+exports.usersRouter.post("/", authorization_middleware_1.authMiddleware, ...users_middlewares_1.usersValidators, validationHelpers_1.inputCheckErrorsFormatter, users_controller_1.default.createUser);
+exports.usersRouter.delete("/:id", authorization_middleware_1.authMiddleware, validationHelpers_1.inputCheckErrorsFormatter, users_controller_1.default.deleteUser);

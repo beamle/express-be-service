@@ -6,7 +6,7 @@ import { CustomError } from "../../helpers/CustomError";
 
 class PostsQueryRepository {
 
-  async getPosts(sortingData: PostsSortingData, blogId?: string) {
+  async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
     // if (blogId) {
     //   const blog = await blogsRepository.findBy(new ObjectId(blogId))
     //
@@ -16,7 +16,7 @@ class PostsQueryRepository {
     // }
 
     const posts = blogId
-      ? await postsRepository.getPosts(sortingData, new ObjectId(blogId))
+      ? await postsRepository.getPosts(sortingData, blogId)
       : await postsRepository.getPosts(sortingData)
 
     if (!posts) {

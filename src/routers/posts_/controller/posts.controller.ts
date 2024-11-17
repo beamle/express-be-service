@@ -4,7 +4,6 @@ import { RequestWithRouteParams, RequestWithRouteParamsAndBody, RoutePathWithIdP
 import { PostError, UpdatePostInput } from "../posts.types";
 import { ObjectId, SortDirection } from "mongodb";
 import postsService, {  PostErrors } from "../posts.service";
-import blogsQueryRepository from "../posts.queryRepository";
 import postsQueryRepository from "../posts.queryRepository";
 import { handleError } from "../../../helpers/validationHelpers";
 import { blogsRepository } from "../../blogs/blogs.repository";
@@ -20,18 +19,17 @@ class PostsController {
     let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10
     let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt'
     let sortDirection: SortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc'
-
-    if (blogId) {
-      const blog = await blogsRepository.findBy(new ObjectId(blogId)) // TODO: change to blogsQueryRepositry
-
-      if (!blog) {
-        throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
-      }
-    }
-
     try {
-      const posts = await blogsQueryRepository.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, blogId)
+      if (blogId) {
+        const blog = await blogsRepository.findBy(new ObjectId(blogId)) // TODO: change to blogsQueryRepository
+
+        if (!blog) {
+          throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
+        }
+      }
+      const posts = await postsQueryRepository.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, blogId ? new ObjectId(blogId) : undefined )
       res.status(200).json(posts)
+
     } catch (error) {
       handleError(res, error)
     }
@@ -63,7 +61,7 @@ class PostsController {
 
     if (!searchablePostId) {
       try {
-        const posts = await postsQueryRepository.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, searchablePostId)
+        const posts = await postsQueryRepository.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, new ObjectId(searchablePostId))
         res.status(200).json(posts)
       } catch (error) {
         handleError(res, error)

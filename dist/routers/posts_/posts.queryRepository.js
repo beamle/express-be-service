@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongodb_1 = require("mongodb");
 const posts_service_1 = require("./posts.service");
 const db_1 = require("../../app/db");
 const posts_repository_1 = require("./posts.repository");
@@ -25,7 +24,7 @@ class PostsQueryRepository {
             //   }
             // }
             const posts = blogId
-                ? yield posts_repository_1.postsRepository.getPosts(sortingData, new mongodb_1.ObjectId(blogId))
+                ? yield posts_repository_1.postsRepository.getPosts(sortingData, blogId)
                 : yield posts_repository_1.postsRepository.getPosts(sortingData);
             if (!posts) {
                 throw new CustomError_1.CustomError({ message: "no error description", field: "", status: 400 });

@@ -47,16 +47,6 @@ class UsersQueryRepository {
             };
         });
     }
-    // TODO: get rid if UserTypeViewModel[]
-    //   async getUserById(userId: ObjectId): Promise<UserTypeViewModel | UserTypeViewModel[]> {
-    //     const user = await usersRepository.findUserById(userId)
-    //
-    //     if (!user) {
-    //       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
-    //     }
-    //
-    //     return this.mapUserOrUsersWithId(user)
-    //   }
     getUserBy(_a) {
         return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
             if (id) {
@@ -84,15 +74,14 @@ class UsersQueryRepository {
         });
     }
     mapUserOrUsersWithId(userOrUsers) {
-        debugger;
         if (Array.isArray(userOrUsers)) {
             return userOrUsers.map((_a) => {
-                var { _id } = _a, restOfUser = __rest(_a, ["_id"]);
-                return (Object.assign(Object.assign({}, restOfUser), { id: _id.toString(), createdAt: new Date() }));
+                var { _id, password } = _a, restOfUser = __rest(_a, ["_id", "password"]);
+                return (Object.assign(Object.assign({}, restOfUser), { id: _id.toString() }));
             });
         }
-        const { _id } = userOrUsers, rest = __rest(userOrUsers, ["_id"]);
-        return Object.assign(Object.assign({}, rest), { id: _id.toString(), createdAt: new Date() });
+        const { _id, password } = userOrUsers, rest = __rest(userOrUsers, ["_id", "password"]);
+        return Object.assign(Object.assign({}, rest), { id: _id.toString() });
     }
 }
 exports.default = new UsersQueryRepository();
