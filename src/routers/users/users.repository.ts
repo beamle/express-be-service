@@ -11,9 +11,10 @@ type UserFilterType = Filter<UserFilter>;
 
 class UsersRepository {
   async getUsers(sortingData: UsersSortingData, filter: UsersSortingData) {
-
+    console.log(filter,"FILTER")
     const users = await usersCollection
-      .find(filter ? filter : {})
+      // .find(filter ? filter : {})
+      .find(filter)
       .skip((sortingData.pageNumber - 1) * sortingData.pageSize)
       .limit(sortingData.pageSize)
       .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })

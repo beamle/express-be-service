@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 
 
 class UsersService {
-  async createUser(userData: UserType): Promise<ObjectId> {
+  async createUser(userData: Omit<UserType, "createdAt">): Promise<ObjectId> {
     const passwordHash = await this.generateHash(userData.password, 10)
 
     const newUser = {

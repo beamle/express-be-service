@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import usersQueryRepository from "../users.queryRepository";
-import { generateSortingDataObject } from "../../../helpers/objectGenerators";
+import { generateSortingDataObject, generateUsersSortingDataObject } from "../../../helpers/objectGenerators";
 import { handleError } from "../../../helpers/validationHelpers";
 import usersService from "../users.service";
 
 class UsersController {
   async getUsers(req: Request, res: Response) {
-    const sortingData = generateSortingDataObject(req)
+    const sortingData = generateUsersSortingDataObject(req)
     try {
       const users = await usersQueryRepository.getUsers(sortingData)
       res.status(200).json(users)

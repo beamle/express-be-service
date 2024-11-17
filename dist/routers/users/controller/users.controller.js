@@ -19,7 +19,7 @@ const users_service_1 = __importDefault(require("../users.service"));
 class UsersController {
     getUsers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sortingData = (0, objectGenerators_1.generateSortingDataObject)(req);
+            const sortingData = (0, objectGenerators_1.generateUsersSortingDataObject)(req);
             try {
                 const users = yield users_queryRepository_1.default.getUsers(sortingData);
                 res.status(200).json(users);

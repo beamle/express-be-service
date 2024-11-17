@@ -17,20 +17,24 @@ function generateSortingDataObject(req) {
 }
 function generateUsersSortingDataObject(req) {
     const sortingDataBase = generateSortingDataBase(req);
-    let searchLoginTerm = req.query.searchLoginTerm ? String(req.query.searchLoginTerm) : "";
-    let searchEmailTerm = req.query.searchEmailTerm ? String(req.query.searchEmailTerm) : "null";
+    let searchLoginTerm = req.query.searchLoginTerm && String(req.query.searchLoginTerm);
+    let searchEmailTerm = req.query.searchEmailTerm && String(req.query.searchEmailTerm);
     return Object.assign(Object.assign({}, sortingDataBase), { searchLoginTerm, searchEmailTerm });
 }
 function createFilter(filterData) {
     const filter = {};
+    const orConditions = [];
     if (filterData.searchNameTerm) {
-        filter.name = { $regex: filterData.searchNameTerm, $options: 'i' }; // ignore Cc
+        orConditions.push({ name: { $regex: filterData.searchNameTerm, $options: 'i' } });
     }
     if (filterData.searchEmailTerm) {
-        filter.email = { $regex: filterData.searchEmailTerm, $options: 'i' };
+        orConditions.push({ email: { $regex: filterData.searchEmailTerm, $options: 'i' } });
     }
     if (filterData.searchLoginTerm) {
-        filter.login = { $regex: filterData.searchLoginTerm, $options: 'i' };
+        orConditions.push({ login: { $regex: filterData.searchLoginTerm, $options: 'i' } });
+    }
+    if (orConditions.length > 0) {
+        filter.$or = orConditions;
     }
     if (filterData.id) {
         filter._id = filterData.id;
