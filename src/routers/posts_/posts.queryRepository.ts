@@ -7,14 +7,6 @@ import { CustomError } from "../../helpers/CustomError";
 class PostsQueryRepository {
 
   async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
-    // if (blogId) {
-    //   const blog = await blogsRepository.findBy(new ObjectId(blogId))
-    //
-    //   if (!blog) {
-    //     throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
-    //   }
-    // }
-
     const posts = blogId
       ? await postsRepository.getPosts(sortingData, blogId)
       : await postsRepository.getPosts(sortingData)

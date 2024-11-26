@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postInputValidators = exports.middlewareObjectIdChecker = exports.postBlogIdAsForeignKeyIdInputValidator = exports.postContentInputValidator = exports.postShortDescriptionInputValidator = exports.postTitleInputValidator = void 0;
+exports.postInputValidators = exports.middlewareObjectIdChecker = exports.postCommentContentValidator = exports.postBlogIdAsForeignKeyIdInputValidator = exports.postContentInputValidator = exports.postShortDescriptionInputValidator = exports.postTitleInputValidator = void 0;
 const express_validator_1 = require("express-validator");
 const blogs_repository_1 = require("../blogs/blogs.repository");
 const mongodb_1 = require("mongodb");
@@ -35,6 +35,9 @@ exports.postBlogIdAsForeignKeyIdInputValidator = (0, express_validator_1.body)('
         throw new CustomError_1.CustomError({ message: 'No blog with such id has been found!', field: 'blogId', status: 400 });
     }
 }));
+exports.postCommentContentValidator = (0, express_validator_1.body)("content")
+    .isLength({ min: 20, max: 300 })
+    .withMessage("Length of content must be at least 20 symbols up to 300 symbols");
 const middlewareObjectIdChecker = (req, res, next) => {
     // if(!ObjectId.isValid(req.params.id)){
     //   res.status(404).json({message: "Not found", field: "id"})
@@ -43,22 +46,6 @@ const middlewareObjectIdChecker = (req, res, next) => {
     next();
 }; // : TODO VYTASHI V ODNELINYJ FAIL
 exports.middlewareObjectIdChecker = middlewareObjectIdChecker;
-// .custom(async (blogId) => {
-//   const blog = await blogsRepository.findBy(new ObjectId(blogId))
-//   if (!blog) {
-//     throw new Error('No blog with such id has been found!')
-//   }
-//   return true
-// })
-// export const postIdInputValidator = param('id')
-//   .optional()
-//   .custom(async (id) => {
-//     const post = await postsRepository.findBy(id)
-//     if (!post && id !== undefined) {
-//       throw new Error('No post with such id has been found!')
-//     }
-//     return true
-//   })
 exports.postInputValidators = [
     exports.middlewareObjectIdChecker,
     exports.postTitleInputValidator,

@@ -88,5 +88,28 @@ exports.postsRepository = {
             const resultOfDeletingPost = yield db_1.postsCollection.deleteOne({ _id: postId });
             return resultOfDeletingPost.acknowledged;
         });
+    },
+    createComment(postId, commentatorInfo, content) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const newComment = {
+                postId: postId.toString(),
+                content: content,
+                commentatorInfo: commentatorInfo,
+                createdAt: new Date().toISOString()
+            };
+            const createdComment = yield db_1.commentsCollection.insertOne(newComment);
+            return createdComment.insertedId;
+        });
+    },
+    getCommentsBy(postId, sortingData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
+            return yield db_1.commentsCollection
+                .find({ postId: postId.toString() }, { projection: { _id: 0 } })
+                .skip((pageNumber - 1) * pageSize)
+                .limit(pageSize)
+                .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
+                .toArray();
+        });
     }
 };

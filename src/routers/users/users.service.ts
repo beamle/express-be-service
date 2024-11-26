@@ -45,7 +45,11 @@ class UsersService {
       throw new CustomError(UsersErrors.INCORRECT_PASSWORD)
     }
 
-    return true
+    return user
+  }
+
+  async getMe(token: string) {
+
   }
 
   private async generateSalt(rounds: number) {

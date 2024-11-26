@@ -13,7 +13,6 @@ const db_1 = require("../../app/db");
 class UsersRepository {
     getUsers(sortingData, filter) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(filter, "FILTER");
             const users = yield db_1.usersCollection
                 // .find(filter ? filter : {})
                 .find(filter)

@@ -33,6 +33,24 @@ export type UserType = {
   createdAt: string
 }
 
+export type CommentDBType = {
+  _id?: ObjectId
+  id?: any
+  postId: string
+  content: string
+  commentatorInfo: {
+    userId: string
+    userLogin: string
+  },
+  createdAt: string
+}
+
+export type MeViewModel = {
+  email: string
+  login: string
+  userId: string
+}
+
 // export type UserCreationInput = {
 //   _id?: ObjectId
 //   id?: any
@@ -49,18 +67,19 @@ export type UserTypeViewModel = {
   createdAt: Date
 }
 
-export type SortingDataBase = {
+export type SortingBase = {
   pageNumber: number
   pageSize: number
   sortBy: 'createdAt' | string
   sortDirection: 'asc' | 'desc'
 }
 
-export type PostsSortingData = SortingDataBase
-export type BlogsSortingData = SortingDataBase & Partial<{ searchNameTerm: string}>
-export type UsersSortingData = SortingDataBase & Partial<{ searchLoginTerm: string}> & Partial<{
+export type PostsSortingData = SortingBase
+export type BlogsSortingData = SortingBase & Partial<{ searchNameTerm: string}>
+export type UsersSortingData = SortingBase & Partial<{ searchLoginTerm: string}> & Partial<{
   searchEmailTerm: string
 }>
+export type CommentsSortingData = SortingBase
 
 export type BlogsModelView = {
   pagesCount: number,
@@ -73,6 +92,7 @@ export type BlogsModelView = {
 export let blogsCollection: Collection<BlogType>
 export let postsCollection: Collection<PostType>
 export let usersCollection: Collection<UserType>
+export let commentsCollection: Collection<CommentDBType>
 
 
 export async function runDb(url: string) {
@@ -94,6 +114,7 @@ export async function runDb(url: string) {
     postsCollection = db.collection<PostType>(SETTINGS.PATH.POSTS)
     blogsCollection = db.collection<BlogType>(SETTINGS.PATH.BLOGS)
     usersCollection = db.collection<UserType>(SETTINGS.PATH.USERS)
+    commentsCollection = db.collection<CommentDBType>(SETTINGS.PATH.COMMENTS)
 
     console.log("Conntected to collections!")
   } catch (e) {

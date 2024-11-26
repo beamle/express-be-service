@@ -14,12 +14,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const users_service_1 = __importDefault(require("../../users/users.service"));
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
+const jwt_service_1 = __importDefault(require("../../../authorization/services/jwt-service"));
 class AuthController {
-    authenticate(req, res) {
+    login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield users_service_1.default.checkCredentials(req.body.loginOrEmail, req.body.password);
-                res.send(204);
+                const user = yield users_service_1.default.checkCredentials(req.body.loginOrEmail, req.body.password);
+                if (user) {
+                    const token = yield jwt_service_1.default.createJWT(user);
+                    res.status(200).json({ accessToken: token });
+                    return;
+                }
+            }
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
+            }
+        });
+    }
+    me(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                res.status(200).json(req.context.user);
+                return;
             }
             catch (e) {
                 (0, validationHelpers_1.handleError)(res, e);

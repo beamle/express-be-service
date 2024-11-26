@@ -7,10 +7,18 @@ import { testingRouter } from "../routers/testing/testing.router";
 import { usersRouter } from "../routers/users/users.router";
 import { authRouter } from "../routers/auth/auth.router";
 
+import { Request, Response, NextFunction } from "express";
+
+export function addContext(req: Request, res: Response, next: NextFunction) {
+  req.context = { user: null };
+  next();
+}
+
 export const app = express()
 app.options('*', cors()); // Enable preflight for all rou
 app.use(cors())
 app.use(express.json()) // The request body will be available as a raw stream of data in req.body, but req.body will be undefined unless you manually parse it.
+app.use(addContext)
 
 app.get('/', (req, res) => {
   res.status(200).json({version: '1.0'})

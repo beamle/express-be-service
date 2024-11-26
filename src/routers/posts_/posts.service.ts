@@ -1,5 +1,5 @@
 import { postsRepository } from "../posts_/posts.repository";
-import { CreatePostInput } from "./posts.types";
+import { CommentatorInfo, CreatePostInput } from "./posts.types";
 import { ObjectId } from "mongodb";
 import { PostsSortingData, PostType } from "../../app/db";
 import { blogsRepository } from "../blogs/blogs.repository";
@@ -10,7 +10,8 @@ export const PostErrors = {
   NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "blogId", status: 404 },
   POST_NOT_CREATED: { message: "Post was not created!", field: "", status: 404 },
   NO_POST_WITH_SUCH_ID: { message: "Post with such id was not found!", field: "id", status: 404 },
-  INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 }
+  INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 },
+  DID_NOT_CREATE_COMMENT: { message: "Didn't create comment", field: "", status: 400 }
 }
 
 class PostsService {
@@ -94,6 +95,26 @@ class PostsService {
     }
 
     return post
+  }
+
+  async createCommentForPost(postId: ObjectId, commentatorInfo: CommentatorInfo, content: string): Promise<ObjectId> {
+    const createdCommentId = await postsRepository.createComment(postId, commentatorInfo, content)
+
+    if(!createdCommentId) {
+      throw new CustomError(PostErrors.DID_NOT_CREATE_COMMENT)
+    }
+
+    return createdCommentId
+  }
+// TODO PROMISE ANY
+  async getCommentForPostBy(postId: ObjectId): Promise<any> {
+    const createdCommentId = await postsRepository.getCommentForPostBy(postId)
+
+    if(!createdCommentId) {
+      throw new CustomError(PostErrors.DID_NOT_CREATE_COMMENT)
+    }
+
+    return createdCommentId
   }
 }
 

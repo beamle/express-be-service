@@ -16,13 +16,6 @@ const CustomError_1 = require("../../helpers/CustomError");
 class PostsQueryRepository {
     getPosts(sortingData, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            // if (blogId) {
-            //   const blog = await blogsRepository.findBy(new ObjectId(blogId))
-            //
-            //   if (!blog) {
-            //     throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
-            //   }
-            // }
             const posts = blogId
                 ? yield posts_repository_1.postsRepository.getPosts(sortingData, blogId)
                 : yield posts_repository_1.postsRepository.getPosts(sortingData);

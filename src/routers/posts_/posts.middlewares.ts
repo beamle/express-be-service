@@ -5,11 +5,11 @@ import { NextFunction, Request, Response } from "express";
 import { CustomError } from "../../helpers/CustomError";
 
 export const postTitleInputValidator = body('title').trim().isString()
-    .isLength({min:1, max: 30})
-    .withMessage("Title should exist and should be less or equal to 30 symbols")
+  .isLength({ min: 1, max: 30 })
+  .withMessage("Title should exist and should be less or equal to 30 symbols")
 
 export const postShortDescriptionInputValidator = body('shortDescription').trim().isString()
-  .isLength({min:1, max: 100})
+  .isLength({ min: 1, max: 100 })
   .withMessage("Short description should exist and should be less or equal to 100 symbols")
 
 export const postContentInputValidator = body('content').isString().trim()
@@ -23,11 +23,15 @@ export const postBlogIdAsForeignKeyIdInputValidator = body('blogId')
   .isHexadecimal()
   .withMessage("Blog ID must be a valid hexadecimal value!")
   .custom(async (blogId) => {
-      const blog = await blogsRepository.findBy(new ObjectId(blogId))
-      if (!blog) {
-        throw new CustomError({ message: 'No blog with such id has been found!', field: 'blogId', status: 400 })
-      }
-    })
+    const blog = await blogsRepository.findBy(new ObjectId(blogId))
+    if (!blog) {
+      throw new CustomError({ message: 'No blog with such id has been found!', field: 'blogId', status: 400 })
+    }
+  })
+
+export const postCommentContentValidator = body("content")
+  .isLength({ min: 20, max: 300 })
+  .withMessage("Length of content must be at least 20 symbols up to 300 symbols")
 
 export const middlewareObjectIdChecker = (req: Request, res: Response, next: NextFunction) => {
   // if(!ObjectId.isValid(req.params.id)){
@@ -36,23 +40,6 @@ export const middlewareObjectIdChecker = (req: Request, res: Response, next: Nex
   // }
   next()
 } // : TODO VYTASHI V ODNELINYJ FAIL
-  // .custom(async (blogId) => {
-  //   const blog = await blogsRepository.findBy(new ObjectId(blogId))
-  //   if (!blog) {
-  //     throw new Error('No blog with such id has been found!')
-  //   }
-  //   return true
-  // })
-
-// export const postIdInputValidator = param('id')
-//   .optional()
-//   .custom(async (id) => {
-//     const post = await postsRepository.findBy(id)
-//     if (!post && id !== undefined) {
-//       throw new Error('No post with such id has been found!')
-//     }
-//     return true
-//   })
 
 
 export const postInputValidators = [

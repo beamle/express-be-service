@@ -11,7 +11,7 @@ type UserFilterType = Filter<UserFilter>;
 
 class UsersRepository {
   async getUsers(sortingData: UsersSortingData, filter: UsersSortingData) {
-    console.log(filter,"FILTER")
+
     const users = await usersCollection
       // .find(filter ? filter : {})
       .find(filter)

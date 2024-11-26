@@ -1,7 +1,7 @@
 import { Router } from "express";
 import blogsController from "./controller/blogs.controller";
 import { blogIdAsParamValidator, blogInputValidators } from "./blogs.middlewares";
-import { authMiddleware } from "../../authorization/authorization.middleware";
+import { authMiddleware } from "../../authorization/middlewares/authorization.middleware";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 import {
   middlewareObjectIdChecker,
