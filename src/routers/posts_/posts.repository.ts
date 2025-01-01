@@ -114,7 +114,7 @@ export const postsRepository = {
 
   },
 
-  async getCommentsBy(postId: ObjectId, sortingData: CommentsSortingData): Promise<any> {
+  async getCommentsBy(postId: ObjectId, sortingData: CommentsSortingData = sortingBase): Promise<any> {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData
 
     return await commentsCollection
@@ -125,3 +125,5 @@ export const postsRepository = {
       .toArray()
   }
 }
+
+const sortingBase: CommentsSortingData = { pageNumber: 1, pageSize: 10, sortBy: 'createdAt', sortDirection: 'desc'}

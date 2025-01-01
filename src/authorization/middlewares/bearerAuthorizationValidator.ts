@@ -3,6 +3,7 @@ import jwtService from "../services/jwt-service";
 import authQueryRepository from "../../routers/auth/auth.queryRepository";
 
 export async function bearerAuthorizationValidator(req: Request, res: Response, next: NextFunction) {
+  debugger
   const auth = req.headers["authorization"]
 
   if (!auth) {

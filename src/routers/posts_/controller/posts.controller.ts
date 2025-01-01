@@ -115,9 +115,9 @@ class PostsController {
     const { postId } = req.params
     const { content } = req.body
     const { userId, login } = req.context.user
+    debugger
 
     try {
-      debugger
       const post = await postsQueryRepository.getPostById(new ObjectId(postId))
       const createdCommentId = await postsService.createCommentForPost(new ObjectId(post.id!), {
         userId,
@@ -125,7 +125,24 @@ class PostsController {
       }, content)
       const createdComment = await commentsQueryRepository.getLastCreatedCommentForPostBy(new ObjectId(createdCommentId))
 
-      res.status(200).json(createdComment)
+      res.status(201).json(createdComment)
+      return
+    } catch (e) {
+      handleError(res, e)
+    }
+  }
+
+  async getCommentsByPostId(req: Request, res: Response) {
+    const { postId } = req.params
+
+    try {
+      const post = await postsQueryRepository.getPostById(new ObjectId(postId))
+      let comment;
+      if(post) {
+        comment = await postsService.getCommentForPostBy(new ObjectId(postId))
+      }
+
+      res.status(200).json(comment)
       return
     } catch (e) {
       handleError(res, e)

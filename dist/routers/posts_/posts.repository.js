@@ -101,8 +101,8 @@ exports.postsRepository = {
             return createdComment.insertedId;
         });
     },
-    getCommentsBy(postId, sortingData) {
-        return __awaiter(this, void 0, void 0, function* () {
+    getCommentsBy(postId_1) {
+        return __awaiter(this, arguments, void 0, function* (postId, sortingData = sortingBase) {
             const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
             return yield db_1.commentsCollection
                 .find({ postId: postId.toString() }, { projection: { _id: 0 } })
@@ -113,3 +113,4 @@ exports.postsRepository = {
         });
     }
 };
+const sortingBase = { pageNumber: 1, pageSize: 10, sortBy: 'createdAt', sortDirection: 'desc' };
