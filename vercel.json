@@ -3,7 +3,7 @@
   "name": "express-to-vercel",
   "builds": [
     {
-      "src": "app.js",
+      "src": "/api/index.ts",
       "use": "@vercel/node"
     }
   ],
