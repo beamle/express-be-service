@@ -50,7 +50,11 @@ class UsersService {
             if (!isMatch) {
                 throw new CustomError_1.CustomError(Errors_1.UsersErrors.INCORRECT_PASSWORD);
             }
-            return true;
+            return user;
+        });
+    }
+    getMe(token) {
+        return __awaiter(this, void 0, void 0, function* () {
         });
     }
     generateSalt(rounds) {

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import usersController from "./controller/users.controller";
-import { authMiddleware } from "../../authorization/authorization.middleware";
+import { authMiddleware } from "../../authorization/middlewares/authorization.middleware";
 import { usersValidators } from "./users.middlewares";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 

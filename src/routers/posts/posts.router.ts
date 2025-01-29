@@ -5,8 +5,9 @@ import {
   postBlogIdAsForeignKeyIdInputValidator,
   postInputValidators
 } from "./posts.middlewares";
-import { authMiddleware } from "../../authorization/authorization.middleware";
+import { authMiddleware } from "../../authorization/middlewares/authorization.middleware";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
+import { bearerAuthorizationValidator } from "../../authorization/middlewares/bearerAuthorizationValidator";
 
 export const postsRouter = Router({ mergeParams: true });
 
@@ -40,4 +41,16 @@ postsRouter.delete("/:id",
   middlewareObjectIdChecker,
   inputCheckErrorsFormatter,
   postsController.deletePost
+)
+
+postsRouter.post("/:postId/comments",
+  bearerAuthorizationValidator,
+  inputCheckErrorsFormatter,
+  postsController.createCommentForPost
+)
+
+postsRouter.get("/:postId/comments",
+  bearerAuthorizationValidator,
+  inputCheckErrorsFormatter,
+  postsController.getCommentsByPostId
 )

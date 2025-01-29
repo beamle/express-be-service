@@ -10,7 +10,7 @@ import { BlogError, CreateBlogInput, CreateBlogOutput } from "../blogs.types";
 import blogsController from "./blogs.controller";
 import { ObjectId, SortDirection } from "mongodb";
 import blogsService from "../blogs.service";
-import {  PostErrors } from "../../posts_/posts.service";
+import {  PostErrors } from "../../posts/posts.service";
 import blogsQueryRepository from "../blogs.queryRepository";
 import BlogsQueryRepository from "../blogs.queryRepository";
 import { generateSortingDataObject } from "../../../helpers/objectGenerators";

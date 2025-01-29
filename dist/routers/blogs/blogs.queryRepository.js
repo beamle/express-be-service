@@ -13,7 +13,7 @@ const mongodb_1 = require("mongodb");
 const blogs_service_1 = require("./blogs.service");
 const db_1 = require("../../app/db");
 const blogs_repository_1 = require("../blogs/blogs.repository");
-const posts_service_1 = require("../posts_/posts.service");
+const posts_service_1 = require("../posts/posts.service");
 const objectGenerators_1 = require("../../helpers/objectGenerators");
 const CustomError_1 = require("../../helpers/CustomError");
 class BlogsQueryRepository {

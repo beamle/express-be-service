@@ -41,6 +41,7 @@ const posts_queryRepository_1 = __importDefault(require("../posts.queryRepositor
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
 const blogs_repository_1 = require("../../blogs/blogs.repository");
 const CustomError_1 = require("../../../helpers/CustomError");
+const comments_queryRepository_1 = __importDefault(require("../../comments/comments.queryRepository"));
 //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
 //https://github.com/goldbergyoni/nodebestpractices
 class PostsController {
@@ -58,7 +59,12 @@ class PostsController {
                         throw new CustomError_1.CustomError(posts_service_1.PostErrors.NO_BLOG_WITH_SUCH_ID);
                     }
                 }
-                const posts = yield posts_queryRepository_1.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, blogId ? new mongodb_1.ObjectId(blogId) : undefined);
+                const posts = yield posts_queryRepository_1.default.getPosts({
+                    pageNumber,
+                    pageSize,
+                    sortBy,
+                    sortDirection
+                }, blogId ? new mongodb_1.ObjectId(blogId) : undefined);
                 res.status(200).json(posts);
             }
             catch (error) {
@@ -85,7 +91,6 @@ class PostsController {
             }
         });
     }
-    // async getPostById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response<PostType | PostType[] | PostError>) {
     getPostById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id: searchablePostId } = req.params;
@@ -95,11 +100,16 @@ class PostsController {
             let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
             if (!searchablePostId) {
                 try {
-                    const posts = yield posts_queryRepository_1.default.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, new mongodb_1.ObjectId(searchablePostId));
+                    const posts = yield posts_queryRepository_1.default.getPosts({
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortDirection
+                    }, new mongodb_1.ObjectId(searchablePostId));
                     res.status(200).json(posts);
                 }
-                catch (error) {
-                    (0, validationHelpers_1.handleError)(res, error);
+                catch (e) {
+                    (0, validationHelpers_1.handleError)(res, e);
                 }
             }
             try {
@@ -107,8 +117,8 @@ class PostsController {
                 res.status(200).json(post);
                 return;
             }
-            catch (error) {
-                (0, validationHelpers_1.handleError)(res, error);
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
             }
         });
     }
@@ -119,8 +129,8 @@ class PostsController {
                 res.sendStatus(204);
                 return;
             }
-            catch (error) {
-                (0, validationHelpers_1.handleError)(res, error);
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
             }
         });
     }
@@ -131,8 +141,46 @@ class PostsController {
                 res.sendStatus(204);
                 return;
             }
-            catch (error) {
-                (0, validationHelpers_1.handleError)(res, error);
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
+            }
+        });
+    }
+    createCommentForPost(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { postId } = req.params;
+            const { content } = req.body;
+            const { userId, login } = req.context.user;
+            debugger;
+            try {
+                const post = yield posts_queryRepository_1.default.getPostById(new mongodb_1.ObjectId(postId));
+                const createdCommentId = yield posts_service_1.default.createCommentForPost(new mongodb_1.ObjectId(post.id), {
+                    userId,
+                    userLogin: login
+                }, content);
+                const createdComment = yield comments_queryRepository_1.default.getLastCreatedCommentForPostBy(new mongodb_1.ObjectId(createdCommentId));
+                res.status(201).json(createdComment);
+                return;
+            }
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
+            }
+        });
+    }
+    getCommentsByPostId(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { postId } = req.params;
+            try {
+                const post = yield posts_queryRepository_1.default.getPostById(new mongodb_1.ObjectId(postId));
+                let comment;
+                if (post) {
+                    comment = yield posts_service_1.default.getCommentForPostBy(new mongodb_1.ObjectId(postId));
+                }
+                res.status(200).json(comment);
+                return;
+            }
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
             }
         });
     }

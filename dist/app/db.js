@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.usersCollection = exports.postsCollection = exports.blogsCollection = void 0;
+exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = void 0;
 exports.runDb = runDb;
 const mongodb_1 = require("mongodb");
 const settings_1 = require("./settings");
@@ -32,6 +32,7 @@ function runDb(url) {
             exports.postsCollection = db.collection(settings_1.SETTINGS.PATH.POSTS);
             exports.blogsCollection = db.collection(settings_1.SETTINGS.PATH.BLOGS);
             exports.usersCollection = db.collection(settings_1.SETTINGS.PATH.USERS);
+            exports.commentsCollection = db.collection(settings_1.SETTINGS.PATH.COMMENTS);
             console.log("Conntected to collections!");
         }
         catch (e) {

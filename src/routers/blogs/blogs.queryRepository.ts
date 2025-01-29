@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { BlogErrors } from "./blogs.service";
 import { blogsCollection, BlogsModelView, BlogsSortingData, BlogType } from "../../app/db";
 import { blogsRepository } from "../blogs/blogs.repository";
-import { PostErrors } from "../posts_/posts.service";
+import { PostErrors } from "../posts/posts.service";
 import { createFilter } from "../../helpers/objectGenerators";
 import { CustomError } from "../../helpers/CustomError";
 

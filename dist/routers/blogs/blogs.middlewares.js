@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogInputValidators = exports.blogIdAsParamValidator = exports.blogWebsiteUrlInputValidator = exports.blogDescriptionInputValidator = exports.blogTitleInputValidator = void 0;
 const express_validator_1 = require("express-validator");
 const controllerValidation_1 = require("./controller/controllerValidation");
-const posts_middlewares_1 = require("../posts_/posts.middlewares");
+const posts_middlewares_1 = require("../posts/posts.middlewares");
 exports.blogTitleInputValidator = (0, express_validator_1.body)('name').trim().isString()
     .isLength({ min: 1, max: 15 })
     .withMessage("Name should exist and should be less or equal to 15 symbols");
