@@ -1,6 +1,6 @@
 import { body, param } from 'express-validator'
 import { urlRegex } from "./controller/controllerValidation";
-import { middlewareObjectIdChecker } from "../posts_/posts.middlewares";
+import { middlewareObjectIdChecker } from "../posts/posts.middlewares";
 
 export const blogTitleInputValidator = body('name').trim().isString()
     .isLength({min:1, max: 15})

@@ -1,4 +1,0 @@
-class CommentsControllers {
-  // async get
-
-}

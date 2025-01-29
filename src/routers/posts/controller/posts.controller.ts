@@ -115,7 +115,6 @@ class PostsController {
     const { postId } = req.params
     const { content } = req.body
     const { userId, login } = req.context.user
-    debugger
 
     try {
       const post = await postsQueryRepository.getPostById(new ObjectId(postId))
@@ -138,7 +137,7 @@ class PostsController {
     try {
       const post = await postsQueryRepository.getPostById(new ObjectId(postId))
       let comment;
-      if(post) {
+      if (post) {
         comment = await postsService.getCommentForPostBy(new ObjectId(postId))
       }
 

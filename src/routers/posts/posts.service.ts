@@ -1,4 +1,4 @@
-import { postsRepository } from "../posts_/posts.repository";
+import { postsRepository } from ".//posts.repository";
 import { CommentatorInfo, CreatePostInput } from "./posts.types";
 import { ObjectId } from "mongodb";
 import { PostsSortingData, PostType } from "../../app/db";

@@ -1,12 +1,18 @@
 import { Router } from "express";
-import { postCommentContentValidator } from "../posts_/posts.middlewares";
+import { postCommentContentValidator } from "../posts/posts.middlewares";
+import commentsController from "./comments.controller";
 
 export const commentsRouter = Router({ mergeParams: true });
 
-commentsRouter.get("/", commentsController.getPosts)
+// commentsRouter.get("/", commentsController.getPosts)
 
-commentsRouter.get("/:id", commentsController.getPostById,
-  postCommentContentValidator
+commentsRouter.get("/:id",
+  // postCommentContentValidator,
+  commentsController.getCommentById
+)
+
+commentsRouter.delete("/:id",
+  commentsController.deleteCommentById
 )
 
 // postsRouter.post("/",

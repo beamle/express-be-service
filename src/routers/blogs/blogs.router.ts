@@ -8,8 +8,8 @@ import {
   postContentInputValidator,
   postShortDescriptionInputValidator,
   postTitleInputValidator
-} from "../posts_/posts.middlewares";
-import postsController from "../posts_/controller/posts.controller";
+} from "../posts/posts.middlewares";
+import postsController from "../posts/controller/posts.controller";
 
 export const blogsRouter = Router({ mergeParams: true });
 

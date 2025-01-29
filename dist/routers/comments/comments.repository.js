@@ -8,25 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommentsErrors = void 0;
-const CustomError_1 = require("../../helpers/CustomError");
-const comments_repository_1 = __importDefault(require("./comments.repository"));
-exports.CommentsErrors = {
-    NO_COMMENTS_FOUND: { message: "Comment with such Id was not found!", field: "id", status: 404 },
-};
-class CommentsService {
-    deleteComment(commentId) {
+const db_1 = require("../../app/db");
+class CommentsRepository {
+    deleteCommentById(commentId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield comments_repository_1.default.deleteCommentById(commentId);
-            if (!result) {
-                throw new CustomError_1.CustomError(exports.CommentsErrors.NO_COMMENTS_FOUND);
+            const comment = yield db_1.commentsCollection.findOne({ _id: commentId });
+            if (!comment) {
+                return false;
             }
-            return result;
+            const resultOfDeletingComment = yield db_1.commentsCollection.deleteOne({ _id: commentId });
+            return resultOfDeletingComment.acknowledged;
         });
     }
 }
-exports.default = new CommentsService();
+exports.default = new CommentsRepository();

@@ -21,14 +21,12 @@ const JwtServiceErrors = {
 class jwtService {
     createJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             const token = jsonwebtoken_1.default.sign({ userId: user._id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '10h' });
             return token;
         });
     }
     getUserIdByToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             try {
                 const result = jsonwebtoken_1.default.verify(token, settings_1.SETTINGS.JWT_SECRET);
                 return result.userId;

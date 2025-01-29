@@ -17,7 +17,6 @@ const jwt_service_1 = __importDefault(require("../services/jwt-service"));
 const auth_queryRepository_1 = __importDefault(require("../../routers/auth/auth.queryRepository"));
 function bearerAuthorizationValidator(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        debugger;
         const auth = req.headers["authorization"];
         if (!auth) {
             res.status(401).json({ message: "No authorization header" });

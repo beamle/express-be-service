@@ -1,7 +1,7 @@
 import { app } from '../src/app/app'
 import { agent } from 'supertest'
 import { PostType } from "../src/app/db";
-import { CreatePostInput } from "../src/routers/posts_/posts.types";
+import { CreatePostInput } from "../src/routers/posts/posts.types";
 import { ObjectId } from "mongodb";
 
 export const req = agent(app)

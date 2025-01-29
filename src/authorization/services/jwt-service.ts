@@ -9,13 +9,11 @@ const JwtServiceErrors = {
 
 class jwtService {
   async createJWT(user: UserType): Promise<string> {
-    debugger
     const token = jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
     return token
   }
 
   async getUserIdByToken(token: string): Promise<string | null> {
-    debugger
     try {
       const result = jwt.verify(token, SETTINGS.JWT_SECRET)
       return (result as JwtPayload).userId;

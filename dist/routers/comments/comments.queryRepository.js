@@ -35,6 +35,15 @@ class CommentsQueryRepository {
             return this.mapToCommentType(comments[0]);
         });
     }
+    getCommentBy(commentId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const comment = yield db_1.commentsCollection.findOne({ _id: commentId });
+            if (!comment) {
+                throw new CustomError_1.CustomError(comments_service_1.CommentsErrors.NO_COMMENTS_FOUND);
+            }
+            return this.mapToCommentType(comment);
+        });
+    }
     mapToCommentType(comment) {
         const { postId, _id } = comment, rest = __rest(comment, ["postId", "_id"]);
         return Object.assign(Object.assign({}, rest), { id: _id });

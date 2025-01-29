@@ -9,34 +9,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongodb_1 = require("mongodb");
-const blogs_service_1 = require("./blogs.service");
+const posts_service_1 = require("./posts.service");
 const db_1 = require("../../app/db");
-const blogs_repository_1 = require("../blogs/blogs.repository");
-const posts_service_1 = require("../posts/posts.service");
-const objectGenerators_1 = require("../../helpers/objectGenerators");
+const posts_repository_1 = require("./posts.repository");
 const CustomError_1 = require("../../helpers/CustomError");
-class BlogsQueryRepository {
-    getBlogs(sortingData, blogId) {
+class PostsQueryRepository {
+    getPosts(sortingData, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const filter = (0, objectGenerators_1.createFilter)(sortingData);
-            const blogsLength = yield db_1.blogsCollection.countDocuments(filter); // make aggregation?
-            const blogs = yield blogs_repository_1.blogsRepository.getBlogs(sortingData, filter);
-            if (!blogs) {
-                throw new CustomError_1.CustomError(blogs_service_1.BlogErrors.NO_BLOGS);
+            const posts = blogId
+                ? yield posts_repository_1.postsRepository.getPosts(sortingData, blogId)
+                : yield posts_repository_1.postsRepository.getPosts(sortingData);
+            if (!posts) {
+                throw new CustomError_1.CustomError({ message: "no error description", field: "", status: 400 });
             }
+            const postsLength = yield db_1.postsCollection.countDocuments(blogId ? { blogId: blogId.toString() } : {});
             return {
-                pagesCount: Math.ceil(blogsLength / sortingData.pageSize),
+                pagesCount: Math.ceil(postsLength / sortingData.pageSize),
                 page: sortingData.pageNumber,
                 pageSize: sortingData.pageSize,
-                totalCount: blogsLength,
-                items: blogs
+                totalCount: postsLength,
+                items: posts
             };
         });
     }
-    getBlogById(searchablePostId) {
+    getPostById(searchablePostId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const post = yield blogs_repository_1.blogsRepository.findBy(new mongodb_1.ObjectId(searchablePostId));
+            const post = yield posts_repository_1.postsRepository.findBy(searchablePostId);
             if (!post) {
                 throw new CustomError_1.CustomError(posts_service_1.PostErrors.NO_POST_WITH_SUCH_ID);
             }
@@ -44,4 +42,4 @@ class BlogsQueryRepository {
         });
     }
 }
-exports.default = new BlogsQueryRepository();
+exports.default = new PostsQueryRepository();

@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { commentsCollection } from "../../app/db";
+import { CommentDBType, commentsCollection } from "../../app/db";
 import { CommentType } from "./comments.types";
 import { CustomError } from "../../helpers/CustomError";
 import { CommentsErrors } from "./comments.service";
@@ -11,11 +11,23 @@ class CommentsQueryRepository {
       .find({ _id: commentId })
       .toArray()
 
-    if(!comments) {
+    if (!comments) {
       throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND)
     }
 
     return this.mapToCommentType(comments[0])
+  }
+
+  async getCommentBy(commentId: ObjectId): Promise<CommentType> {
+
+    const comment = await commentsCollection.findOne({ _id: commentId })
+
+    if (!comment) {
+      throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND)
+    }
+
+    return this.mapToCommentType(comment)
+
   }
 
   private mapToCommentType(comment: CommentType) {
