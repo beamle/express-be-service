@@ -1,38 +1,24 @@
 import { Router } from "express";
 import usersController from "./controller/users.controller";
+import { authMiddleware } from "../../authorization/middlewares/authorization.middleware";
+import { usersValidators } from "./users.middlewares";
+import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 
 export const usersRouter = Router({ mergeParams: true });
 
-usersRouter.get("/", usersController.getUsers)
+usersRouter.get("/",
+  usersController.getUsers
+)
 
-// usersRouter.get("/:id",
-//   usersController.getPostById)
-//
-// usersRouter.post("/",
-//   authMiddleware,
-//   ...postInputValidators,
-//   inputCheckErrorsFormatter,
-//   usersController.createPost
-// )
+usersRouter.post("/",
+  authMiddleware,
+  ...usersValidators,
+  inputCheckErrorsFormatter,
+  usersController.createUser
+)
 
-// usersRouter.post("/:blogId",
-//   authMiddleware,
-//   ...postInputValidators,
-//   inputCheckErrorsFormatter,
-//   usersController.createPost
-// )
-// usersRouter.put("/:id",
-//   authMiddleware,
-//   // postIdInputValidator,
-//   ...postInputValidators,
-//   inputCheckErrorsFormatter,
-//   usersController.updatePost
-// )
-// usersRouter.delete("/:id",
-//   authMiddleware,
-//   middlewareObjectIdChecker,
-//   // postIdInputValidator,
-//   // postBlogIdAsForeignKeyIdInputValidator,
-//   inputCheckErrorsFormatter,
-//   usersController.deletePost
-// )
+usersRouter.delete("/:id",
+  authMiddleware,
+  inputCheckErrorsFormatter,
+  usersController.deleteUser
+)

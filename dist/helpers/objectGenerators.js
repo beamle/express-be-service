@@ -12,25 +12,32 @@ function generateSortingDataBase(req) {
 }
 function generateSortingDataObject(req) {
     const sortingDataBase = generateSortingDataBase(req);
-    let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : null;
+    let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : "";
     return Object.assign(Object.assign({}, sortingDataBase), { searchNameTerm });
 }
 function generateUsersSortingDataObject(req) {
     const sortingDataBase = generateSortingDataBase(req);
-    let searchLoginTerm = req.query.searchLoginTerm ? String(req.query.searchLoginTerm) : null;
-    let searchEmailTerm = req.query.searchEmailTerm ? String(req.query.searchEmailTerm) : null;
+    let searchLoginTerm = req.query.searchLoginTerm && String(req.query.searchLoginTerm);
+    let searchEmailTerm = req.query.searchEmailTerm && String(req.query.searchEmailTerm);
     return Object.assign(Object.assign({}, sortingDataBase), { searchLoginTerm, searchEmailTerm });
 }
-function createFilter(sortingData) {
+function createFilter(filterData) {
     const filter = {};
-    if (sortingData.searchNameTerm) {
-        filter.name = { $regex: sortingData.searchNameTerm, $options: 'i' }; // ignore Cc
+    const orConditions = [];
+    if (filterData.searchNameTerm) {
+        orConditions.push({ name: { $regex: filterData.searchNameTerm, $options: 'i' } });
     }
-    if (sortingData.searchEmailTerm) {
-        filter.email = { $regex: sortingData.searchEmailTerm, $options: 'i' };
+    if (filterData.searchEmailTerm) {
+        orConditions.push({ email: { $regex: filterData.searchEmailTerm, $options: 'i' } });
     }
-    if (sortingData.searchLoginTerm) {
-        filter.login = { $regex: sortingData.searchLoginTerm, $options: 'i' };
+    if (filterData.searchLoginTerm) {
+        orConditions.push({ login: { $regex: filterData.searchLoginTerm, $options: 'i' } });
+    }
+    if (orConditions.length > 0) {
+        filter.$or = orConditions;
+    }
+    if (filterData.id) {
+        filter._id = filterData.id;
     }
     return filter;
 }

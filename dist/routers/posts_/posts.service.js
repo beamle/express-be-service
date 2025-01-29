@@ -9,24 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CustomError = exports.PostErrors = void 0;
+exports.PostErrors = void 0;
 const posts_repository_1 = require("../posts_/posts.repository");
 const mongodb_1 = require("mongodb");
+const CustomError_1 = require("../../helpers/CustomError");
 exports.PostErrors = {
     NO_POSTS: { message: "Something went wrong, try again.", field: "", status: 404 },
     NO_BLOG_WITH_SUCH_ID: { message: "No blog with such id has been found!", field: "blogId", status: 404 },
     POST_NOT_CREATED: { message: "Post was not created!", field: "", status: 404 },
     NO_POST_WITH_SUCH_ID: { message: "Post with such id was not found!", field: "id", status: 404 },
-    INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 }
+    INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 },
+    DID_NOT_CREATE_COMMENT: { message: "Didn't create comment", field: "", status: 400 }
 };
-class CustomError extends Error {
-    constructor({ message, field, status }) {
-        super(message);
-        this.status = status;
-        this.field = field;
-    }
-}
-exports.CustomError = CustomError;
 class PostsService {
     // async getPosts(sortingData: PostsSortingData, blogId?: ObjectId): Promise<PostType[]> {
     // if(blogId) {
@@ -47,11 +41,11 @@ class PostsService {
         return __awaiter(this, void 0, void 0, function* () {
             const createdPostId = yield posts_repository_1.postsRepository.create(postCreatingInput);
             if (!(createdPostId instanceof mongodb_1.ObjectId)) {
-                throw new CustomError(exports.PostErrors.NO_BLOG_WITH_SUCH_ID);
+                throw new CustomError_1.CustomError(exports.PostErrors.NO_BLOG_WITH_SUCH_ID);
             }
             const createdPost = yield posts_repository_1.postsRepository.findBy(new mongodb_1.ObjectId(createdPostId));
             if (!createdPost) {
-                throw new CustomError(exports.PostErrors.POST_NOT_CREATED);
+                throw new CustomError_1.CustomError(exports.PostErrors.POST_NOT_CREATED);
             }
             return createdPost;
         });
@@ -60,11 +54,11 @@ class PostsService {
         return __awaiter(this, void 0, void 0, function* () {
             const createdPostId = yield posts_repository_1.postsRepository.create(postCreatingInput, blogIdAsParam ? new mongodb_1.ObjectId(blogIdAsParam) : undefined);
             if (!(createdPostId instanceof mongodb_1.ObjectId)) {
-                throw new CustomError(exports.PostErrors.NO_BLOG_WITH_SUCH_ID);
+                throw new CustomError_1.CustomError(exports.PostErrors.NO_BLOG_WITH_SUCH_ID);
             }
             const createdPost = yield posts_repository_1.postsRepository.findBy(new mongodb_1.ObjectId(createdPostId));
             if (!createdPost) {
-                throw new CustomError(exports.PostErrors.POST_NOT_CREATED);
+                throw new CustomError_1.CustomError(exports.PostErrors.POST_NOT_CREATED);
             }
             return createdPost;
         });
@@ -80,7 +74,7 @@ class PostsService {
         return __awaiter(this, void 0, void 0, function* () {
             const updatedPost = yield posts_repository_1.postsRepository.updatePost(dataForUpdate, postId);
             if (!updatedPost) {
-                throw new CustomError(exports.PostErrors.NO_POST_WITH_SUCH_ID);
+                throw new CustomError_1.CustomError(exports.PostErrors.NO_POST_WITH_SUCH_ID);
             }
             return updatedPost;
         });
@@ -89,9 +83,28 @@ class PostsService {
         return __awaiter(this, void 0, void 0, function* () {
             const post = yield posts_repository_1.postsRepository.delete(postId);
             if (!post) {
-                throw new CustomError(exports.PostErrors.NO_POST_WITH_SUCH_ID);
+                throw new CustomError_1.CustomError(exports.PostErrors.NO_POST_WITH_SUCH_ID);
             }
             return post;
+        });
+    }
+    createCommentForPost(postId, commentatorInfo, content) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const createdCommentId = yield posts_repository_1.postsRepository.createComment(postId, commentatorInfo, content);
+            if (!createdCommentId) {
+                throw new CustomError_1.CustomError(exports.PostErrors.DID_NOT_CREATE_COMMENT);
+            }
+            return createdCommentId;
+        });
+    }
+    // TODO PROMISE ANY
+    getCommentForPostBy(postId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const createdCommentId = yield posts_repository_1.postsRepository.getCommentsBy(postId);
+            if (!createdCommentId) {
+                throw new CustomError_1.CustomError(exports.PostErrors.DID_NOT_CREATE_COMMENT);
+            }
+            return createdCommentId;
         });
     }
 }

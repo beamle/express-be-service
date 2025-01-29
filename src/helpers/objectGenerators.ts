@@ -1,8 +1,15 @@
 import { Request } from "express";
 import { SortDirection } from "mongodb";
-import { SortingDataBase, UsersSortingData } from "../app/db";
+import { BlogsSortingData, PostsSortingData, SortingDataBase, UsersSortingData } from "../app/db";
 
-function generateSortingDataBase(req): SortingDataBase {
+type FilterData = Partial<{
+  searchNameTerm: string,
+  searchEmailTerm: string,
+  searchLoginTerm: string
+  id: string
+}>
+
+function generateSortingDataBase(req: Request): SortingDataBase {
   let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1
   let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10
   let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt'
@@ -11,33 +18,43 @@ function generateSortingDataBase(req): SortingDataBase {
   return { pageNumber, pageSize, sortBy, sortDirection }
 }
 
-export function generateSortingDataObject(req: Request): SortingDataBase & Partial<{ searchNameTerm: string | null }>  {
+export function generateSortingDataObject(req: Request): SortingDataBase & Partial<{ searchNameTerm: string }> {
   const sortingDataBase = generateSortingDataBase(req)
-  let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : null
+  let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : ""
 
   return { ...sortingDataBase, searchNameTerm }
 }
 
 export function generateUsersSortingDataObject(req: Request): UsersSortingData {
   const sortingDataBase = generateSortingDataBase(req)
-  let searchLoginTerm = req.query.searchLoginTerm ? String(req.query.searchLoginTerm) : null
-  let searchEmailTerm = req.query.searchEmailTerm ? String(req.query.searchEmailTerm) : null
+  let searchLoginTerm = req.query.searchLoginTerm && String(req.query.searchLoginTerm)
+  let searchEmailTerm = req.query.searchEmailTerm && String(req.query.searchEmailTerm)
 
   return { ...sortingDataBase, searchLoginTerm, searchEmailTerm }
 }
 
-export function createFilter(sortingData) {
+
+
+export function createFilter(filterData: FilterData) {
   const filter: any = {};
+  const orConditions: any[] = [];
 
-  if (sortingData.searchNameTerm) {
-    filter.name = { $regex: sortingData.searchNameTerm, $options: 'i' } // ignore Cc
+  if (filterData.searchNameTerm) {
+    orConditions.push({ name: { $regex: filterData.searchNameTerm, $options: 'i' } });
+  }
+  if (filterData.searchEmailTerm) {
+    orConditions.push({ email: { $regex: filterData.searchEmailTerm, $options: 'i' } });
+  }
+  if (filterData.searchLoginTerm) {
+    orConditions.push({ login: { $regex: filterData.searchLoginTerm, $options: 'i' } });
   }
 
-  if (sortingData.searchEmailTerm) {
-    filter.email = { $regex: sortingData.searchEmailTerm, $options: 'i' };
+  if (orConditions.length > 0) {
+    filter.$or = orConditions;
   }
-  if (sortingData.searchLoginTerm) {
-    filter.login = { $regex: sortingData.searchLoginTerm, $options: 'i' };
+
+  if (filterData.id) {
+    filter._id = filterData.id;
   }
 
   return filter;

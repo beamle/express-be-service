@@ -15,6 +15,7 @@ class TestingRepository {
         return __awaiter(this, void 0, void 0, function* () {
             yield db_1.postsCollection.deleteMany({});
             yield db_1.blogsCollection.deleteMany({});
+            yield db_1.usersCollection.deleteMany({});
         });
     }
 }

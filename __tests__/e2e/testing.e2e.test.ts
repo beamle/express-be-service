@@ -1,4 +1,4 @@
-import { ADMIN_AUTH } from "../../src/authorization/authorization.middleware";
+import { ADMIN_AUTH } from "../../src/authorization/middlewares/authorization.middleware";
 import { req } from "../test-helpers";
 import { SETTINGS } from "../../src/app/settings";
 import { db } from "../../src/app/db";

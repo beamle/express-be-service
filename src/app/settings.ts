@@ -8,7 +8,11 @@ export const SETTINGS = {
     BLOGS: '/blogs',
     POSTS: '/posts',
     USERS: '/users',
+    AUTH: '/auth',
+    COMMENTS: '/comments',
     TESTING: '/testing',
   },
-  DB_NAME: process.env.DB_NAME || "lesson-2-3"
+  DB_NAME: process.env.DB_NAME || "lesson-2-3",
+  JWT_SECRET: process.env.JWT_SECRET || "!23"
+    // require('crypto').randomBytes(64).toString('hex') // dynamic import is asyncrounoys, dynamic require is syncrounous
 }

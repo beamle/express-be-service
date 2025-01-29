@@ -7,10 +7,10 @@ exports.blogsRouter = void 0;
 const express_1 = require("express");
 const blogs_controller_1 = __importDefault(require("./controller/blogs.controller"));
 const blogs_middlewares_1 = require("./blogs.middlewares");
-const authorization_middleware_1 = require("../../authorization/authorization.middleware");
+const authorization_middleware_1 = require("../../authorization/middlewares/authorization.middleware");
 const validationHelpers_1 = require("../../helpers/validationHelpers");
-const posts_middlewares_1 = require("../posts_/posts.middlewares");
-const posts_controller_1 = __importDefault(require("../posts_/controller/posts.controller"));
+const posts_middlewares_1 = require("../posts/posts.middlewares");
+const posts_controller_1 = __importDefault(require("../posts/controller/posts.controller"));
 exports.blogsRouter = (0, express_1.Router)({ mergeParams: true });
 exports.blogsRouter.get("/", blogs_controller_1.default.getBlogs);
 exports.blogsRouter.get("/test-cord", (req, res) => {

@@ -1,23 +1,14 @@
-import { Request, Response } from "express";
-import { ObjectId, SortDirection } from "mongodb";
-import postsService, { CustomError, PostErrors } from "./posts.service";
+import { ObjectId } from "mongodb";
+import { PostErrors } from "./posts.service";
 import { postsCollection, PostsSortingData, PostType } from "../../app/db";
-import { blogsRepository } from "../blogs/blogs.repository";
 import { postsRepository } from "./posts.repository";
+import { CustomError } from "../../helpers/CustomError";
 
 class PostsQueryRepository {
 
-  async getPosts(sortingData: PostsSortingData, blogId?: string) {
-    // if (blogId) {
-    //   const blog = await blogsRepository.findBy(new ObjectId(blogId))
-    //
-    //   if (!blog) {
-    //     throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
-    //   }
-    // }
-
+  async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
     const posts = blogId
-      ? await postsRepository.getPosts(sortingData, new ObjectId(blogId))
+      ? await postsRepository.getPosts(sortingData, blogId)
       : await postsRepository.getPosts(sortingData)
 
     if (!posts) {

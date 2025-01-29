@@ -15,20 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const blogs_controller_1 = __importDefault(require("./blogs.controller"));
 const mongodb_1 = require("mongodb");
 const blogs_service_1 = __importDefault(require("../blogs.service"));
-const posts_service_1 = require("../../posts_/posts.service");
 const blogs_queryRepository_1 = __importDefault(require("../blogs.queryRepository"));
 const blogs_queryRepository_2 = __importDefault(require("../blogs.queryRepository"));
 const objectGenerators_1 = require("../../../helpers/objectGenerators");
-function handleError(res, error) {
-    if (error.constructor.name === 'CustomError') {
-        res.status(error.status).json({ message: error.message, field: error.field });
-        return;
-    }
-    else {
-        res.status(500).json(posts_service_1.PostErrors.INTERNAL_SERVER_ERROR);
-        return;
-    }
-}
+const validationHelpers_1 = require("../../../helpers/validationHelpers");
 class BlogsController {
     getBlogs(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -39,7 +29,7 @@ class BlogsController {
                 return;
             }
             catch (error) {
-                handleError(res, error);
+                (0, validationHelpers_1.handleError)(res, error);
             }
         });
     }
@@ -51,7 +41,7 @@ class BlogsController {
                 return;
             }
             catch (error) {
-                handleError(res, error);
+                (0, validationHelpers_1.handleError)(res, error);
             }
         });
     }
@@ -67,7 +57,7 @@ class BlogsController {
                 return;
             }
             catch (error) {
-                handleError(res, error);
+                (0, validationHelpers_1.handleError)(res, error);
             }
         });
     }
@@ -79,7 +69,7 @@ class BlogsController {
                 return;
             }
             catch (error) {
-                handleError(res, error);
+                (0, validationHelpers_1.handleError)(res, error);
             }
         });
     }
@@ -90,7 +80,7 @@ class BlogsController {
                 res.sendStatus(204);
             }
             catch (error) {
-                handleError(res, error);
+                (0, validationHelpers_1.handleError)(res, error);
             }
         });
     }

@@ -1,7 +1,7 @@
 import { dummyBlogs, req } from "../test-helpers";
 import { SETTINGS } from "../../src/app/settings";
 import { blogsCollection, runDb } from "../../src/app/db";
-import { ADMIN_AUTH } from "../../src/authorization/authorization.middleware";
+import { ADMIN_AUTH } from "../../src/authorization/middlewares/authorization.middleware";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
 let server: MongoMemoryServer;

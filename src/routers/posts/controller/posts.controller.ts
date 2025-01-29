@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
-import { PostsSortingData, PostType } from "../../../app/db";
+import { PostType } from "../../../app/db";
 import { RequestWithRouteParams, RequestWithRouteParamsAndBody, RoutePathWithIdParam } from "../../RequestTypes";
 import { PostError, UpdatePostInput } from "../posts.types";
 import { ObjectId, SortDirection } from "mongodb";
-import postsService, { CustomError, PostErrors } from "../posts.service";
-import blogsQueryRepository from "../posts.queryRepository";
+import postsService, { PostErrors } from "../posts.service";
 import postsQueryRepository from "../posts.queryRepository";
 import { handleError } from "../../../helpers/validationHelpers";
 import { blogsRepository } from "../../blogs/blogs.repository";
+import { CustomError } from "../../../helpers/CustomError";
+import commentsQueryRepository from "../../comments/comments.queryRepository";
 
 //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
 //https://github.com/goldbergyoni/nodebestpractices
@@ -19,18 +20,22 @@ class PostsController {
     let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10
     let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt'
     let sortDirection: SortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc'
-
-    if (blogId) {
-      const blog = await blogsRepository.findBy(new ObjectId(blogId)) // TODO: change to blogsQueryRepositry
-
-      if (!blog) {
-        throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
-      }
-    }
-
     try {
-      const posts = await blogsQueryRepository.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, blogId)
+      if (blogId) {
+        const blog = await blogsRepository.findBy(new ObjectId(blogId)) // TODO: change to blogsQueryRepository
+
+        if (!blog) {
+          throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
+        }
+      }
+      const posts = await postsQueryRepository.getPosts({
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection
+      }, blogId ? new ObjectId(blogId) : undefined)
       res.status(200).json(posts)
+
     } catch (error) {
       handleError(res, error)
     }
@@ -52,7 +57,6 @@ class PostsController {
     }
   }
 
-  // async getPostById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response<PostType | PostType[] | PostError>) {
   async getPostById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     const { id: searchablePostId } = req.params
     let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1
@@ -62,10 +66,15 @@ class PostsController {
 
     if (!searchablePostId) {
       try {
-        const posts = await postsQueryRepository.getPosts({ pageNumber, pageSize, sortBy, sortDirection }, searchablePostId)
+        const posts = await postsQueryRepository.getPosts({
+          pageNumber,
+          pageSize,
+          sortBy,
+          sortDirection
+        }, new ObjectId(searchablePostId))
         res.status(200).json(posts)
-      } catch (error) {
-        handleError(res, error)
+      } catch (e) {
+        handleError(res, e)
       }
     }
 
@@ -73,8 +82,8 @@ class PostsController {
       const post = await postsQueryRepository.getPostById(new ObjectId(searchablePostId))
       res.status(200).json(post)
       return
-    } catch (error) {
-      handleError(res, error)
+    } catch (e) {
+      handleError(res, e)
     }
   }
 
@@ -84,8 +93,8 @@ class PostsController {
       res.sendStatus(204)
       return
 
-    } catch (error) {
-      handleError(res, error)
+    } catch (e) {
+      handleError(res, e)
     }
   }
 
@@ -95,8 +104,47 @@ class PostsController {
       res.sendStatus(204)
       return
 
-    } catch (error) {
-      handleError(res, error)
+    } catch (e) {
+      handleError(res, e)
+    }
+  }
+
+  async createCommentForPost(req: RequestWithRouteParamsAndBody<{ postId: string }, {
+    context: string
+  }>, res: Response) {
+    const { postId } = req.params
+    const { content } = req.body
+    const { userId, login } = req.context.user
+
+    try {
+      const post = await postsQueryRepository.getPostById(new ObjectId(postId))
+      const createdCommentId = await postsService.createCommentForPost(new ObjectId(post.id!), {
+        userId,
+        userLogin: login
+      }, content)
+      const createdComment = await commentsQueryRepository.getLastCreatedCommentForPostBy(new ObjectId(createdCommentId))
+
+      res.status(201).json(createdComment)
+      return
+    } catch (e) {
+      handleError(res, e)
+    }
+  }
+
+  async getCommentsByPostId(req: Request, res: Response) {
+    const { postId } = req.params
+
+    try {
+      const post = await postsQueryRepository.getPostById(new ObjectId(postId))
+      let comment;
+      if (post) {
+        comment = await postsService.getCommentForPostBy(new ObjectId(postId))
+      }
+
+      res.status(200).json(comment)
+      return
+    } catch (e) {
+      handleError(res, e)
     }
   }
 }

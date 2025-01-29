@@ -26,33 +26,73 @@ export type PostType = {
 
 export type UserType = {
   _id?: ObjectId
-  id: string,
+  id?: any, // TODO: remove id
   login: string,
   email: string,
+  password: string,
   createdAt: string
 }
 
-export type SortingDataBase = {
+export type CommentDBType = {
+  _id?: ObjectId
+  id?: any
+  postId: string
+  content: string
+  commentatorInfo: {
+    userId: string
+    userLogin: string
+  },
+  createdAt: string
+}
+
+export type MeViewModel = {
+  email: string
+  login: string
+  userId: string
+}
+
+// export type UserCreationInput = {
+//   _id?: ObjectId
+//   id?: any
+//   login: string,
+//   email: string,
+//   password: string,
+// }
+
+export type UserTypeViewModel = {
+  id: string,
+  login: string,
+  email: string,
+  password?: string,
+  createdAt: Date
+}
+
+export type SortingBase = {
   pageNumber: number
   pageSize: number
   sortBy: 'createdAt' | string
   sortDirection: 'asc' | 'desc'
 }
 
-export type PostsSortingData = SortingDataBase
-export type BlogsSortingData = SortingDataBase & Partial<{ searchNameTerm: string | null }>
-export type UsersSortingData = SortingDataBase & Partial<{ searchLoginTerm: string | null }> & Partial<{ searchEmailTerm: string | null }>
+export type PostsSortingData = SortingBase
+export type BlogsSortingData = SortingBase & Partial<{ searchNameTerm: string}>
+export type UsersSortingData = SortingBase & Partial<{ searchLoginTerm: string}> & Partial<{
+  searchEmailTerm: string
+}>
+export type CommentsSortingData = SortingBase
 
-export type BlogsModelView =  {
+export type BlogsModelView = {
   pagesCount: number,
   page: number,
   pageSize: number,
   totalCount: number,
-  items: BlogType[] }
+  items: BlogType[]
+}
 
 export let blogsCollection: Collection<BlogType>
 export let postsCollection: Collection<PostType>
 export let usersCollection: Collection<UserType>
+export let commentsCollection: Collection<CommentDBType>
 
 
 export async function runDb(url: string) {
@@ -74,6 +114,7 @@ export async function runDb(url: string) {
     postsCollection = db.collection<PostType>(SETTINGS.PATH.POSTS)
     blogsCollection = db.collection<BlogType>(SETTINGS.PATH.BLOGS)
     usersCollection = db.collection<UserType>(SETTINGS.PATH.USERS)
+    commentsCollection = db.collection<CommentDBType>(SETTINGS.PATH.COMMENTS)
 
     console.log("Conntected to collections!")
   } catch (e) {

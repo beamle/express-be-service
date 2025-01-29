@@ -1,7 +1,9 @@
-import { postsCollection, PostsSortingData, PostType } from "../../app/db";
-import { CreatePostInput } from "./posts.types";
+import { commentsCollection, CommentsSortingData, postsCollection, PostsSortingData, PostType } from "../../app/db";
+import { CommentatorInfo, CreatePostInput } from "./posts.types";
 import { blogsRepository } from "../blogs/blogs.repository";
 import { ObjectId } from "mongodb";
+import { CustomError } from "../../helpers/CustomError";
+import { PostErrors } from "./posts.service";
 
 export const postsRepository = {
   async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
@@ -87,7 +89,7 @@ export const postsRepository = {
     return resultOfUpdatingPost.acknowledged
   },
 
-  async delete(postId: ObjectId) {
+  async delete(postId: ObjectId): Promise<boolean> {
     const post = await postsCollection.findOne({ _id: postId })
 
     if (!post) {
@@ -96,5 +98,32 @@ export const postsRepository = {
     const resultOfDeletingPost = await postsCollection.deleteOne({ _id: postId })
 
     return resultOfDeletingPost.acknowledged
+  },
+
+  async createComment(postId: ObjectId, commentatorInfo: CommentatorInfo, content: string): Promise<ObjectId> {
+    const newComment = {
+      postId: postId.toString(),
+      content: content,
+      commentatorInfo: commentatorInfo,
+      createdAt: new Date().toISOString()
+    };
+
+    const createdComment = await commentsCollection.insertOne(newComment)
+
+    return createdComment.insertedId
+
+  },
+
+  async getCommentsBy(postId: ObjectId, sortingData: CommentsSortingData = sortingBase): Promise<any> {
+    const { pageNumber, pageSize, sortBy, sortDirection } = sortingData
+
+    return await commentsCollection
+      .find({ postId: postId.toString() }, { projection: { _id: 0 } })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
+      .toArray()
   }
 }
+
+const sortingBase: CommentsSortingData = { pageNumber: 1, pageSize: 10, sortBy: 'createdAt', sortDirection: 'desc'}

@@ -1,15 +1,15 @@
 import { Router } from "express";
 import blogsController from "./controller/blogs.controller";
 import { blogIdAsParamValidator, blogInputValidators } from "./blogs.middlewares";
-import { authMiddleware } from "../../authorization/authorization.middleware";
+import { authMiddleware } from "../../authorization/middlewares/authorization.middleware";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 import {
   middlewareObjectIdChecker,
   postContentInputValidator,
   postShortDescriptionInputValidator,
   postTitleInputValidator
-} from "../posts_/posts.middlewares";
-import postsController from "../posts_/controller/posts.controller";
+} from "../posts/posts.middlewares";
+import postsController from "../posts/controller/posts.controller";
 
 export const blogsRouter = Router({ mergeParams: true });
 

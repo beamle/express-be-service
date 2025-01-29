@@ -14,13 +14,31 @@ class UsersRepository {
     getUsers(sortingData, filter) {
         return __awaiter(this, void 0, void 0, function* () {
             const users = yield db_1.usersCollection
-                // .find(blogId ? { blogId: blogId.toString() } : {}, { projection: { _id: 0 } })
-                .find(filter ? filter : {}, { projection: { _id: 0 } })
+                // .find(filter ? filter : {})
+                .find(filter)
                 .skip((sortingData.pageNumber - 1) * sortingData.pageSize)
                 .limit(sortingData.pageSize)
                 .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })
                 .toArray();
             return users;
+        });
+    }
+    findUserBy(filter) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield db_1.usersCollection.findOne(filter); // to allow passing mongodb Query strings
+            return user;
+        });
+    }
+    createUser(userData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.usersCollection.insertOne(userData);
+            return result.insertedId;
+        });
+    }
+    deleteUser(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.usersCollection.deleteOne({ _id: id });
+            return result.acknowledged;
         });
     }
 }
