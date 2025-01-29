@@ -1,6 +1,6 @@
-import {app} from './app'
-import {SETTINGS} from './settings'
-import { runDb } from "./db";
+import {app} from '../app'
+import {SETTINGS} from '../settings'
+import { runDb } from "../db";
 
 const startApp = async() => {
   try {
