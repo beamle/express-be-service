@@ -11,6 +11,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../app/db");
 class CommentsRepository {
+    updateCommentById(content, commentId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const comment = yield db_1.commentsCollection.findOne({ _id: commentId });
+            if (!comment)
+                return false;
+            const resultOfUpdatingComment = yield db_1.commentsCollection.updateOne({ _id: commentId }, {
+                $set: {
+                    content
+                }
+            });
+            return resultOfUpdatingComment.matchedCount;
+        });
+    }
     deleteCommentById(commentId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comment = yield db_1.commentsCollection.findOne({ _id: commentId });

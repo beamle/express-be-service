@@ -8,7 +8,7 @@ commentsRouter.get("/:id",
   commentsController.getCommentById
 )
 
-commentsRouter.put("/:id",
+commentsRouter.put("/3:id",
   postCommentContentValidator,
   commentsController.updateCommentForPost
 )

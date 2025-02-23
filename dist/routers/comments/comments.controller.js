@@ -16,6 +16,7 @@ const mongodb_1 = require("mongodb");
 const validationHelpers_1 = require("../../helpers/validationHelpers");
 const comments_queryRepository_1 = __importDefault(require("./comments.queryRepository"));
 const comments_service_1 = __importDefault(require("./comments.service"));
+const auth_queryRepository_1 = __importDefault(require("../auth/auth.queryRepository"));
 class CommentsController {
     getCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -43,12 +44,31 @@ class CommentsController {
             }
         });
     }
+    updateCommentForPost(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id: searchableCommentId } = req.params;
+            try {
+                const comment = yield comments_queryRepository_1.default.getCommentBy(new mongodb_1.ObjectId(searchableCommentId));
+                const me = yield auth_queryRepository_1.default.getMeBy(req.context.user);
+                if (comment.commentatorInfo.userId !== me.userId) {
+                    return res.status(403).json({ message: "You are not owner of the comment" });
+                }
+                const isCommentUpdated = yield comments_service_1.default.updateComment(Object.assign({}, req.body), new mongodb_1.ObjectId(searchableCommentId));
+                if (isCommentUpdated)
+                    res.sendStatus(204);
+                return;
+            }
+            catch (error) {
+                (0, validationHelpers_1.handleError)(res, error);
+            }
+        });
+    }
     deleteCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id: commentIdToDelete } = req.params;
             try {
                 const comment = yield comments_service_1.default.deleteComment(new mongodb_1.ObjectId(commentIdToDelete));
-                res.status(200).json(comment);
+                res.status(204).json(comment);
                 return;
             }
             catch (e) {
