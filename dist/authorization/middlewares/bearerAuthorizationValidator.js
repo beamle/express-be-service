@@ -20,7 +20,7 @@ function bearerAuthorizationValidator(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const auth = req.headers["authorization"];
         if (!auth) {
-            res.status(404).json({ message: "No authorization header" });
+            res.status(401).json({ message: "No authorization header" });
             return;
         }
         if (!auth.startsWith("Bearer")) {
