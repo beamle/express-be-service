@@ -4,7 +4,7 @@ import { SETTINGS } from "../../app/settings";
 import { CustomError } from "../../helpers/CustomError";
 
 const JwtServiceErrors = {
-  NO_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
+  NO_CORRECT_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
 }
 
 class jwtService {
@@ -18,7 +18,7 @@ class jwtService {
       const result = jwt.verify(token, SETTINGS.JWT_SECRET)
       return (result as JwtPayload).userId;
     } catch (e) {
-      throw new CustomError(JwtServiceErrors.NO_TOKEN_PROVIDED)
+      throw new CustomError(JwtServiceErrors.NO_CORRECT_TOKEN_PROVIDED)
     }
   }
 }

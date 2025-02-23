@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.bearerAuthorizationValidator = bearerAuthorizationValidator;
 const jwt_service_1 = __importDefault(require("../services/jwt-service"));
 const auth_queryRepository_1 = __importDefault(require("../../routers/auth/auth.queryRepository"));
+const validationHelpers_1 = require("../../helpers/validationHelpers");
 function bearerAuthorizationValidator(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const auth = req.headers["authorization"];
@@ -27,11 +28,16 @@ function bearerAuthorizationValidator(req, res, next) {
             return;
         }
         const token = req.headers.authorization.split(' ')[1];
-        const userId = yield jwt_service_1.default.getUserIdByToken(token);
-        if (userId) {
-            const user = yield auth_queryRepository_1.default.getMeBy(userId);
-            req.context.user = user;
-            next();
+        try {
+            const userId = yield jwt_service_1.default.getUserIdByToken(token);
+            if (userId) {
+                const user = yield auth_queryRepository_1.default.getMeBy(userId);
+                req.context.user = user;
+                next();
+            }
+        }
+        catch (e) {
+            (0, validationHelpers_1.handleError)(res, e);
         }
         // res.sendStatus(401)
     });

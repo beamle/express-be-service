@@ -16,7 +16,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const settings_1 = require("../../app/settings");
 const CustomError_1 = require("../../helpers/CustomError");
 const JwtServiceErrors = {
-    NO_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
+    NO_CORRECT_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
 };
 class jwtService {
     createJWT(user) {
@@ -32,7 +32,7 @@ class jwtService {
                 return result.userId;
             }
             catch (e) {
-                throw new CustomError_1.CustomError(JwtServiceErrors.NO_TOKEN_PROVIDED);
+                throw new CustomError_1.CustomError(JwtServiceErrors.NO_CORRECT_TOKEN_PROVIDED);
             }
         });
     }
