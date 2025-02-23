@@ -169,6 +169,7 @@ class PostsController {
     getCommentsByPostId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { postId } = req.params;
+            debugger;
             try {
                 const post = yield posts_queryRepository_1.default.getPostById(new mongodb_1.ObjectId(postId));
                 let comment;

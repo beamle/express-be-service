@@ -134,6 +134,7 @@ class PostsController {
   async getCommentsByPostId(req: Request, res: Response) {
     const { postId } = req.params
 
+    debugger
     try {
       const post = await postsQueryRepository.getPostById(new ObjectId(postId))
       let comment;

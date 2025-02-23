@@ -45,6 +45,7 @@ postsRouter.delete("/:id",
 
 postsRouter.post("/:postId/comments",
   bearerAuthorizationValidator,
+  ...postInputValidators,
   inputCheckErrorsFormatter,
   postsController.createCommentForPost
 )
