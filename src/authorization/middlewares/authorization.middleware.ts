@@ -4,7 +4,7 @@ export const ADMIN_AUTH = "admin:qwerty"
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
   const auth = req.headers["authorization"]
-  console.log(req.params)
+
   if(!auth) {
     res.status(401).json({ message: "No authorization header"})
     return

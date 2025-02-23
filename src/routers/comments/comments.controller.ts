@@ -56,8 +56,15 @@ class CommentsController {
     const { id: commentIdToDelete } = req.params;
 
     try {
-      const comment = await commentsService.deleteComment(new ObjectId(commentIdToDelete))
-      res.status(204).json(comment)
+      const comment = await commentsQueryRepository.getCommentBy(new ObjectId(commentIdToDelete))
+
+      if (comment.commentatorInfo.userId !== req.context.user?.userId) {
+        return res.status(403).json({ message: "You are not owner of the comment" })
+      }
+
+      const deletingResult = await commentsService.deleteComment(new ObjectId(commentIdToDelete))
+
+      res.status(204).json(deletingResult)
       return
     } catch (e) {
       handleError(res, e)

@@ -66,10 +66,15 @@ class CommentsController {
     }
     deleteCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const { id: commentIdToDelete } = req.params;
             try {
-                const comment = yield comments_service_1.default.deleteComment(new mongodb_1.ObjectId(commentIdToDelete));
-                res.status(204).json(comment);
+                const comment = yield comments_queryRepository_1.default.getCommentBy(new mongodb_1.ObjectId(commentIdToDelete));
+                if (comment.commentatorInfo.userId !== ((_a = req.context.user) === null || _a === void 0 ? void 0 : _a.userId)) {
+                    return res.status(403).json({ message: "You are not owner of the comment" });
+                }
+                const deletingResult = yield comments_service_1.default.deleteComment(new mongodb_1.ObjectId(commentIdToDelete));
+                res.status(204).json(deletingResult);
                 return;
             }
             catch (e) {
