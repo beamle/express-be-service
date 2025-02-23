@@ -2,7 +2,7 @@ import { Router } from "express";
 import postsController from "./controller/posts.controller";
 import {
   middlewareObjectIdChecker,
-  postBlogIdAsForeignKeyIdInputValidator,
+  postBlogIdAsForeignKeyIdInputValidator, postCommentContentValidator,
   postInputValidators
 } from "./posts.middlewares";
 import { authMiddleware } from "../../authorization/middlewares/authorization.middleware";
@@ -45,7 +45,7 @@ postsRouter.delete("/:id",
 
 postsRouter.post("/:postId/comments",
   bearerAuthorizationValidator,
-  ...postInputValidators,
+  postCommentContentValidator,
   inputCheckErrorsFormatter,
   postsController.createCommentForPost
 )
