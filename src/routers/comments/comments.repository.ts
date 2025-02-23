@@ -6,11 +6,13 @@ class CommentsRepository {
     const comment = await commentsCollection.findOne({ _id: commentId })
 
     if (!comment) return false
-    const resultOfUpdatingComment = await commentsCollection.updateOne({ _id: commentId }, {
-      $set: {
-        content
-      }
-    })
+    const resultOfUpdatingComment = await commentsCollection.updateOne(
+      { _id: commentId },
+      {
+        $set: {
+          content: content
+        }
+      })
 
     return resultOfUpdatingComment.matchedCount;
   }

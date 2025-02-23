@@ -18,7 +18,7 @@ class CommentsRepository {
                 return false;
             const resultOfUpdatingComment = yield db_1.commentsCollection.updateOne({ _id: commentId }, {
                 $set: {
-                    content
+                    content: content
                 }
             });
             return resultOfUpdatingComment.matchedCount;

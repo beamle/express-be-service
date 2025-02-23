@@ -19,9 +19,10 @@ exports.CommentsErrors = {
     NO_COMMENTS_FOUND: { message: "Comment with such Id was not found!", field: "id", status: 404 },
 };
 class CommentsService {
-    updateComment(content, commentId) {
+    updateComment(contentObj, commentId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield comments_repository_1.default.updateCommentById(content, commentId);
+            debugger;
+            const result = yield comments_repository_1.default.updateCommentById(contentObj.content, commentId);
             if (!result) {
                 throw new CustomError_1.CustomError(exports.CommentsErrors.NO_COMMENTS_FOUND);
             }

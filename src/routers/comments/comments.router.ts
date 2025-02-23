@@ -10,7 +10,7 @@ commentsRouter.get("/:id",
 )
 
 commentsRouter.put("/:id",
-  bearerAuthorizationValidator,
+  // bearerAuthorizationValidator,
   postCommentContentValidator,
   commentsController.updateCommentForPost
 )

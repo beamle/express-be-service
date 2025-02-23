@@ -26,9 +26,9 @@ exports.app.use(addContext);
 exports.app.get('/', (req, res) => {
     res.status(200).json({ version: '1.0' });
 });
+exports.app.use(settings_1.SETTINGS.PATH.AUTH, auth_router_1.authRouter);
 exports.app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.USERS, users_router_1.usersRouter);
 exports.app.use(settings_1.SETTINGS.PATH.COMMENTS, comments_router_1.commentsRouter);
-exports.app.use(settings_1.SETTINGS.PATH.AUTH, auth_router_1.authRouter);
 exports.app.use(settings_1.SETTINGS.PATH.TESTING, testing_router_1.testingRouter);

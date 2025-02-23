@@ -9,15 +9,16 @@ export const CommentsErrors = {
 }
 
 class CommentsService {
-  async updateComment(content: string, commentId: ObjectId) {
-    const result = await commentsRepository.updateCommentById(content, commentId)
+  async updateComment(contentObj: { content: string }, commentId: ObjectId) {
+    debugger
+    const result = await commentsRepository.updateCommentById(contentObj.content, commentId)
 
     if(!result) {
       throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND)
     }
 
     return result
-  }
+  }F
 
   async deleteComment(commentId: ObjectId) {
     const result = await commentsRepository.deleteCommentById(commentId);
