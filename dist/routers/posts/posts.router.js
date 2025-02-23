@@ -18,4 +18,6 @@ exports.postsRouter.post("/:blogId", authorization_middleware_1.authMiddleware, 
 exports.postsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...posts_middlewares_1.postInputValidators, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.updatePost);
 exports.postsRouter.delete("/:id", authorization_middleware_1.authMiddleware, posts_middlewares_1.middlewareObjectIdChecker, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.deletePost);
 exports.postsRouter.post("/:postId/comments", bearerAuthorizationValidator_1.bearerAuthorizationValidator, posts_middlewares_1.postCommentContentValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.createCommentForPost);
-exports.postsRouter.get("/:postId/comments", bearerAuthorizationValidator_1.bearerAuthorizationValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.getCommentsByPostId);
+exports.postsRouter.get("/:postId/comments", 
+// bearerAuthorizationValidator,
+validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.getCommentsByPostId);

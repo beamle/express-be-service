@@ -51,7 +51,6 @@ postsRouter.post("/:postId/comments",
 )
 
 postsRouter.get("/:postId/comments",
-  bearerAuthorizationValidator,
   inputCheckErrorsFormatter,
   postsController.getCommentsByPostId
 )
