@@ -33,6 +33,7 @@ class AuthController {
     }
     me(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            debugger;
             try {
                 res.status(200).json(req.context.user);
                 return;

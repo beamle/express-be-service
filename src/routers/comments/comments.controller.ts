@@ -34,10 +34,12 @@ class CommentsController {
   async updateCommentForPost(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     const { id: searchableCommentId } = req.params
 
+    debugger
+
     try {
       const comment = await commentsQueryRepository.getCommentBy(new ObjectId(searchableCommentId))
-      const me = await authQueryRepository.getMeBy(req.context.user)
-      if (comment.commentatorInfo.userId !== me.userId) {
+      // const me = await authQueryRepository.getMeBy(req.context.user)
+      if (comment.commentatorInfo.userId !== req.context.user?.userId) {
         return res.status(403).json({ message: "You are not owner of the comment" })
       }
       const isCommentUpdated = await commentsService.updateComment({ ...req.body }, new ObjectId(searchableCommentId))

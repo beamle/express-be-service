@@ -16,7 +16,6 @@ const mongodb_1 = require("mongodb");
 const validationHelpers_1 = require("../../helpers/validationHelpers");
 const comments_queryRepository_1 = __importDefault(require("./comments.queryRepository"));
 const comments_service_1 = __importDefault(require("./comments.service"));
-const auth_queryRepository_1 = __importDefault(require("../auth/auth.queryRepository"));
 class CommentsController {
     getCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -46,11 +45,13 @@ class CommentsController {
     }
     updateCommentForPost(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const { id: searchableCommentId } = req.params;
+            debugger;
             try {
                 const comment = yield comments_queryRepository_1.default.getCommentBy(new mongodb_1.ObjectId(searchableCommentId));
-                const me = yield auth_queryRepository_1.default.getMeBy(req.context.user);
-                if (comment.commentatorInfo.userId !== me.userId) {
+                // const me = await authQueryRepository.getMeBy(req.context.user)
+                if (comment.commentatorInfo.userId !== ((_a = req.context.user) === null || _a === void 0 ? void 0 : _a.userId)) {
                     return res.status(403).json({ message: "You are not owner of the comment" });
                 }
                 const isCommentUpdated = yield comments_service_1.default.updateComment(Object.assign({}, req.body), new mongodb_1.ObjectId(searchableCommentId));

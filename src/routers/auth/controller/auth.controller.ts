@@ -20,6 +20,7 @@ class AuthController {
   }
 
   async me(req: Request, res: Response) {
+    debugger
     try {
       res.status(200).json(req.context.user)
       return

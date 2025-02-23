@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { postCommentContentValidator } from "../posts/posts.middlewares";
 import commentsController from "./comments.controller";
+import { bearerAuthorizationValidator } from "../../authorization/middlewares/bearerAuthorizationValidator";
 
 export const commentsRouter = Router({ mergeParams: true });
 
@@ -8,7 +9,8 @@ commentsRouter.get("/:id",
   commentsController.getCommentById
 )
 
-commentsRouter.put("/3:id",
+commentsRouter.put("/:id",
+  bearerAuthorizationValidator,
   postCommentContentValidator,
   commentsController.updateCommentForPost
 )
