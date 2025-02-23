@@ -7,7 +7,7 @@ export async function bearerAuthorizationValidator(req: Request, res: Response, 
   const auth = req.headers["authorization"]
 
   if (!auth) {
-    res.status(401).json({ message: "No authorization header" })
+    res.status(404).json({ message: "No authorization header" })
     return
   }
 
