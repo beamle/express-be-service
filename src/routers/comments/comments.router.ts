@@ -4,20 +4,15 @@ import commentsController from "./comments.controller";
 
 export const commentsRouter = Router({ mergeParams: true });
 
-// commentsRouter.get("/", commentsController.getPosts)
-
 commentsRouter.get("/:id",
-  // postCommentContentValidator,
   commentsController.getCommentById
+)
+
+commentsRouter.put("/:id",
+  postCommentContentValidator,
+  commentsController.updateCommentForPost
 )
 
 commentsRouter.delete("/:id",
   commentsController.deleteCommentById
 )
-
-// postsRouter.post("/",
-//   authMiddleware,
-//   ...postInputValidators,
-//   inputCheckErrorsFormatter,
-//   postsController.createPost
-// )

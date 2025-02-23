@@ -1,7 +1,20 @@
 import { ObjectId } from "mongodb";
-import { commentsCollection, postsCollection } from "../../app/db";
+import { commentsCollection } from "../../app/db";
 
 class CommentsRepository {
+  async updateCommentById(content: string, commentId: ObjectId): Promise<boolean | number> {
+    const comment = await commentsCollection.findOne({ _id: commentId })
+
+    if (!comment) return false
+    const resultOfUpdatingComment = await commentsCollection.updateOne({ _id: commentId }, {
+      $set: {
+        content
+      }
+    })
+
+    return resultOfUpdatingComment.matchedCount;
+  }
+
   async deleteCommentById(commentId: ObjectId) {
     const comment = await commentsCollection.findOne({ _id: commentId })
 
