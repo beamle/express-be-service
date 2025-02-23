@@ -5,6 +5,7 @@ import { CustomError } from "../../helpers/CustomError";
 
 const JwtServiceErrors = {
   NO_CORRECT_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
+  NO_TOKEN_PROVIDED: { message: "Unauthorized. You didn't pass jwt token", field: "", status: 404 },
 }
 
 class jwtService {
@@ -14,6 +15,10 @@ class jwtService {
   }
 
   async getUserIdByToken(token: string): Promise<string | null> {
+    if (!token || token === "undefined") {
+      throw new CustomError(JwtServiceErrors.NO_TOKEN_PROVIDED);
+    }
+
     try {
       const result = jwt.verify(token, SETTINGS.JWT_SECRET)
       return (result as JwtPayload).userId;

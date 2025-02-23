@@ -29,6 +29,7 @@ function bearerAuthorizationValidator(req, res, next) {
         }
         const token = req.headers.authorization.split(' ')[1];
         try {
+            debugger;
             const userId = yield jwt_service_1.default.getUserIdByToken(token);
             if (userId) {
                 const user = yield auth_queryRepository_1.default.getMeBy(userId);
