@@ -6,7 +6,9 @@ import { CommentsErrors } from "./comments.service";
 
 class CommentsQueryRepository {
   async getCommentsByPostId(sortingData: PostsSortingData, postId: string): Promise<CommentType[] | boolean> {
-    const comments = await commentsCollection.find({ postId }, { projection: { postId: 0 } }).skip((pageNumber - 1) * pageSize)
+
+    const comments = await commentsCollection.find({ postId }, { projection: { postId: 0 } })
+      .skip((sortingData.pageNumber - 1) * sortingData.pageSize)
       .limit(sortingData.pageSize)
       .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })
       .toArray();

@@ -26,7 +26,8 @@ const comments_service_1 = require("./comments.service");
 class CommentsQueryRepository {
     getCommentsByPostId(sortingData, postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comments = yield db_1.commentsCollection.find({ postId }, { projection: { postId: 0 } }).skip((pageNumber - 1) * pageSize)
+            const comments = yield db_1.commentsCollection.find({ postId }, { projection: { postId: 0 } })
+                .skip((sortingData.pageNumber - 1) * sortingData.pageSize)
                 .limit(sortingData.pageSize)
                 .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })
                 .toArray();
