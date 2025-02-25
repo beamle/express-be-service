@@ -138,12 +138,12 @@ class PostsController {
     let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10
     let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt'
     let sortDirection: SortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc'
-    
+
     try {
       const post = await postsQueryRepository.getPostById(new ObjectId(postId))
-      let comment;
+      let comments;
       if (post) {
-        comment = await postsQueryRepository.getPostCommentsByPostId({
+        comments = await postsQueryRepository.getPostCommentsByPostId({
           pageNumber,
           pageSize,
           sortBy,
@@ -151,7 +151,7 @@ class PostsController {
         }, new ObjectId(postId))
       }
 
-      res.status(200).json(comment)
+      res.status(200).json(comments)
       return
     } catch (e) {
       handleError(res, e)

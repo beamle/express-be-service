@@ -175,16 +175,16 @@ class PostsController {
             let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
             try {
                 const post = yield posts_queryRepository_1.default.getPostById(new mongodb_1.ObjectId(postId));
-                let comment;
+                let comments;
                 if (post) {
-                    comment = yield posts_queryRepository_1.default.getPostCommentsByPostId({
+                    comments = yield posts_queryRepository_1.default.getPostCommentsByPostId({
                         pageNumber,
                         pageSize,
                         sortBy,
                         sortDirection
                     }, new mongodb_1.ObjectId(postId));
                 }
-                res.status(200).json(comment);
+                res.status(200).json(comments);
                 return;
             }
             catch (e) {

@@ -26,10 +26,10 @@ const comments_service_1 = require("./comments.service");
 class CommentsQueryRepository {
     getCommentsByPostId(postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comments = yield db_1.commentsCollection.find({ postId }).toArray();
+            const comments = yield db_1.commentsCollection.find({ postId }, { projection: { postId: 0 } }).toArray();
             if (!comments)
                 return false;
-            return comments;
+            return this.mapCommentsToCommentType(comments);
         });
     }
     getLastCreatedCommentForPostBy(commentId) {
@@ -50,6 +50,12 @@ class CommentsQueryRepository {
                 throw new CustomError_1.CustomError(comments_service_1.CommentsErrors.NO_COMMENTS_FOUND);
             }
             return this.mapToCommentType(comment);
+        });
+    }
+    mapCommentsToCommentType(comments) {
+        return comments.map(comment => {
+            const { _id } = comment, rest = __rest(comment, ["_id"]);
+            return Object.assign({ id: _id.toString() }, rest);
         });
     }
     mapToCommentType(comment) {

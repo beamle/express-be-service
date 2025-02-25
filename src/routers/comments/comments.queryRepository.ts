@@ -1,16 +1,15 @@
 import { ObjectId } from "mongodb";
-import { CommentDBType, commentsCollection } from "../../app/db";
+import { commentsCollection } from "../../app/db";
 import { CommentType } from "./comments.types";
 import { CustomError } from "../../helpers/CustomError";
 import { CommentsErrors } from "./comments.service";
 
 class CommentsQueryRepository {
   async getCommentsByPostId(postId: string): Promise<CommentType[] | boolean> {
-    const comments = await commentsCollection.find({ postId }).toArray();
+    const comments = await commentsCollection.find({ postId }, { projection: { postId: 0 } }).toArray();
     if (!comments) return false
 
-    return comments
-
+    return this.mapCommentsToCommentType(comments)
   }
 
   async getLastCreatedCommentForPostBy(commentId: ObjectId): Promise<CommentType> {
@@ -36,6 +35,13 @@ class CommentsQueryRepository {
 
     return this.mapToCommentType(comment)
 
+  }
+
+  private mapCommentsToCommentType(comments) {
+    return comments.map(comment => {
+      const { _id, ...rest } = comment;
+      return { id: _id.toString(), ...rest };
+    });
   }
 
   private mapToCommentType(comment: CommentType) {
