@@ -138,9 +138,7 @@ class PostsController {
     let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10
     let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt'
     let sortDirection: SortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc'
-
-
-    debugger
+    
     try {
       const post = await postsQueryRepository.getPostById(new ObjectId(postId))
       let comment;

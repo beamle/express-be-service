@@ -24,6 +24,14 @@ const db_1 = require("../../app/db");
 const CustomError_1 = require("../../helpers/CustomError");
 const comments_service_1 = require("./comments.service");
 class CommentsQueryRepository {
+    getCommentsByPostId(postId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const comments = yield db_1.commentsCollection.find({ postId }).toArray();
+            if (!comments)
+                return false;
+            return comments;
+        });
+    }
     getLastCreatedCommentForPostBy(commentId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comments = yield db_1.commentsCollection

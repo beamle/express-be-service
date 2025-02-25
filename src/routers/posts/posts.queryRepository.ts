@@ -3,6 +3,7 @@ import { PostErrors } from "./posts.service";
 import { commentsCollection, postsCollection, PostsSortingData, PostType } from "../../app/db";
 import { postsRepository } from "./posts.repository";
 import { CustomError } from "../../helpers/CustomError";
+import commentsQueryRepository from "../comments/comments.queryRepository";
 
 class PostsQueryRepository {
 
@@ -40,7 +41,7 @@ class PostsQueryRepository {
   async getPostCommentsByPostId(sortingData: PostsSortingData, searchablePostId: ObjectId): Promise<any> {
     // const post = await postsRepository.findBy(searchablePostId)
 
-    const posts = await postsRepository.getPosts(sortingData)
+    const posts = await commentsQueryRepository.getCommentsByPostId(searchablePostId.toString())
 
     if (!posts) {
       throw new CustomError({ message: "no error description", field: "", status: 400 })

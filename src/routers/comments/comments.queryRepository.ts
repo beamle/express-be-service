@@ -5,6 +5,14 @@ import { CustomError } from "../../helpers/CustomError";
 import { CommentsErrors } from "./comments.service";
 
 class CommentsQueryRepository {
+  async getCommentsByPostId(postId: string): Promise<CommentType[] | boolean> {
+    const comments = await commentsCollection.find({ postId }).toArray();
+    if (!comments) return false
+
+    return comments
+
+  }
+
   async getLastCreatedCommentForPostBy(commentId: ObjectId): Promise<CommentType> {
 
     const comments = await commentsCollection

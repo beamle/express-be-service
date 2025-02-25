@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { commentsCollection } from "../../app/db";
+import { CommentType } from "./comments.types";
 
 class CommentsRepository {
   async updateCommentById(content: string, commentId: ObjectId): Promise<boolean | number> {
