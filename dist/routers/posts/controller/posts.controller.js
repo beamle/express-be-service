@@ -169,12 +169,21 @@ class PostsController {
     getCommentsByPostId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { postId } = req.params;
+            let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1;
+            let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
+            let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt';
+            let sortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
             debugger;
             try {
                 const post = yield posts_queryRepository_1.default.getPostById(new mongodb_1.ObjectId(postId));
                 let comment;
                 if (post) {
-                    comment = yield posts_service_1.default.getCommentForPostBy(new mongodb_1.ObjectId(postId));
+                    comment = yield posts_queryRepository_1.default.getPostCommentsByPostId({
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortDirection
+                    }, new mongodb_1.ObjectId(postId));
                 }
                 res.status(200).json(comment);
                 return;

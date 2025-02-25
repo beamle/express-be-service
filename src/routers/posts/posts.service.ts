@@ -107,8 +107,8 @@ class PostsService {
     return createdCommentId
   }
 // TODO PROMISE ANY
-  async getCommentForPostBy(postId: ObjectId): Promise<any> {
-    const createdCommentId = await postsRepository.getCommentsBy(postId)
+  async getCommentForPostBy(sortingData: PostsSortingData, postId: ObjectId): Promise<any> {
+    const createdCommentId = await postsRepository.getCommentsBy(postId, sortingData)
 
     if(!createdCommentId) {
       throw new CustomError(PostErrors.DID_NOT_CREATE_COMMENT)

@@ -98,9 +98,9 @@ class PostsService {
         });
     }
     // TODO PROMISE ANY
-    getCommentForPostBy(postId) {
+    getCommentForPostBy(sortingData, postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const createdCommentId = yield posts_repository_1.postsRepository.getCommentsBy(postId);
+            const createdCommentId = yield posts_repository_1.postsRepository.getCommentsBy(postId, sortingData);
             if (!createdCommentId) {
                 throw new CustomError_1.CustomError(exports.PostErrors.DID_NOT_CREATE_COMMENT);
             }

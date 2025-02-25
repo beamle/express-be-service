@@ -41,5 +41,22 @@ class PostsQueryRepository {
             return post;
         });
     }
+    getPostCommentsByPostId(sortingData, searchablePostId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // const post = await postsRepository.findBy(searchablePostId)
+            const posts = yield posts_repository_1.postsRepository.getPosts(sortingData);
+            if (!posts) {
+                throw new CustomError_1.CustomError({ message: "no error description", field: "", status: 400 });
+            }
+            const postsLength = yield db_1.commentsCollection.countDocuments(searchablePostId ? { postId: searchablePostId.toString() } : {});
+            return {
+                pagesCount: Math.ceil(postsLength / sortingData.pageSize),
+                page: sortingData.pageNumber,
+                pageSize: sortingData.pageSize,
+                totalCount: postsLength,
+                items: posts
+            };
+        });
+    }
 }
 exports.default = new PostsQueryRepository();

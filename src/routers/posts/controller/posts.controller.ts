@@ -134,12 +134,23 @@ class PostsController {
   async getCommentsByPostId(req: Request, res: Response) {
     const { postId } = req.params
 
+    let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1
+    let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10
+    let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt'
+    let sortDirection: SortDirection = req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc'
+
+
     debugger
     try {
       const post = await postsQueryRepository.getPostById(new ObjectId(postId))
       let comment;
       if (post) {
-        comment = await postsService.getCommentForPostBy(new ObjectId(postId))
+        comment = await postsQueryRepository.getPostCommentsByPostId({
+          pageNumber,
+          pageSize,
+          sortBy,
+          sortDirection
+        }, new ObjectId(postId))
       }
 
       res.status(200).json(comment)
