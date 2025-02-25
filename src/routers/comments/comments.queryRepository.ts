@@ -40,7 +40,7 @@ class CommentsQueryRepository {
   private mapCommentsToCommentType(comments) {
     return comments.map(comment => {
       const { _id, ...rest } = comment;
-      return { id: _id.toString(), ...rest };
+      return { ...rest, id: _id.toString() };
     });
   }
 

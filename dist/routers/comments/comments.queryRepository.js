@@ -55,7 +55,7 @@ class CommentsQueryRepository {
     mapCommentsToCommentType(comments) {
         return comments.map(comment => {
             const { _id } = comment, rest = __rest(comment, ["_id"]);
-            return Object.assign({ id: _id.toString() }, rest);
+            return Object.assign(Object.assign({}, rest), { id: _id.toString() });
         });
     }
     mapToCommentType(comment) {
