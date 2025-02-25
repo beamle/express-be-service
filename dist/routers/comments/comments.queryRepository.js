@@ -24,9 +24,12 @@ const db_1 = require("../../app/db");
 const CustomError_1 = require("../../helpers/CustomError");
 const comments_service_1 = require("./comments.service");
 class CommentsQueryRepository {
-    getCommentsByPostId(postId) {
+    getCommentsByPostId(sortingData, postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comments = yield db_1.commentsCollection.find({ postId }, { projection: { postId: 0 } }).toArray();
+            const comments = yield db_1.commentsCollection.find({ postId }, { projection: { postId: 0 } }).skip((pageNumber - 1) * pageSize)
+                .limit(sortingData.pageSize)
+                .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })
+                .toArray();
             if (!comments)
                 return false;
             return this.mapCommentsToCommentType(comments);

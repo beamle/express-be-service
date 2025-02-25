@@ -48,7 +48,7 @@ class PostsQueryRepository {
     getPostCommentsByPostId(sortingData, searchablePostId) {
         return __awaiter(this, void 0, void 0, function* () {
             // const post = await postsRepository.findBy(searchablePostId)
-            const posts = yield comments_queryRepository_1.default.getCommentsByPostId(searchablePostId.toString());
+            const posts = yield comments_queryRepository_1.default.getCommentsByPostId(sortindData, searchablePostId.toString());
             if (!posts) {
                 throw new CustomError_1.CustomError({ message: "no error description", field: "", status: 400 });
             }

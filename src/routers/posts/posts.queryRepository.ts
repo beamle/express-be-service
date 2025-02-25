@@ -41,7 +41,7 @@ class PostsQueryRepository {
   async getPostCommentsByPostId(sortingData: PostsSortingData, searchablePostId: ObjectId): Promise<any> {
     // const post = await postsRepository.findBy(searchablePostId)
 
-    const posts = await commentsQueryRepository.getCommentsByPostId(searchablePostId.toString())
+    const posts = await commentsQueryRepository.getCommentsByPostId(sortindData, searchablePostId.toString())
 
     if (!posts) {
       throw new CustomError({ message: "no error description", field: "", status: 400 })

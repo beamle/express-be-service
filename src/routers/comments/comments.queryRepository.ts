@@ -1,12 +1,16 @@
 import { ObjectId } from "mongodb";
-import { commentsCollection } from "../../app/db";
+import { commentsCollection, PostsSortingData } from "../../app/db";
 import { CommentType } from "./comments.types";
 import { CustomError } from "../../helpers/CustomError";
 import { CommentsErrors } from "./comments.service";
 
 class CommentsQueryRepository {
-  async getCommentsByPostId(postId: string): Promise<CommentType[] | boolean> {
-    const comments = await commentsCollection.find({ postId }, { projection: { postId: 0 } }).toArray();
+  async getCommentsByPostId(sortingData: PostsSortingData, postId: string): Promise<CommentType[] | boolean> {
+    const comments = await commentsCollection.find({ postId }, { projection: { postId: 0 } }).skip((pageNumber - 1) * pageSize)
+      .limit(sortingData.pageSize)
+      .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })
+      .toArray();
+
     if (!comments) return false
 
     return this.mapCommentsToCommentType(comments)
