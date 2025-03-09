@@ -15,23 +15,6 @@ export const PostErrors = {
 }
 
 class PostsService {
-  // async getPosts(sortingData: PostsSortingData, blogId?: ObjectId): Promise<PostType[]> {
-    // if(blogId) {
-    //   const blog = await blogsRepository.findBy(blogId)
-    //
-    //   if (!blog) {
-    //     throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
-    //   }
-    //   const blogPosts = await postsRepository.getPosts(sortingData, blogId)
-    //   if (!blogPosts) {
-    //     throw new CustomError({ message: "no error description", field: "", status: 400 })
-    //   }
-    //   return blogPosts
-    // }
-
-    // return await postsRepository.getPosts(sortingData)
-  // }
-
   async createPost(postCreatingInput: CreatePostInput): Promise<PostType> {
     const createdPostId = await postsRepository.create(postCreatingInput)
 
@@ -62,14 +45,6 @@ class PostsService {
 
     return createdPost
   }
-
-  // async getPostById(searchablePostId: ObjectId): Promise<PostType> {
-    // const post = await postsRepository.findBy(searchablePostId)
-    // if (!post) {
-    //   throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID)
-    // }
-    // return post;
-  // }
 
   async updatePost(dataForUpdate: {
     title: string,

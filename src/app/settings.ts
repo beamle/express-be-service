@@ -10,6 +10,7 @@ export const SETTINGS = {
     USERS: '/users',
     AUTH: '/auth',
     COMMENTS: '/comments',
+    EMAIL: '/email',
     TESTING: '/testing',
   },
   DB_NAME: process.env.DB_NAME || "lesson-2-3",

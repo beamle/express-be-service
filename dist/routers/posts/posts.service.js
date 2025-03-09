@@ -22,21 +22,6 @@ exports.PostErrors = {
     DID_NOT_CREATE_COMMENT: { message: "Didn't create comment", field: "", status: 400 }
 };
 class PostsService {
-    // async getPosts(sortingData: PostsSortingData, blogId?: ObjectId): Promise<PostType[]> {
-    // if(blogId) {
-    //   const blog = await blogsRepository.findBy(blogId)
-    //
-    //   if (!blog) {
-    //     throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID)
-    //   }
-    //   const blogPosts = await postsRepository.getPosts(sortingData, blogId)
-    //   if (!blogPosts) {
-    //     throw new CustomError({ message: "no error description", field: "", status: 400 })
-    //   }
-    //   return blogPosts
-    // }
-    // return await postsRepository.getPosts(sortingData)
-    // }
     createPost(postCreatingInput) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdPostId = yield posts_repository_1.postsRepository.create(postCreatingInput);
@@ -63,13 +48,6 @@ class PostsService {
             return createdPost;
         });
     }
-    // async getPostById(searchablePostId: ObjectId): Promise<PostType> {
-    // const post = await postsRepository.findBy(searchablePostId)
-    // if (!post) {
-    //   throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID)
-    // }
-    // return post;
-    // }
     updatePost(dataForUpdate, postId) {
         return __awaiter(this, void 0, void 0, function* () {
             const updatedPost = yield posts_repository_1.postsRepository.updatePost(dataForUpdate, postId);

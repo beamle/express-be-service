@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const users_service_1 = __importDefault(require("../../users/users.service"));
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
 const jwt_service_1 = __importDefault(require("../../../authorization/services/jwt-service"));
+const users_queryRepository_1 = __importDefault(require("../../users/users.queryRepository"));
 class AuthController {
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -23,6 +24,24 @@ class AuthController {
                 if (user) {
                     const token = yield jwt_service_1.default.createJWT(user);
                     res.status(200).json({ accessToken: token });
+                    return;
+                }
+            }
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
+            }
+        });
+    }
+    register(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, password, login } = req.body;
+            try {
+                yield users_queryRepository_1.default.getUserBy({ email });
+                yield users_queryRepository_1.default.getUserBy({ login });
+                const createdUserId = yield users_service_1.default.createUser({ email, password, login });
+                if (createdUserId) {
+                    const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
+                    res.status(201).json(user);
                     return;
                 }
             }

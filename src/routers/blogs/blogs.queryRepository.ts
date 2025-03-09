@@ -7,11 +7,8 @@ import { createFilter } from "../../helpers/objectGenerators";
 import { CustomError } from "../../helpers/CustomError";
 
 class BlogsQueryRepository {
-
   async getBlogs(sortingData: BlogsSortingData, blogId?: string): Promise<BlogsModelView> {
-
     const filter: any = createFilter(sortingData)
-
     const blogsLength = await blogsCollection.countDocuments(filter) // make aggregation?
     const blogs = await blogsRepository.getBlogs(sortingData, filter)
 
@@ -29,8 +26,8 @@ class BlogsQueryRepository {
   }
 
   async getBlogById(searchablePostId: string): Promise<BlogType> {
-
     const post = await blogsRepository.findBy(new ObjectId(searchablePostId))
+
     if (!post) {
       throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID)
     }

@@ -18,7 +18,6 @@ exports.blogWebsiteUrlInputValidator = (0, express_validator_1.body)('websiteUrl
 exports.blogIdAsParamValidator = (0, express_validator_1.param)('blogId').isAlphanumeric().trim()
     .isLength({ min: 1, max: 100 })
     .withMessage("Blog id is required");
-// export const blogIdAsParamValidator = param('blogId').toInt().isInt().withMessage("PROVERKA")
 // export const blogIdAsParamValidator = param('blogId')
 //   // .optional()
 //   .custom(async (id) => {
