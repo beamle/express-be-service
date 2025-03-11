@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 
 class AuthService {
   async confirmEmail(code: string, email: string) {
-    let user = await usersRepository.findUserBy({ code }) as UserTypeViewModel
+    let user = await usersRepository.findUserBy({ "emailConfirmation.confirmationCode": code }) as UserTypeViewModel
     if (!user) return false
     if (user.emailConfirmation.confirmationCode === code && user.emailConfirmation.expirationDate > new Date()) {
       return await usersRepository.updateConfirmation(new ObjectId(user.id))

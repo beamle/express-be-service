@@ -17,7 +17,7 @@ const mongodb_1 = require("mongodb");
 class AuthService {
     confirmEmail(code, email) {
         return __awaiter(this, void 0, void 0, function* () {
-            let user = yield users_repository_1.default.findUserBy({ code });
+            let user = yield users_repository_1.default.findUserBy({ "emailConfirmation.confirmationCode": code });
             if (!user)
                 return false;
             if (user.emailConfirmation.confirmationCode === code && user.emailConfirmation.expirationDate > new Date()) {
