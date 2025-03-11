@@ -7,7 +7,10 @@ import bcrypt from "bcrypt";
 import { add } from "date-fns";
 import { uuid } from "uuidv4";
 
-const EXPIRATION_TIME_EXTRA = { ONE_MINUTE: { minutes: 1 } }
+const EXPIRATION_TIME_EXTRA = {
+  ONE_MINUTE: { minutes: 1 },
+  FIVE_MINUTES: { minutes: 5 }
+}
 
 class UsersService {
   async createUser(userData: Omit<UserType, "createdAt">, isConfirmed = true): Promise<ObjectId> {
@@ -21,7 +24,7 @@ class UsersService {
       emailConfirmation: {
         isConfirmed,
         confirmationCode: uuid(),
-        expirationDate: add(new Date(), EXPIRATION_TIME_EXTRA.ONE_MINUTE)
+        expirationDate: add(new Date(), EXPIRATION_TIME_EXTRA.FIVE_MINUTES)
       }
     }
 

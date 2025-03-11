@@ -8,7 +8,8 @@ class AuthService {
     let user = await usersRepository.findUserBy({ "emailConfirmation.confirmationCode": code }) as UserTypeViewModel
     if (!user) return false
     if (user.emailConfirmation.confirmationCode === code && user.emailConfirmation.expirationDate > new Date()) {
-      return await usersRepository.updateConfirmation(new ObjectId(user.id))
+      const result = await usersRepository.updateConfirmation(new ObjectId(user.id))
+      return result
     }
     return false
   }

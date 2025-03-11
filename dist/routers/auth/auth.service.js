@@ -21,7 +21,8 @@ class AuthService {
             if (!user)
                 return false;
             if (user.emailConfirmation.confirmationCode === code && user.emailConfirmation.expirationDate > new Date()) {
-                return yield users_repository_1.default.updateConfirmation(new mongodb_1.ObjectId(user.id));
+                const result = yield users_repository_1.default.updateConfirmation(new mongodb_1.ObjectId(user.id));
+                return result;
             }
             return false;
         });

@@ -19,7 +19,10 @@ const Errors_1 = require("./meta/Errors");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const date_fns_1 = require("date-fns");
 const uuidv4_1 = require("uuidv4");
-const EXPIRATION_TIME_EXTRA = { ONE_MINUTE: { minutes: 1 } };
+const EXPIRATION_TIME_EXTRA = {
+    ONE_MINUTE: { minutes: 1 },
+    FIVE_MINUTES: { minutes: 5 }
+};
 class UsersService {
     createUser(userData_1) {
         return __awaiter(this, arguments, void 0, function* (userData, isConfirmed = true) {
@@ -32,7 +35,7 @@ class UsersService {
                 emailConfirmation: {
                     isConfirmed,
                     confirmationCode: (0, uuidv4_1.uuid)(),
-                    expirationDate: (0, date_fns_1.add)(new Date(), EXPIRATION_TIME_EXTRA.ONE_MINUTE)
+                    expirationDate: (0, date_fns_1.add)(new Date(), EXPIRATION_TIME_EXTRA.FIVE_MINUTES)
                 }
             };
             const newUserId = yield users_repository_1.default.createUser(newUser);
