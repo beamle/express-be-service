@@ -35,7 +35,7 @@ class UsersController {
     const { id } = req.params
     try {
       await usersQueryRepository.getUserBy({ id })
-      await usersService.deleteUser(id as string)
+      await usersService.deleteUser(id)
       res.sendStatus(204)
       return
     } catch (e) {

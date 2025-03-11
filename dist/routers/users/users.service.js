@@ -17,15 +17,23 @@ const users_repository_1 = __importDefault(require("./users.repository"));
 const CustomError_1 = require("../../helpers/CustomError");
 const Errors_1 = require("./meta/Errors");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const date_fns_1 = require("date-fns");
+const uuidv4_1 = require("uuidv4");
+const EXPIRATION_TIME_EXTRA = { ONE_MINUTE: { minutes: 1 } };
 class UsersService {
-    createUser(userData) {
-        return __awaiter(this, void 0, void 0, function* () {
+    createUser(userData_1) {
+        return __awaiter(this, arguments, void 0, function* (userData, isConfirmed = true) {
             const passwordHash = yield this.generateHash(userData.password, 10);
             const newUser = {
                 login: userData.login,
                 password: passwordHash,
                 email: userData.email,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                emailConfirmation: {
+                    isConfirmed,
+                    confirmationCode: (0, uuidv4_1.uuid)(),
+                    expirationDate: (0, date_fns_1.add)(new Date(), EXPIRATION_TIME_EXTRA.ONE_MINUTE)
+                }
             };
             const newUserId = yield users_repository_1.default.createUser(newUser);
             if (!newUserId) {

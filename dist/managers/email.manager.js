@@ -20,6 +20,11 @@ class EmailManager {
             yield email_adapter_1.default.sendEmail("user email", "password recovery", "<div> message</div>");
         });
     }
+    sendEmailConfirmationMessage(user, message, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield email_adapter_1.default.sendEmail(user.email, message || "", password);
+        });
+    }
 }
 exports.EmailManager = EmailManager;
 exports.default = new EmailManager();

@@ -36,9 +36,14 @@ class UsersRepository {
   }
 
   async deleteUser(id: ObjectId): Promise<boolean> {
-    const result = await usersCollection.deleteOne({_id: id})
+    const result = await usersCollection.deleteOne({ _id: id })
 
     return result.acknowledged
+  }
+
+  async updateConfirmation(id: ObjectId): Promise<boolean> {
+    let result = await usersCollection.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } })
+    return result.modifiedCount === 1
   }
 }
 

@@ -3,6 +3,10 @@ import { Request, Response } from "express";
 import { handleError } from "../../../helpers/validationHelpers";
 import jwtService from "../../../authorization/services/jwt-service";
 import usersQueryRepository from "../../users/users.queryRepository";
+import emailManager from "../../../managers/email.manager";
+import usersRepository from "../../users/users.repository";
+import authService from "../auth.service";
+import { UserTypeViewModel } from "../../../app/db";
 
 class AuthController {
   async login(req: Request, res: Response) {
@@ -24,11 +28,31 @@ class AuthController {
       await usersQueryRepository.getUserBy({ email })
       await usersQueryRepository.getUserBy({ login })
 
-      const createdUserId = await usersService.createUser({ email, password, login })
+      const createdUserId = await usersService.createUser({ email, password, login }, false)
       if (createdUserId) {
-        const user = await usersQueryRepository.getUserBy({ id: createdUserId.toString() })
-        res.status(201).json(user)
-        return}
+        const user = await usersQueryRepository.getUserBy({ id: createdUserId.toString() }) as UserTypeViewModel
+        try {
+          await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode))
+        } catch (e) {
+          handleError(res, e)
+          await usersRepository.deleteUser(createdUserId)
+        }
+        res.status(204).json(user)
+        return
+      }
+    } catch (e) {
+      handleError(res, e)
+    }
+  }
+
+  async confirmEmail(req: Request, res: Response) {
+    try {
+      const result = await authService.confirmEmail(req.body.code, req.body.email)
+      if(result) {
+        res.status(201).send()
+      } else {
+        res.status(404).send()
+      }
     } catch (e) {
       handleError(res, e)
     }
@@ -46,3 +70,12 @@ class AuthController {
 }
 
 export default new AuthController()
+
+// utils
+
+const generateEmailConfirmationMessage = (code: string) => {
+  return "<h1>Thank you for your registration</h1>\n" +
+    " <p>To finish registration please follow the link below:\n" +
+    `     <a href=https://somesite.com/confirm-email?code=${code}>complete registration</a>\n` +
+    " </p>\n"
+}

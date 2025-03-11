@@ -31,6 +31,12 @@ export type UserType = {
   email: string,
   password: string,
   createdAt: string
+  // emailConfirmation: {
+  //   isConfirmed: boolean
+  //   confirmationCode: string
+  //   expirationDate: Date
+  // }
+
 }
 
 export type CommentDBType = {
@@ -65,6 +71,11 @@ export type UserTypeViewModel = {
   email: string,
   password?: string,
   createdAt: Date
+  emailConfirmation: {
+    isConfirmed: boolean
+    confirmationCode: string
+    expirationDate: Date
+  }
 }
 
 export type SortingBase = {
@@ -75,8 +86,8 @@ export type SortingBase = {
 }
 
 export type PostsSortingData = SortingBase
-export type BlogsSortingData = SortingBase & Partial<{ searchNameTerm: string}>
-export type UsersSortingData = SortingBase & Partial<{ searchLoginTerm: string}> & Partial<{
+export type BlogsSortingData = SortingBase & Partial<{ searchNameTerm: string }>
+export type UsersSortingData = SortingBase & Partial<{ searchLoginTerm: string }> & Partial<{
   searchEmailTerm: string
 }>
 export type CommentsSortingData = SortingBase

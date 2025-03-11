@@ -41,5 +41,11 @@ class UsersRepository {
             return result.acknowledged;
         });
     }
+    updateConfirmation(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = yield db_1.usersCollection.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } });
+            return result.modifiedCount === 1;
+        });
+    }
 }
 exports.default = new UsersRepository();
