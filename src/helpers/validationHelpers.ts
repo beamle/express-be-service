@@ -43,3 +43,14 @@ export function handleError(res: Response, error: any) {
     return
   }
 }
+
+export function handleErrorAsArrayOfErrors(res: Response, error: any) {
+  if (error.name === 'CustomError') {
+    res.status(error.status).json([{ errorMessages: error.message, field: error.field }]);
+    return
+  } else {
+    res.status(500).json({ message: "Internal server error", field: "", status: 500 });
+    console.log(res,"RES")
+    return
+  }
+}

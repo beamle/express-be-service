@@ -48,7 +48,7 @@ class AuthController {
                         yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode));
                     }
                     catch (e) {
-                        (0, validationHelpers_1.handleError)(res, e);
+                        (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
                         yield users_repository_1.default.deleteUser(createdUserId);
                     }
                     res.status(204).json(user);
@@ -56,7 +56,7 @@ class AuthController {
                 }
             }
             catch (e) {
-                (0, validationHelpers_1.handleError)(res, e);
+                (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
             }
         });
     }

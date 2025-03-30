@@ -1,6 +1,6 @@
 import usersService from "../../users/users.service";
 import { Request, Response } from "express";
-import { handleError } from "../../../helpers/validationHelpers";
+import { handleError, handleErrorAsArrayOfErrors } from "../../../helpers/validationHelpers";
 import jwtService from "../../../authorization/services/jwt-service";
 import usersQueryRepository from "../../users/users.queryRepository";
 import emailManager from "../../../managers/email.manager";
@@ -34,14 +34,14 @@ class AuthController {
         try {
           await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode))
         } catch (e) {
-          handleError(res, e)
+          handleErrorAsArrayOfErrors(res, e)
           await usersRepository.deleteUser(createdUserId)
         }
         res.status(204).json(user)
         return
       }
     } catch (e) {
-      handleError(res, e)
+      handleErrorAsArrayOfErrors(res, e)
     }
   }
 

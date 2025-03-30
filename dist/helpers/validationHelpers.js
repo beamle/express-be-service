@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.inputCheckErrorsFormatter = void 0;
 exports.handleError = handleError;
+exports.handleErrorAsArrayOfErrors = handleErrorAsArrayOfErrors;
 const express_validator_1 = require("express-validator");
 const inputCheckErrorsFormatter = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req).array({ onlyFirstError: true });
@@ -37,6 +38,17 @@ function handleError(res, error) {
     }
     else {
         // res.status(500).json(PostErrors.INTERNAL_SERVER_ERROR);
+        res.status(500).json({ message: "Internal server error", field: "", status: 500 });
+        console.log(res, "RES");
+        return;
+    }
+}
+function handleErrorAsArrayOfErrors(res, error) {
+    if (error.name === 'CustomError') {
+        res.status(error.status).json([{ errorMessages: error.message, field: error.field }]);
+        return;
+    }
+    else {
         res.status(500).json({ message: "Internal server error", field: "", status: 500 });
         console.log(res, "RES");
         return;
