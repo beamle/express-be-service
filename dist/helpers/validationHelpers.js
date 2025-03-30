@@ -45,7 +45,7 @@ function handleError(res, error) {
 }
 function handleErrorAsArrayOfErrors(res, error) {
     if (error.name === 'CustomError') {
-        res.status(error.status).json({ errorMessages: [{ message: error.message, field: error.field }] });
+        res.status(error.status).json({ errorsMessages: [{ message: error.message, field: error.field }] });
         return;
     }
     else {
