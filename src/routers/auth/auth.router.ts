@@ -5,6 +5,6 @@ import { bearerAuthorizationValidator } from "../../authorization/middlewares/be
 export const authRouter = Router({})
 
 authRouter.post("/login", authController.login)
-authRouter.post("/register", authController.register)
+authRouter.post("/registration", authController.registration)
 authRouter.post("/confirm-email", authController.confirmEmail)
 authRouter.get("/me", bearerAuthorizationValidator, authController.me)

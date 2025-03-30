@@ -22,7 +22,7 @@ class AuthController {
     }
   }
 
-  async register(req: Request, res: Response) {
+  async registration(req: Request, res: Response) {
     const { email, password, login } = req.body
     try {
       await usersQueryRepository.getUserBy({ email })

@@ -35,7 +35,7 @@ class AuthController {
             }
         });
     }
-    register(req, res) {
+    registration(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password, login } = req.body;
             try {
