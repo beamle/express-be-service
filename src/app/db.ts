@@ -57,14 +57,6 @@ export type MeViewModel = {
   userId: string
 }
 
-// export type UserCreationInput = {
-//   _id?: ObjectId
-//   id?: any
-//   login: string,
-//   email: string,
-//   password: string,
-// }
-
 export type UserTypeViewModel = {
   id: string,
   login: string,

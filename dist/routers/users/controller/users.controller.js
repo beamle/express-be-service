@@ -36,7 +36,7 @@ class UsersController {
             try {
                 yield users_queryRepository_1.default.getUserBy({ email });
                 yield users_queryRepository_1.default.getUserBy({ login });
-                const createdUserId = yield users_service_1.default.createUser({ email, password, login });
+                const createdUserId = yield users_service_1.default.createUser({ email, password, login }, false, true);
                 const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
                 res.status(201).json(user);
                 return;

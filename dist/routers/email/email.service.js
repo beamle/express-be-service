@@ -22,11 +22,10 @@ exports.PostErrors = {
     INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 },
     DID_NOT_CREATE_COMMENT: { message: "Didn't create comment", field: "", status: 400 }
 };
+// Service is using Manager
 class EmailService {
     sendEmail(userEmail, password, message) {
         return __awaiter(this, void 0, void 0, function* () {
-            // savet orepo
-            // get usr  from repo
             yield email_manager_1.default.sendEmailRecoveryMessage(userEmail, password, message);
         });
     }

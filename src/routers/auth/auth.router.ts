@@ -6,5 +6,6 @@ export const authRouter = Router({})
 
 authRouter.post("/login", authController.login)
 authRouter.post("/registration", authController.registration)
-authRouter.post("/confirm-email", authController.confirmEmail)
+authRouter.post("/registration-confirmation", authController.confirmEmail)
+authRouter.get("/registration-email-resending", authController.resendEmail)
 authRouter.get("/me", bearerAuthorizationValidator, authController.me)

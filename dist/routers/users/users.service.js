@@ -25,15 +25,16 @@ const EXPIRATION_TIME_EXTRA = {
 };
 class UsersService {
     createUser(userData_1) {
-        return __awaiter(this, arguments, void 0, function* (userData, isConfirmed = true) {
+        return __awaiter(this, arguments, void 0, function* (userData, isConfirmed = false, createByAdmin = false) {
             const passwordHash = yield this.generateHash(userData.password, 10);
             const newUser = {
                 login: userData.login,
                 password: passwordHash,
                 email: userData.email,
                 createdAt: new Date().toISOString(),
+                // registrationData: { ip: userData.ip}, // TODO: esli za poslednie 5 minut, s odnogo Ip adressa mngoo registracij, to block for 5 minutes
                 emailConfirmation: {
-                    isConfirmed,
+                    isConfirmed: createByAdmin,
                     confirmationCode: (0, uuidv4_1.uuid)(),
                     expirationDate: (0, date_fns_1.add)(new Date(), EXPIRATION_TIME_EXTRA.FIVE_MINUTES)
                 }

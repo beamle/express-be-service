@@ -10,12 +10,10 @@ export const PostErrors = {
   DID_NOT_CREATE_COMMENT: { message: "Didn't create comment", field: "", status: 400 }
 }
 
+// Service is using Manager
 class EmailService {
 
   async sendEmail(userEmail, password, message) {
-
-    // savet orepo
-    // get usr  from repo
     await emailManager.sendEmailRecoveryMessage(userEmail, password, message)
   }
 }

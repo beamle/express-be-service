@@ -22,7 +22,7 @@ class UsersController {
       await usersQueryRepository.getUserBy({ email })
       await usersQueryRepository.getUserBy({ login })
 
-      const createdUserId = await usersService.createUser({ email, password, login })
+      const createdUserId = await usersService.createUser({ email, password, login }, false, true)
       const user = await usersQueryRepository.getUserBy({ id: createdUserId.toString() })
       res.status(201).json(user)
       return

@@ -47,6 +47,17 @@ class UsersQueryRepository {
             };
         });
     }
+    getUserByEmail(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email }) {
+            if (email) {
+                const existingUserByEmail = yield users_repository_1.default.findUserBy({ email: email });
+                if (!existingUserByEmail) {
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+                }
+                return this.mapUserOrUsersWithId(existingUserByEmail);
+            }
+        });
+    }
     getUserBy(_a) {
         return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
             if (id) {

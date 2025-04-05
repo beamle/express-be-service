@@ -6,5 +6,5 @@ export const UsersErrors = {
   INCORRECT_PASSWORD: { message: "Wrong password", field: "password", status: 401 },
   INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 },
   USER_WITH_SUCH_EMAIL_ALREADY_EXIST: { message: "Such email already in use", field: "email", status: 400 },
-  USER_WITH_SUCH_LOGIN_ALREADY_EXIST: { message: "Such login already in use", field: "", status: 400 }
+  USER_WITH_SUCH_LOGIN_ALREADY_EXIST: { message: "Such login already in use", field: "login", status: 400 }
 }

@@ -13,7 +13,7 @@ const EXPIRATION_TIME_EXTRA = {
 }
 
 class UsersService {
-  async createUser(userData: Omit<UserType, "createdAt">, isConfirmed = true): Promise<ObjectId> {
+  async createUser(userData: Omit<UserType, "createdAt">, isConfirmed = false, createByAdmin = false): Promise<ObjectId> {
     const passwordHash = await this.generateHash(userData.password, 10)
 
     const newUser = {
@@ -21,8 +21,9 @@ class UsersService {
       password: passwordHash,
       email: userData.email,
       createdAt: new Date().toISOString(),
+      // registrationData: { ip: userData.ip}, // TODO: esli za poslednie 5 minut, s odnogo Ip adressa mngoo registracij, to block for 5 minutes
       emailConfirmation: {
-        isConfirmed,
+        isConfirmed: createByAdmin,
         confirmationCode: uuid(),
         expirationDate: add(new Date(), EXPIRATION_TIME_EXTRA.FIVE_MINUTES)
       }

@@ -41,6 +41,12 @@ class UsersRepository {
     return result.acknowledged
   }
 
+  async updateUserConfirmationCode(id: ObjectId, code: string): Promise<boolean> {
+    const result = await usersCollection.updateOne({_id: id}, {$set: {'emailConfirmation.confirmationCode': code}});
+
+    return result.modifiedCount === 1
+  }
+
   async updateConfirmation(id: ObjectId): Promise<boolean> {
     let result = await usersCollection.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } })
     return result.modifiedCount === 1
