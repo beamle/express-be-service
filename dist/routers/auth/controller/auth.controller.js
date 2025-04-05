@@ -23,7 +23,7 @@ const auth_service_1 = __importDefault(require("../auth.service"));
 const uuidv4_1 = require("uuidv4");
 const mongodb_1 = require("mongodb");
 exports.AuthErrors = {
-    EMAIL_CONFIRMATION_PROBLEM: { message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate", field: "", status: 404 },
+    EMAIL_CONFIRMATION_PROBLEM: { message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate", field: "", status: 400 },
 };
 class AuthController {
     login(req, res) {
@@ -99,10 +99,11 @@ class AuthController {
             try {
                 const result = yield auth_service_1.default.confirmEmail(req.body.code, req.body.email);
                 if (result) {
-                    res.status(201).send();
+                    res.status(204).send();
+                    return;
                 }
                 else {
-                    res.status(404).send();
+                    res.status(400).send();
                 }
             }
             catch (e) {

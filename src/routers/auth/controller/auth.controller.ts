@@ -13,7 +13,7 @@ import { uuid } from "uuidv4";
 import { ObjectId } from "mongodb";
 
 export const AuthErrors = {
-  EMAIL_CONFIRMATION_PROBLEM: { message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate", field: "", status: 404 },
+  EMAIL_CONFIRMATION_PROBLEM: { message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate", field: "", status: 400 },
 }
 
 
@@ -87,9 +87,11 @@ class AuthController {
     try {
       const result = await authService.confirmEmail(req.body.code, req.body.email)
       if(result) {
-        res.status(201).send()
-      } else {
-        res.status(404).send()
+        res.status(204).send()
+        return
+      }
+      else {
+        res.status(400).send()
       }
     } catch (e) {
       handleError(res, e)

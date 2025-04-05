@@ -14,17 +14,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const users_repository_1 = __importDefault(require("../users/users.repository"));
 const mongodb_1 = require("mongodb");
+const CustomError_1 = require("../../helpers/CustomError");
+const Errors_1 = require("../users/meta/Errors");
+const auth_controller_1 = require("./controller/auth.controller");
 class AuthService {
     confirmEmail(code, email) {
         return __awaiter(this, void 0, void 0, function* () {
             let user = yield users_repository_1.default.findUserBy({ "emailConfirmation.confirmationCode": code });
-            if (!user)
-                return false;
+            if (!user) {
+                throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+            }
             if (user.emailConfirmation.confirmationCode === code && user.emailConfirmation.expirationDate > new Date()) {
                 const result = yield users_repository_1.default.updateConfirmation(new mongodb_1.ObjectId(user._id));
                 return result;
             }
-            return false;
+            else {
+                throw new CustomError_1.CustomError(auth_controller_1.AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
+            }
         });
     }
 }
