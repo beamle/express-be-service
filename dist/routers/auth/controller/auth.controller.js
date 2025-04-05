@@ -20,7 +20,6 @@ const users_queryRepository_1 = __importDefault(require("../../users/users.query
 const email_manager_1 = __importDefault(require("../../../managers/email.manager"));
 const users_repository_1 = __importDefault(require("../../users/users.repository"));
 const auth_service_1 = __importDefault(require("../auth.service"));
-const CustomError_1 = require("../../../helpers/CustomError");
 const uuidv4_1 = require("uuidv4");
 const mongodb_1 = require("mongodb");
 exports.AuthErrors = {
@@ -77,7 +76,9 @@ class AuthController {
                 debugger;
                 // if(user.emailConfirmation.isConfirmed || user.emailConfirmation.expirationDate < new Date()) {
                 if (user.emailConfirmation.isConfirmed) {
-                    throw new CustomError_1.CustomError(exports.AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
+                    res.sendStatus(200);
+                    return;
+                    // throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
                 }
                 const newConfirmationCode = (0, uuidv4_1.uuid)();
                 yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);

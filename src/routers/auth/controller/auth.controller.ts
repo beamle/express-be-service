@@ -63,7 +63,9 @@ class AuthController {
       debugger
       // if(user.emailConfirmation.isConfirmed || user.emailConfirmation.expirationDate < new Date()) {
       if(user.emailConfirmation.isConfirmed) {
-        throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
+        res.sendStatus(200)
+        return
+        // throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
       }
 
       const newConfirmationCode = uuid()
