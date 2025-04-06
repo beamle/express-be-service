@@ -24,12 +24,13 @@ class AuthService {
             if (!user) {
                 throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
             }
-            if (user.emailConfirmation.confirmationCode === code && user.emailConfirmation.expirationDate > new Date()) {
+            // && user.emailConfirmation.expirationDate > new Date()
+            if (user.emailConfirmation.confirmationCode === code) {
                 const result = yield users_repository_1.default.updateConfirmation(new mongodb_1.ObjectId(user._id));
                 return result;
             }
             else {
-                throw new CustomError_1.CustomError(auth_controller_1.AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
+                throw new CustomError_1.CustomError(auth_controller_1.AuthErrors.ACCOUNT_ALREADY_CONFIRMED);
             }
         });
     }

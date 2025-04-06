@@ -13,11 +13,12 @@ class AuthService {
     if (!user){
       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN)
     }
-    if (user.emailConfirmation.confirmationCode === code && user.emailConfirmation.expirationDate > new Date()) {
+    // && user.emailConfirmation.expirationDate > new Date()
+    if (user.emailConfirmation.confirmationCode === code) {
       const result = await usersRepository.updateConfirmation(new ObjectId(user._id))
       return result
     } else {
-      throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
+      throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
     }
   }
 

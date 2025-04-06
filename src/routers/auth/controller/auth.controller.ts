@@ -9,18 +9,26 @@ import authService from "../auth.service";
 import { UserTypeViewModel } from "../../../app/db";
 import { uuid } from "uuidv4";
 import { ObjectId } from "mongodb";
+import { CustomError } from "../../../helpers/CustomError";
+import { UsersErrors } from "../../users/meta/Errors";
 
 export const AuthErrors = {
   EMAIL_CONFIRMATION_PROBLEM: {
-    message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate",
-    field: "",
+    message: "Something wrong with email confirmation. Code is confirmed already or expirtationDate has expired",
+    field: "code",
     status: 400
   },
   ACCOUNT_ALREADY_CONFIRMED: {
     message: "Your account is already confirmed",
-    field: "",
-    status: 200
+    field: "code",
+    status: 400
   },
+  EMAIL_ALREADY_CONFIRMED: {
+    message: "Your email is already confirmed",
+    field: "code",
+    status: 400
+  },
+
   // ACCOUNT_CONFIRMATION_CODE_EXPIRED: {
   //   message: "Your account confirmation code has expired",
   //   field: "",
@@ -73,7 +81,7 @@ class AuthController {
     try {
       const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
       if (user.emailConfirmation.isConfirmed) {
-        res.send(200).json({ message: AuthErrors.ACCOUNT_ALREADY_CONFIRMED })
+        throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
       }
 
       const newConfirmationCode = uuid()
@@ -91,7 +99,6 @@ class AuthController {
   }
 
   async confirmEmail(req: Request, res: Response) {
-    debugger
     try {
       const result = await authService.confirmEmail(req.body.code, req.body.email)
       if (result) {
@@ -101,7 +108,7 @@ class AuthController {
         res.status(400).send()
       }
     } catch (e) {
-      handleError(res, e)
+      handleErrorAsArrayOfErrors(res, e)
     }
   }
 

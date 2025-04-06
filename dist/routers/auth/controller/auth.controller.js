@@ -22,16 +22,22 @@ const users_repository_1 = __importDefault(require("../../users/users.repository
 const auth_service_1 = __importDefault(require("../auth.service"));
 const uuidv4_1 = require("uuidv4");
 const mongodb_1 = require("mongodb");
+const CustomError_1 = require("../../../helpers/CustomError");
 exports.AuthErrors = {
     EMAIL_CONFIRMATION_PROBLEM: {
-        message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate",
-        field: "",
+        message: "Something wrong with email confirmation. Code is confirmed already or expirtationDate has expired",
+        field: "code",
         status: 400
     },
     ACCOUNT_ALREADY_CONFIRMED: {
         message: "Your account is already confirmed",
-        field: "",
-        status: 200
+        field: "code",
+        status: 400
+    },
+    EMAIL_ALREADY_CONFIRMED: {
+        message: "Your email is already confirmed",
+        field: "code",
+        status: 400
     },
     // ACCOUNT_CONFIRMATION_CODE_EXPIRED: {
     //   message: "Your account confirmation code has expired",
@@ -88,7 +94,7 @@ class AuthController {
             try {
                 const user = yield users_queryRepository_1.default.getUserByEmail({ email });
                 if (user.emailConfirmation.isConfirmed) {
-                    res.send(200).json({ message: exports.AuthErrors.ACCOUNT_ALREADY_CONFIRMED });
+                    throw new CustomError_1.CustomError(exports.AuthErrors.EMAIL_ALREADY_CONFIRMED);
                 }
                 const newConfirmationCode = (0, uuidv4_1.uuid)();
                 yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
@@ -105,7 +111,6 @@ class AuthController {
     }
     confirmEmail(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             try {
                 const result = yield auth_service_1.default.confirmEmail(req.body.code, req.body.email);
                 if (result) {
@@ -117,7 +122,7 @@ class AuthController {
                 }
             }
             catch (e) {
-                (0, validationHelpers_1.handleError)(res, e);
+                (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
             }
         });
     }
