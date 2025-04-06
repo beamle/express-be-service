@@ -73,13 +73,12 @@ class AuthController {
             const { email } = req.body;
             try {
                 const user = yield users_queryRepository_1.default.getUserByEmail({ email });
-                debugger;
                 // if(user.emailConfirmation.isConfirmed || user.emailConfirmation.expirationDate < new Date()) {
-                if (user.emailConfirmation.isConfirmed) {
-                    res.sendStatus(200);
-                    return;
-                    // throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
-                }
+                // if(user.emailConfirmation.isConfirmed) {
+                //   res.sendStatus(204)
+                //   return
+                //   // throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
+                // }
                 const newConfirmationCode = (0, uuidv4_1.uuid)();
                 yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
                 const updatedUser = yield users_queryRepository_1.default.getUserByEmail({ email });

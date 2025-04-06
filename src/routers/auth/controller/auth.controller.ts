@@ -60,13 +60,12 @@ class AuthController {
     const { email } = req.body
     try {
       const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-      debugger
       // if(user.emailConfirmation.isConfirmed || user.emailConfirmation.expirationDate < new Date()) {
-      if(user.emailConfirmation.isConfirmed) {
-        res.sendStatus(200)
-        return
-        // throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
-      }
+      // if(user.emailConfirmation.isConfirmed) {
+      //   res.sendStatus(204)
+      //   return
+      //   // throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
+      // }
 
       const newConfirmationCode = uuid()
 
