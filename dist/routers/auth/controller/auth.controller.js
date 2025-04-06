@@ -23,7 +23,21 @@ const auth_service_1 = __importDefault(require("../auth.service"));
 const uuidv4_1 = require("uuidv4");
 const mongodb_1 = require("mongodb");
 exports.AuthErrors = {
-    EMAIL_CONFIRMATION_PROBLEM: { message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate", field: "", status: 400 },
+    EMAIL_CONFIRMATION_PROBLEM: {
+        message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate",
+        field: "",
+        status: 400
+    },
+    ACCOUNT_ALREADY_CONFIRMED: {
+        message: "Your account is already confirmed",
+        field: "",
+        status: 200
+    },
+    // ACCOUNT_CONFIRMATION_CODE_EXPIRED: {
+    //   message: "Your account confirmation code has expired",
+    //   field: "",
+    //   status: 200
+    // }
 };
 class AuthController {
     login(req, res) {
@@ -48,19 +62,19 @@ class AuthController {
                 yield users_queryRepository_1.default.getUserBy({ email });
                 yield users_queryRepository_1.default.getUserBy({ login });
                 const createdUserId = yield users_service_1.default.createUser({ email, password, login }, false);
-                if (createdUserId) {
-                    const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
-                    try {
-                        // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-                        yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode));
-                    }
-                    catch (e) {
-                        (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
-                        yield users_repository_1.default.deleteUser(createdUserId);
-                    }
-                    res.status(204).json(user);
-                    return;
+                // if (createdUserId) {
+                const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
+                try {
+                    // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+                    yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode));
                 }
+                catch (e) {
+                    (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
+                    yield users_repository_1.default.deleteUser(createdUserId);
+                }
+                res.status(204).json(user);
+                return;
+                // }
             }
             catch (e) {
                 (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
@@ -73,12 +87,9 @@ class AuthController {
             const { email } = req.body;
             try {
                 const user = yield users_queryRepository_1.default.getUserByEmail({ email });
-                // if(user.emailConfirmation.isConfirmed || user.emailConfirmation.expirationDate < new Date()) {
-                // if(user.emailConfirmation.isConfirmed) {
-                //   res.sendStatus(204)
-                //   return
-                //   // throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
-                // }
+                if (user.emailConfirmation.isConfirmed) {
+                    res.send(200).json({ message: exports.AuthErrors.ACCOUNT_ALREADY_CONFIRMED });
+                }
                 const newConfirmationCode = (0, uuidv4_1.uuid)();
                 yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
                 const updatedUser = yield users_queryRepository_1.default.getUserByEmail({ email });

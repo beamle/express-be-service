@@ -7,13 +7,25 @@ import emailManager from "../../../managers/email.manager";
 import usersRepository from "../../users/users.repository";
 import authService from "../auth.service";
 import { UserTypeViewModel } from "../../../app/db";
-import { CustomError } from "../../../helpers/CustomError";
-import { CommentsErrors } from "../../comments/comments.service";
 import { uuid } from "uuidv4";
 import { ObjectId } from "mongodb";
 
 export const AuthErrors = {
-  EMAIL_CONFIRMATION_PROBLEM: { message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate", field: "", status: 400 },
+  EMAIL_CONFIRMATION_PROBLEM: {
+    message: "Something wrong with email confirmation. Check isConfirmed or expirtationDate",
+    field: "",
+    status: 400
+  },
+  ACCOUNT_ALREADY_CONFIRMED: {
+    message: "Your account is already confirmed",
+    field: "",
+    status: 200
+  },
+  // ACCOUNT_CONFIRMATION_CODE_EXPIRED: {
+  //   message: "Your account confirmation code has expired",
+  //   field: "",
+  //   status: 200
+  // }
 }
 
 
@@ -38,18 +50,18 @@ class AuthController {
       await usersQueryRepository.getUserBy({ login })
 
       const createdUserId = await usersService.createUser({ email, password, login }, false)
-      if (createdUserId) {
-        const user = await usersQueryRepository.getUserBy({ id: createdUserId.toString() }) as UserTypeViewModel
-        try {
-          // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-          await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode))
-        } catch (e) {
-          handleErrorAsArrayOfErrors(res, e)
-          await usersRepository.deleteUser(createdUserId)
-        }
-        res.status(204).json(user)
-        return
+      // if (createdUserId) {
+      const user = await usersQueryRepository.getUserBy({ id: createdUserId.toString() }) as UserTypeViewModel
+      try {
+        // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+        await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode))
+      } catch (e) {
+        handleErrorAsArrayOfErrors(res, e)
+        await usersRepository.deleteUser(createdUserId)
       }
+      res.status(204).json(user)
+      return
+      // }
     } catch (e) {
       handleErrorAsArrayOfErrors(res, e)
     }
@@ -60,12 +72,9 @@ class AuthController {
     const { email } = req.body
     try {
       const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-      // if(user.emailConfirmation.isConfirmed || user.emailConfirmation.expirationDate < new Date()) {
-      // if(user.emailConfirmation.isConfirmed) {
-      //   res.sendStatus(204)
-      //   return
-      //   // throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM)
-      // }
+      if (user.emailConfirmation.isConfirmed) {
+        res.send(200).json({ message: AuthErrors.ACCOUNT_ALREADY_CONFIRMED })
+      }
 
       const newConfirmationCode = uuid()
 
@@ -85,11 +94,10 @@ class AuthController {
     debugger
     try {
       const result = await authService.confirmEmail(req.body.code, req.body.email)
-      if(result) {
+      if (result) {
         res.status(204).send()
         return
-      }
-      else {
+      } else {
         res.status(400).send()
       }
     } catch (e) {
