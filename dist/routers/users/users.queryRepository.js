@@ -52,7 +52,7 @@ class UsersQueryRepository {
             if (email) {
                 const existingUserByEmail = yield users_repository_1.default.findUserBy({ email: email });
                 if (!existingUserByEmail) {
-                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL);
                 }
                 return this.mapUserOrUsersWithId(existingUserByEmail);
             }

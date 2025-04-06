@@ -8,7 +8,6 @@ import { ObjectId } from "mongodb";
 
 class UsersQueryRepository {
   async getUsers(sortingData: UsersSortingData): Promise<UsersViewModel> {
-
     const filter: any = createFilter(sortingData)
     const users = await usersRepository.getUsers(sortingData, filter)
     const usersLength = await usersCollection.countDocuments(filter)
@@ -28,11 +27,10 @@ class UsersQueryRepository {
 
 
   async getUserByEmail({ email }: Partial<UserType>): Promise<UserTypeViewModel | UserTypeViewModel[] | null> {
-
     if (email) {
       const existingUserByEmail = await usersRepository.findUserBy({ email: email });
       if (!existingUserByEmail) {
-        throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+        throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL);
       }
       return this.mapUserOrUsersWithId(existingUserByEmail)
     }
@@ -40,7 +38,6 @@ class UsersQueryRepository {
   }
 
   async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | UserTypeViewModel[] | null> {
-
     if (id) {
       const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
       if (!user) {

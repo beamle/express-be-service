@@ -105,7 +105,7 @@ class AuthController {
         res.status(204).send()
         return
       } else {
-        res.status(400).send()
+        throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
       }
     } catch (e) {
       handleErrorAsArrayOfErrors(res, e)

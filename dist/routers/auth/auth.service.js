@@ -20,9 +20,10 @@ const auth_controller_1 = require("./controller/auth.controller");
 class AuthService {
     confirmEmail(code, email) {
         return __awaiter(this, void 0, void 0, function* () {
+            debugger;
             let user = yield users_repository_1.default.findUserBy({ "emailConfirmation.confirmationCode": code });
             if (!user) {
-                throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+                throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST);
             }
             // && user.emailConfirmation.expirationDate > new Date()
             if (user.emailConfirmation.confirmationCode === code) {

@@ -118,7 +118,7 @@ class AuthController {
                     return;
                 }
                 else {
-                    res.status(400).send();
+                    throw new CustomError_1.CustomError(exports.AuthErrors.ACCOUNT_ALREADY_CONFIRMED);
                 }
             }
             catch (e) {

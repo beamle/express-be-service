@@ -9,9 +9,10 @@ import { AuthErrors } from "./controller/auth.controller";
 
 class AuthService {
   async confirmEmail(code: string, email: string) {
+    debugger
     let user = await usersRepository.findUserBy({ "emailConfirmation.confirmationCode": code }) as UserTypeViewModel
     if (!user){
-      throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN)
+      throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST)
     }
     // && user.emailConfirmation.expirationDate > new Date()
     if (user.emailConfirmation.confirmationCode === code) {
