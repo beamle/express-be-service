@@ -21,29 +21,31 @@ class UsersQueryRepository {
       page: sortingData.pageNumber,
       pageSize: sortingData.pageSize,
       totalCount: usersLength,
-      items: this.mapUserOrUsersWithId(users) as UserTypeViewModel[]
+      items: users.map(user => this.mapUserWithId(user))
     }
   }
 
 
-  async getUserByEmail({ email }: Partial<UserType>): Promise<UserTypeViewModel | UserTypeViewModel[] | null> {
+  async getUserByEmail({ email }: Partial<UserType>): Promise<UserTypeViewModel | null> {
     if (email) {
       const existingUserByEmail = await usersRepository.findUserBy({ email: email });
       if (!existingUserByEmail) {
         throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL);
       }
-      return this.mapUserOrUsersWithId(existingUserByEmail)
+      return this.mapUserWithId(existingUserByEmail)
     }
+
+    return null
 
   }
 
-  async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | UserTypeViewModel[] | null> {
+  async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | null> {
     if (id) {
       const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
       if (!user) {
         throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
       }
-      return this.mapUserOrUsersWithId(user)
+      return this.mapUserWithId(user)
     }
 
     else if(email) {
@@ -66,14 +68,18 @@ class UsersQueryRepository {
 
   }
 
-  mapUserOrUsersWithId(userOrUsers: UserType | UserType[]): UserTypeViewModel | UserTypeViewModel[] {
-    if (Array.isArray(userOrUsers)) {
-      return userOrUsers.map(({ _id, password, ...restOfUser }) => ({ ...restOfUser, id: _id!.toString() } as UserTypeViewModel))
-    }
-
-    const { _id, password, ...rest } = userOrUsers
-    return { ...rest, id: _id!.toString() } as UserTypeViewModel
+  mapUserWithId(user: UserType): UserTypeViewModel {
+    const { _id, password, ...rest } = user
+    return { ...rest, id: _id!.toString() }
   }
+  // mapUserOrUsersWithId(userOrUsers: UserType | UserType[]): UserTypeViewModel | UserTypeViewModel[] {
+  //   if (Array.isArray(userOrUsers)) {
+  //     return userOrUsers.map(({ _id, password, ...restOfUser }) => ({ ...restOfUser, id: _id!.toString() } as UserTypeViewModel))
+  //   }
+  //
+  //   const { _id, password, ...rest } = userOrUsers
+  //   return { ...rest, id: _id!.toString() } as UserTypeViewModel
+  // }
 }
 
 export default new UsersQueryRepository()

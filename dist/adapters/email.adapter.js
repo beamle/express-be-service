@@ -13,22 +13,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const dotenv_1 = require("dotenv");
+const CustomError_1 = require("../helpers/CustomError");
+(0, dotenv_1.config)();
+const transporter = nodemailer_1.default.createTransport({
+    service: 'gmail',
+    host: "smtp.gmail.com",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+    },
+});
 class EmailAdapter {
     sendEmail(email, message, subject) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transporter = nodemailer_1.default.createTransport({
-                service: 'gmail',
-                host: "smtp.ethereal.email",
-                // port: 587,
-                // secure: false, // true for port 465, false for other ports
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASSWORD,
-                },
-            });
             try {
+                console.log(`email`, email);
+                console.log(`message`, message);
+                console.log(`subject`, subject);
                 const info = yield transporter.sendMail({
-                    from: 'Nikita', // sender address
+                    from: 'Nikita <nikitadevmode@gmail.com>', // sender address
                     to: email, // list of receivers
                     subject: subject, // Subject line
                     html: message, // html body
@@ -37,6 +41,11 @@ class EmailAdapter {
             }
             catch (e) {
                 console.log('Error sending email: ', e);
+                throw new CustomError_1.CustomError({
+                    message: "Something went wrong with sending email",
+                    field: "email STMP service",
+                    status: 400
+                });
             }
         });
     }

@@ -4,24 +4,10 @@ import { ObjectId } from "mongodb";
 import { handleError } from "../../helpers/validationHelpers";
 import commentsQueryRepository from "./comments.queryRepository";
 import commentsService from "./comments.service";
-import authQueryRepository from "../auth/auth.queryRepository";
 
 class CommentsController {
   async getCommentById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     const { id: searchableCommentId } = req.params
-    // if (!searchableCommentId) {
-    //   try {
-    //     const posts = await postsQueryRepository.getPosts({
-    //       pageNumber,
-    //       pageSize,
-    //       sortBy,
-    //       sortDirection
-    //     }, new ObjectId(searchablePostId))
-    //     res.status(200).json(posts)
-    //   } catch (e) {
-    //     handleError(res, e)
-    //   }
-    // }
     try {
       const comment = await commentsQueryRepository.getCommentBy(new ObjectId(searchableCommentId))
       res.status(200).json(comment)
@@ -31,39 +17,38 @@ class CommentsController {
     }
   }
 
-  async updateCommentForPost(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
+  async updateCommentForPost(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response): Promise<any> {
     const { id: searchableCommentId } = req.params
-
-    debugger
 
     try {
       const comment = await commentsQueryRepository.getCommentBy(new ObjectId(searchableCommentId))
-      // const me = await authQueryRepository.getMeBy(req.context.user)
+
       if (comment.commentatorInfo.userId !== req.context.user?.userId) {
         return res.status(403).json({ message: "You are not owner of the comment" })
       }
+
       const isCommentUpdated = await commentsService.updateComment({ ...req.body }, new ObjectId(searchableCommentId))
-
-      if (isCommentUpdated) res.sendStatus(204)
-
-      return
+      if (isCommentUpdated) {
+        return res.send(204)
+      }
+      // else {
+      //   return res.status(400).json({ message: "Failed to update the comment" })
+      // }
     } catch (error) {
       handleError(res, error)
     }
   }
 
-  async deleteCommentById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
+  async deleteCommentById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response): Promise<any> {
     const { id: commentIdToDelete } = req.params;
 
     try {
       const comment = await commentsQueryRepository.getCommentBy(new ObjectId(commentIdToDelete))
-
       if (comment.commentatorInfo.userId !== req.context.user?.userId) {
         return res.status(403).json({ message: "You are not owner of the comment" })
       }
 
       const deletingResult = await commentsService.deleteComment(new ObjectId(commentIdToDelete))
-
       res.status(204).json(deletingResult)
       return
     } catch (e) {

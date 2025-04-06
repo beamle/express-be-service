@@ -63,10 +63,11 @@ class AuthController {
                 yield users_queryRepository_1.default.getUserBy({ email });
                 yield users_queryRepository_1.default.getUserBy({ login });
                 const createdUserId = yield users_service_1.default.createUser({ email, password, login }, false);
-                const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
+                const user = yield users_queryRepository_1.default.getUserByEmail({ email });
+                // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
+                debugger;
                 try {
-                    // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-                    yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation");
+                    yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
                 }
                 catch (e) {
                     (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);

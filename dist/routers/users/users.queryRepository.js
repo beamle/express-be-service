@@ -43,7 +43,7 @@ class UsersQueryRepository {
                 page: sortingData.pageNumber,
                 pageSize: sortingData.pageSize,
                 totalCount: usersLength,
-                items: this.mapUserOrUsersWithId(users)
+                items: users.map(user => this.mapUserWithId(user))
             };
         });
     }
@@ -54,8 +54,9 @@ class UsersQueryRepository {
                 if (!existingUserByEmail) {
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL);
                 }
-                return this.mapUserOrUsersWithId(existingUserByEmail);
+                return this.mapUserWithId(existingUserByEmail);
             }
+            return null;
         });
     }
     getUserBy(_a) {
@@ -65,7 +66,7 @@ class UsersQueryRepository {
                 if (!user) {
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_ID);
                 }
-                return this.mapUserOrUsersWithId(user);
+                return this.mapUserWithId(user);
             }
             else if (email) {
                 const existingUserByEmail = yield users_repository_1.default.findUserBy({ email: email });
@@ -84,14 +85,8 @@ class UsersQueryRepository {
             return null;
         });
     }
-    mapUserOrUsersWithId(userOrUsers) {
-        if (Array.isArray(userOrUsers)) {
-            return userOrUsers.map((_a) => {
-                var { _id, password } = _a, restOfUser = __rest(_a, ["_id", "password"]);
-                return (Object.assign(Object.assign({}, restOfUser), { id: _id.toString() }));
-            });
-        }
-        const { _id, password } = userOrUsers, rest = __rest(userOrUsers, ["_id", "password"]);
+    mapUserWithId(user) {
+        const { _id, password } = user, rest = __rest(user, ["_id", "password"]);
         return Object.assign(Object.assign({}, rest), { id: _id.toString() });
     }
 }

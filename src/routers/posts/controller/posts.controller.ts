@@ -113,7 +113,7 @@ class PostsController {
     context: string
   }>, res: Response) {
     const { postId } = req.params
-    const { content } = req.body
+    const { context } = req.body
     const { userId, login } = req.context.user
 
     try {
@@ -121,7 +121,7 @@ class PostsController {
       const createdCommentId = await postsService.createCommentForPost(new ObjectId(post.id!), {
         userId,
         userLogin: login
-      }, content)
+      }, context)
       const createdComment = await commentsQueryRepository.getLastCreatedCommentForPostBy(new ObjectId(createdCommentId))
 
       res.status(201).json(createdComment)

@@ -31,18 +31,23 @@ export type UserType = {
   email: string,
   password: string,
   createdAt: string
-  // emailConfirmation: {
-  //   isConfirmed: boolean
-  //   confirmationCode: string
-  //   expirationDate: Date
-  // }
+  emailConfirmation: {
+    isConfirmed: boolean
+    confirmationCode: string
+    expirationDate: Date
+  }
+}
 
+export type UserCreationType = {
+  email: string,
+  password: string,
+  login: string,
 }
 
 export type CommentDBType = {
   _id?: ObjectId
   id?: any
-  postId: string
+  postId?: string
   content: string
   commentatorInfo: {
     userId: string
@@ -62,7 +67,7 @@ export type UserTypeViewModel = {
   login: string,
   email: string,
   password?: string,
-  createdAt: Date
+  createdAt: string
   emailConfirmation: {
     isConfirmed: boolean
     confirmationCode: string

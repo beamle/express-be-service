@@ -20,19 +20,6 @@ class CommentsController {
     getCommentById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id: searchableCommentId } = req.params;
-            // if (!searchableCommentId) {
-            //   try {
-            //     const posts = await postsQueryRepository.getPosts({
-            //       pageNumber,
-            //       pageSize,
-            //       sortBy,
-            //       sortDirection
-            //     }, new ObjectId(searchablePostId))
-            //     res.status(200).json(posts)
-            //   } catch (e) {
-            //     handleError(res, e)
-            //   }
-            // }
             try {
                 const comment = yield comments_queryRepository_1.default.getCommentBy(new mongodb_1.ObjectId(searchableCommentId));
                 res.status(200).json(comment);
@@ -47,17 +34,18 @@ class CommentsController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const { id: searchableCommentId } = req.params;
-            debugger;
             try {
                 const comment = yield comments_queryRepository_1.default.getCommentBy(new mongodb_1.ObjectId(searchableCommentId));
-                // const me = await authQueryRepository.getMeBy(req.context.user)
                 if (comment.commentatorInfo.userId !== ((_a = req.context.user) === null || _a === void 0 ? void 0 : _a.userId)) {
                     return res.status(403).json({ message: "You are not owner of the comment" });
                 }
                 const isCommentUpdated = yield comments_service_1.default.updateComment(Object.assign({}, req.body), new mongodb_1.ObjectId(searchableCommentId));
-                if (isCommentUpdated)
-                    res.sendStatus(204);
-                return;
+                if (isCommentUpdated) {
+                    return res.send(204);
+                }
+                // else {
+                //   return res.status(400).json({ message: "Failed to update the comment" })
+                // }
             }
             catch (error) {
                 (0, validationHelpers_1.handleError)(res, error);

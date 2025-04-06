@@ -8,7 +8,7 @@ export type CommentsModelView = {
   items: CommentType[];
 }
 
-export type CommentType = Omit<CommentDBType, "postId" | "_id">
+export type CommentType = CommentDBType
 
 export type Comment = {
   commentatorInfo: {
@@ -17,4 +17,5 @@ export type Comment = {
   };
   createdAt: string;
   id: string;
+  _id?: string
 }

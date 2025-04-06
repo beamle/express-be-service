@@ -1,6 +1,6 @@
 import { Request } from "express";
 import { SortDirection } from "mongodb";
-import { BlogsSortingData, PostsSortingData, SortingDataBase, UsersSortingData } from "../app/db";
+import { SortingBase, UsersSortingData } from "../app/db";
 
 type FilterData = Partial<{
   searchNameTerm: string,
@@ -9,7 +9,7 @@ type FilterData = Partial<{
   id: string
 }>
 
-function generateSortingDataBase(req: Request): SortingDataBase {
+function generateSortingDataBase(req: Request): SortingBase {
   let pageNumber = req.query.pageNumber ? Number(req.query.pageNumber) : 1
   let pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10
   let sortBy = req.query.sortBy ? String(req.query.sortBy) : 'createdAt'
@@ -18,7 +18,7 @@ function generateSortingDataBase(req: Request): SortingDataBase {
   return { pageNumber, pageSize, sortBy, sortDirection }
 }
 
-export function generateSortingDataObject(req: Request): SortingDataBase & Partial<{ searchNameTerm: string }> {
+export function generateSortingDataObject(req: Request): SortingBase & Partial<{ searchNameTerm: string }> {
   const sortingDataBase = generateSortingDataBase(req)
   let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : ""
 

@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import usersRepository from "./users.repository";
 import { CustomError } from "../../helpers/CustomError";
 import { UsersErrors } from "./meta/Errors";
-import { UserType } from "../../app/db";
+import { UserCreationType, UserType } from "../../app/db";
 import bcrypt from "bcrypt";
 import { add } from "date-fns";
 import { uuid } from "uuidv4";
@@ -13,7 +13,7 @@ const EXPIRATION_TIME_EXTRA = {
 }
 
 class UsersService {
-  async createUser(userData: Omit<UserType, "createdAt">, isConfirmed = false, createByAdmin = false): Promise<ObjectId> {
+  async createUser(userData: UserCreationType, isConfirmed = false, createByAdmin = false): Promise<ObjectId> {
     const passwordHash = await this.generateHash(userData.password, 10)
 
     const newUser = {

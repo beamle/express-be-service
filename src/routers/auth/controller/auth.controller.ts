@@ -52,11 +52,11 @@ class AuthController {
       await usersQueryRepository.getUserBy({ login })
 
       const createdUserId = await usersService.createUser({ email, password, login }, false)
-      const user = await usersQueryRepository.getUserBy({ id: createdUserId.toString() }) as UserTypeViewModel
-
+      const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
+      // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
+debugger
       try {
-        // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-        await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation")
+        await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation") // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
       } catch (e) {
         handleErrorAsArrayOfErrors(res, e)
         await usersRepository.deleteUser(createdUserId)
