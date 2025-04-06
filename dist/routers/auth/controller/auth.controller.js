@@ -39,11 +39,6 @@ exports.AuthErrors = {
         field: "code",
         status: 400
     },
-    // ACCOUNT_CONFIRMATION_CODE_EXPIRED: {
-    //   message: "Your account confirmation code has expired",
-    //   field: "",
-    //   status: 200
-    // }
 };
 class AuthController {
     login(req, res) {
@@ -68,7 +63,6 @@ class AuthController {
                 yield users_queryRepository_1.default.getUserBy({ email });
                 yield users_queryRepository_1.default.getUserBy({ login });
                 const createdUserId = yield users_service_1.default.createUser({ email, password, login }, false);
-                // if (createdUserId) {
                 const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
                 try {
                     // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
@@ -89,7 +83,6 @@ class AuthController {
     }
     resendEmail(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             const { email } = req.body;
             try {
                 const user = yield users_queryRepository_1.default.getUserByEmail({ email });
@@ -99,8 +92,7 @@ class AuthController {
                 const newConfirmationCode = (0, uuidv4_1.uuid)();
                 yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
                 const updatedUser = yield users_queryRepository_1.default.getUserByEmail({ email });
-                // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-                yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode));
+                yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode)); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
                 res.sendStatus(204);
                 return;
             }

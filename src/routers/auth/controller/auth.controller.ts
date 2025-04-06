@@ -28,12 +28,6 @@ export const AuthErrors = {
     field: "code",
     status: 400
   },
-
-  // ACCOUNT_CONFIRMATION_CODE_EXPIRED: {
-  //   message: "Your account confirmation code has expired",
-  //   field: "",
-  //   status: 200
-  // }
 }
 
 
@@ -58,8 +52,8 @@ class AuthController {
       await usersQueryRepository.getUserBy({ login })
 
       const createdUserId = await usersService.createUser({ email, password, login }, false)
-      // if (createdUserId) {
       const user = await usersQueryRepository.getUserBy({ id: createdUserId.toString() }) as UserTypeViewModel
+
       try {
         // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
         await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode))
@@ -76,7 +70,6 @@ class AuthController {
   }
 
   async resendEmail(req: Request, res: Response) {
-    debugger
     const { email } = req.body
     try {
       const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
@@ -85,11 +78,9 @@ class AuthController {
       }
 
       const newConfirmationCode = uuid()
-
       await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode)
       const updatedUser = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-      await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode))
+      await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode))      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
       res.sendStatus(204)
       return
 
