@@ -56,7 +56,7 @@ class AuthController {
 
       try {
         // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-        await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode))
+        await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation")
       } catch (e) {
         handleErrorAsArrayOfErrors(res, e)
         await usersRepository.deleteUser(createdUserId)
@@ -80,7 +80,7 @@ class AuthController {
       const newConfirmationCode = uuid()
       await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode)
       const updatedUser = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-      await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode))      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+      await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode), "Resending registration email")      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
       res.sendStatus(204)
       return
 
@@ -121,6 +121,6 @@ export default new AuthController()
 const generateEmailConfirmationMessage = (code: string) => {
   return "<h1>Thank you for your registration</h1>\n" +
     " <p>To finish registration please follow the link below:\n" +
-    `     <a href=https://somesite.com/confirm-email?code=${code}>complete registration</a>\n` +
+    `     <a href=https://somesite.com/confirm-registration?code=${code}>complete registration</a>\n` +
     " </p>\n"
 }

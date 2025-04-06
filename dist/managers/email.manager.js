@@ -20,9 +20,9 @@ class EmailManager {
             yield email_adapter_1.default.sendEmail("user email", "password recovery", "<div> message</div>");
         });
     }
-    sendEmailConfirmationMessage(user, message, password) {
+    sendEmailConfirmationMessage(user, message, subject) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield email_adapter_1.default.sendEmail(user.email, message || "", password);
+            yield email_adapter_1.default.sendEmail(user.email, message || "", subject);
         });
     }
 }

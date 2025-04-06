@@ -66,7 +66,7 @@ class AuthController {
                 const user = yield users_queryRepository_1.default.getUserBy({ id: createdUserId.toString() });
                 try {
                     // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-                    yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode));
+                    yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation");
                 }
                 catch (e) {
                     (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
@@ -92,7 +92,7 @@ class AuthController {
                 const newConfirmationCode = (0, uuidv4_1.uuid)();
                 yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
                 const updatedUser = yield users_queryRepository_1.default.getUserByEmail({ email });
-                yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode)); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+                yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode), "Resending registration email"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
                 res.sendStatus(204);
                 return;
             }
@@ -136,6 +136,6 @@ exports.default = new AuthController();
 const generateEmailConfirmationMessage = (code) => {
     return "<h1>Thank you for your registration</h1>\n" +
         " <p>To finish registration please follow the link below:\n" +
-        `     <a href=https://somesite.com/confirm-email?code=${code}>complete registration</a>\n` +
+        `     <a href=https://somesite.com/confirm-registration?code=${code}>complete registration</a>\n` +
         " </p>\n";
 };
