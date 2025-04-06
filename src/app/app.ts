@@ -9,7 +9,6 @@ import { authRouter } from "../routers/auth/auth.router";
 
 import { Request, Response, NextFunction } from "express";
 import { commentsRouter } from "../routers/comments/comments.router";
-import { emailRouter } from "../routers/email/email.router";
 
 export function addContext(req: Request, res: Response, next: NextFunction) {
   req.context = { user: null };
@@ -32,5 +31,4 @@ app.use(SETTINGS.PATH.BLOGS, blogsRouter)
 app.use(SETTINGS.PATH.POSTS, postsRouter)
 app.use(SETTINGS.PATH.USERS, usersRouter)
 app.use(SETTINGS.PATH.COMMENTS, commentsRouter)
-app.use(SETTINGS.PATH.EMAIL, emailRouter)
 app.use(SETTINGS.PATH.TESTING, testingRouter )

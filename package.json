@@ -20,7 +20,7 @@
   },
   "scripts": {
     "watch": "tsc -w",
-    "dev": "yarn nodemon --inspect dist/app/index.js",
+    "dev": "yarn nodemon --inspect dist/app/api/index.js",
     "jest": "jest -i",
     "jest:coverage": "jest -i --coverage"
   },

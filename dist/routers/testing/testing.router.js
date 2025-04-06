@@ -7,4 +7,5 @@ exports.testingRouter = void 0;
 const express_1 = require("express");
 const testing_controller_1 = __importDefault(require("./testing.controller"));
 exports.testingRouter = (0, express_1.Router)();
+debugger;
 exports.testingRouter.delete("/all-data", testing_controller_1.default.clearDatabase);

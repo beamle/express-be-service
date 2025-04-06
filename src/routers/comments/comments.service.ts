@@ -18,7 +18,7 @@ class CommentsService {
     }
 
     return result
-  }F
+  }
 
   async deleteComment(commentId: ObjectId) {
     const result = await commentsRepository.deleteCommentById(commentId);

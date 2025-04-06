@@ -14,7 +14,6 @@ const testing_router_1 = require("../routers/testing/testing.router");
 const users_router_1 = require("../routers/users/users.router");
 const auth_router_1 = require("../routers/auth/auth.router");
 const comments_router_1 = require("../routers/comments/comments.router");
-const email_router_1 = require("../routers/email/email.router");
 function addContext(req, res, next) {
     req.context = { user: null };
     next();
@@ -32,5 +31,4 @@ exports.app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.POSTS, posts_router_1.postsRouter);
 exports.app.use(settings_1.SETTINGS.PATH.USERS, users_router_1.usersRouter);
 exports.app.use(settings_1.SETTINGS.PATH.COMMENTS, comments_router_1.commentsRouter);
-exports.app.use(settings_1.SETTINGS.PATH.EMAIL, email_router_1.emailRouter);
 exports.app.use(settings_1.SETTINGS.PATH.TESTING, testing_router_1.testingRouter);

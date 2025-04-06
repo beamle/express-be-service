@@ -43,10 +43,10 @@ class CommentsQueryRepository {
 
   }
 
-  private mapCommentsToCommentType(comments) {
+  private mapCommentsToCommentType(comments: CommentType[]) {
     return comments.map(comment => {
       const { _id, ...rest } = comment;
-      return { ...rest, id: _id.toString() };
+      return { ...rest, id: _id!.toString() };
     });
   }
 

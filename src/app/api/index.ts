@@ -1,6 +1,6 @@
-import {app} from './app'
-import {SETTINGS} from './settings'
-import { runDb } from "./db";
+import {SETTINGS} from '../settings'
+import { runDb } from "../db";
+import { app } from "../app";
 
 // Only run the server locally (not on Vercel)
 if (process.env.NODE_ENV !== 'production') {
@@ -20,6 +20,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Vercel serverless handler
-export default (req, res) => {
+export default (req: any, res: any) => {
   app(req, res); // Use your Express app to handle the request in the serverless environment
 };

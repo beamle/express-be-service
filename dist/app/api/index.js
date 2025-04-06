@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = require("../app");
 const settings_1 = require("../settings");
 const db_1 = require("../db");
+const app_1 = require("../app");
 // Only run the server locally (not on Vercel)
 if (process.env.NODE_ENV !== 'production') {
     const startApp = () => __awaiter(void 0, void 0, void 0, function* () {

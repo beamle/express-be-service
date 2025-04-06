@@ -114,7 +114,7 @@ class PostsController {
   }>, res: Response) {
     const { postId } = req.params
     const { context } = req.body
-    const { userId, login } = req.context.user
+    const { userId, login } = req.context.user!
 
     try {
       const post = await postsQueryRepository.getPostById(new ObjectId(postId))

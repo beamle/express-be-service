@@ -15,11 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailManager = void 0;
 const email_adapter_1 = __importDefault(require("../adapters/email.adapter"));
 class EmailManager {
-    sendEmailRecoveryMessage(user, password, message) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield email_adapter_1.default.sendEmail("user email", "password recovery", "<div> message</div>");
-        });
-    }
     sendEmailConfirmationMessage(user, message, subject) {
         return __awaiter(this, void 0, void 0, function* () {
             yield email_adapter_1.default.sendEmail(user.email, message || "", subject);
