@@ -46,8 +46,13 @@ class AuthController {
             try {
                 const user = yield users_service_1.default.checkCredentials(req.body.loginOrEmail, req.body.password);
                 if (user) {
-                    const token = yield jwt_service_1.default.createJWT(user);
-                    res.status(200).json({ accessToken: token });
+                    const { accessToken, refreshToken } = yield jwt_service_1.default.createJWT(user);
+                    res
+                        .status(200)
+                        .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+                        // .header('Authorization', accessToken)
+                        .json({ accessToken });
+                    // res.status(200).json({ accessToken: accessToken })
                     return;
                 }
             }
@@ -121,7 +126,6 @@ class AuthController {
     }
     me(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             try {
                 res.status(200).json(req.context.user);
                 return;

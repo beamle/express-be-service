@@ -22,8 +22,9 @@ const JwtServiceErrors = {
 class jwtService {
     createJWT(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = jsonwebtoken_1.default.sign({ userId: user._id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '10h' });
-            return token;
+            const accessToken = jsonwebtoken_1.default.sign({ userId: user._id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '10h' });
+            const refreshToken = jsonwebtoken_1.default.sign({ userId: user._id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '1d' });
+            return { accessToken, refreshToken };
         });
     }
     getUserIdByToken(token) {

@@ -1,6 +1,6 @@
-import {SETTINGS} from '../settings'
-import { runDb } from "../db";
-import { app } from "../app";
+import {SETTINGS} from './settings'
+import { runDb } from "./db";
+import { app } from "./app";
 
 // Only run the server locally (not on Vercel)
 if (process.env.NODE_ENV !== 'production') {

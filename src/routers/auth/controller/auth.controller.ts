@@ -36,8 +36,13 @@ class AuthController {
     try {
       const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
       if (user) {
-        const token = await jwtService.createJWT(user)
-        res.status(200).json({ accessToken: token })
+        const {accessToken, refreshToken} = await jwtService.createJWT(user)
+        res
+          .status(200)
+          .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+          // .header('Authorization', accessToken)
+          .json({ accessToken });
+        // res.status(200).json({ accessToken: accessToken })
         return
       }
     } catch (e) {
@@ -104,7 +109,6 @@ debugger
   }
 
   async me(req: Request, res: Response) {
-    debugger
     try {
       res.status(200).json(req.context.user)
       return

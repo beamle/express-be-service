@@ -19,8 +19,6 @@ export async function bearerAuthorizationValidator(req: Request, res: Response, 
   const token = req.headers.authorization!.split(' ')[1]
 
   try {
-    debugger
-
     const userId = await jwtService.getUserIdByToken(token)
     if (userId) {
       const user = await authQueryRepository.getMeBy(userId)

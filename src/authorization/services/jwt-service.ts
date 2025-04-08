@@ -9,9 +9,10 @@ const JwtServiceErrors = {
 }
 
 class jwtService {
-  async createJWT(user: UserType): Promise<string> {
-    const token = jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
-    return token
+  async createJWT(user: UserType): Promise<{ accessToken: string, refreshToken: string }> {
+    const accessToken = jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
+    const refreshToken = jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '1d' });
+    return { accessToken, refreshToken }
   }
 
   async getUserIdByToken(token: string): Promise<string | null> {
