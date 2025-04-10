@@ -10,7 +10,6 @@ import { UserTypeViewModel } from "../../../app/db";
 import { uuid } from "uuidv4";
 import { ObjectId } from "mongodb";
 import { CustomError } from "../../../helpers/CustomError";
-import { UsersErrors } from "../../users/meta/Errors";
 
 export const AuthErrors = {
   EMAIL_CONFIRMATION_PROBLEM: {
@@ -36,7 +35,7 @@ class AuthController {
     try {
       const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
       if (user) {
-        const {accessToken, refreshToken} = await jwtService.createJWT(user)
+        const { accessToken, refreshToken } = await jwtService.createJWT(user)
         res
           .status(200)
           .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
@@ -50,6 +49,27 @@ class AuthController {
     }
   }
 
+  async refreshToken(req: Request, res: Response) {
+    // GET refreshToken from cookie
+    // Generate new tokens pair
+    // Add previous refreshToken to blackList
+    // Send back
+    try {
+      const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
+      if (user) {
+        const { accessToken, refreshToken } = await jwtService.createJWT(user)
+        res
+          .status(200)
+          .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+          .json({ accessToken });
+        return
+      }
+    } catch (e) {
+      handleError(res, e)
+    }
+  }
+
+
   async registration(req: Request, res: Response) {
     const { email, password, login } = req.body
     try {
@@ -59,7 +79,7 @@ class AuthController {
       const createdUserId = await usersService.createUser({ email, password, login }, false)
       const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
       // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
-debugger
+
       try {
         await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation") // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
       } catch (e) {

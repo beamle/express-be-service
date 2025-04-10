@@ -61,6 +61,28 @@ class AuthController {
             }
         });
     }
+    refreshToken(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // GET refreshToken from cookie
+            // Generate new tokens pair
+            // Add previous refreshToken to blackList
+            // Send back
+            try {
+                const user = yield users_service_1.default.checkCredentials(req.body.loginOrEmail, req.body.password);
+                if (user) {
+                    const { accessToken, refreshToken } = yield jwt_service_1.default.createJWT(user);
+                    res
+                        .status(200)
+                        .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+                        .json({ accessToken });
+                    return;
+                }
+            }
+            catch (e) {
+                (0, validationHelpers_1.handleError)(res, e);
+            }
+        });
+    }
     registration(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password, login } = req.body;
@@ -70,7 +92,6 @@ class AuthController {
                 const createdUserId = yield users_service_1.default.createUser({ email, password, login }, false);
                 const user = yield users_queryRepository_1.default.getUserByEmail({ email });
                 // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
-                debugger;
                 try {
                     yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
                 }
