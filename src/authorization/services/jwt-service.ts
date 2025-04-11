@@ -15,6 +15,15 @@ class jwtService {
     return { accessToken, refreshToken }
   }
 
+  async isTokenValid(token: string, key: string): Promise<boolean> {
+    try {
+      jwt.verify(token, key);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
   async getUserIdByToken(token: string): Promise<string | null> {
     if (!token || token === "undefined") {
       throw new CustomError(JwtServiceErrors.NO_TOKEN_PROVIDED);

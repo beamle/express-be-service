@@ -27,6 +27,17 @@ class jwtService {
             return { accessToken, refreshToken };
         });
     }
+    isTokenValid(token, key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                jsonwebtoken_1.default.verify(token, key);
+                return true;
+            }
+            catch (err) {
+                return false;
+            }
+        });
+    }
     getUserIdByToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!token || token === "undefined") {
