@@ -46,7 +46,10 @@ class AuthController {
             try {
                 const user = yield users_service_1.default.checkCredentials(req.body.loginOrEmail, req.body.password);
                 if (user) {
-                    const { accessToken, refreshToken } = yield jwt_service_1.default.createJWT(user);
+                    const deviceId = (0, uuidv4_1.uuid)();
+                    const accessToken = yield jwt_service_1.default.createAccessToken(user);
+                    const refreshToken = yield jwt_service_1.default.createRefreshToken(user, deviceId);
+                    const decodedRefreshToken = yield jwt_service_1.default.decodeToken(refreshToken);
                     res
                         .status(200)
                         .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
@@ -61,28 +64,64 @@ class AuthController {
             }
         });
     }
-    refreshToken(req, res) {
+    updateTokens(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            // GET refreshToken from cookie
-            // Generate new tokens pair
-            // Add previous refreshToken to blackList
-            // Send back
+            var _a;
             try {
-                const user = yield users_service_1.default.checkCredentials(req.body.loginOrEmail, req.body.password);
-                if (user) {
-                    const { accessToken, refreshToken } = yield jwt_service_1.default.createJWT(user);
-                    res
-                        .status(200)
-                        .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
-                        .json({ accessToken });
-                    return;
+                const refreshToken = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
+                if (!refreshToken) {
+                    return res.status(401).json({ message: 'No refresh token' });
                 }
+                const { deviceId, iat } = yield jwt_service_1.default.decodeToken(refreshToken);
+                console.log(deviceId, iat);
+                // const session = await sessionsRepository.findSession(deviceId, iat);
+                // if (!session) {
+                //   return res.status(401).json({ message: 'Invalid or expired refresh token' });
+                // }
+                //
+                // const newAccessToken = await jwtService.createAccessJWT(session.userId);
+                // const {
+                //   refreshToken: newRefreshToken,
+                //   iat: newIat,
+                //   exp
+                // } = await jwtService.createRefreshJWT(deviceId, session.userId);
+                //
+                // await sessionsRepository.updateSessionData({
+                //   ...session,
+                //   iat: newIat,
+                //   exp
+                // });
+                res
+                    .status(200);
+                return;
+                // .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
+                // .json({ accessToken: newAccessToken });
             }
             catch (e) {
-                (0, validationHelpers_1.handleError)(res, e);
+                return res.status(401).json({ message: 'Unauthorized' });
             }
         });
     }
+    //
+    // async updateTokens(req: Request, res: Response) {
+    //   // GET refreshToken from cookie
+    //   // Generate new tokens pair
+    //   // Add previous refreshToken to blackList
+    //   // Send back
+    //   try {
+    //     const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
+    //     if (user) {
+    //       const { accessToken, refreshToken } = await jwtService.createJWT(user)
+    //       res
+    //         .status(200)
+    //         .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+    //         .json({ accessToken });
+    //       return
+    //     }
+    //   } catch (e) {
+    //     handleError(res, e)
+    //   }
+    // }
     registration(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password, login } = req.body;

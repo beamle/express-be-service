@@ -9,6 +9,7 @@ import { authRouter } from "../routers/auth/auth.router";
 
 import { Request, Response, NextFunction } from "express";
 import { commentsRouter } from "../routers/comments/comments.router";
+import cookieParser from "cookie-parser";
 
 export function addContext(req: Request, res: Response, next: NextFunction) {
   req.context = { user: null };
@@ -18,6 +19,7 @@ export function addContext(req: Request, res: Response, next: NextFunction) {
 export const app = express()
 app.options('*', cors()); // Enable preflight for all rou
 app.use(cors())
+app.use(cookieParser())
 app.use(express.json()) // The request body will be available as a raw stream of data in req.body, but req.body will be undefined unless you manually parse it.
 app.use(addContext)
 

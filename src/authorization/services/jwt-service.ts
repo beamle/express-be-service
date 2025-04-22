@@ -9,9 +9,23 @@ const JwtServiceErrors = {
 }
 
 class jwtService {
-  async createJWT(user: UserType): Promise<{ accessToken: string, refreshToken: string }> {
+  async createAccessToken(user: UserType): Promise<string> {
+    return jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
+  }
+
+  async createRefreshToken(user: UserType, deviceId: string): Promise<{ refreshToken: string } & RefreshTokenPayloadType> {
+    const refreshToken = jwt.sign({ userId: user._id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '1d' });
+    const refreshTokenPayload = jwt.decode(refreshToken) as RefreshTokenPayloadType;
+
+    return {
+      refreshToken,
+      ...refreshTokenPayload
+    };
+  }
+
+  async createJWT(user: UserType, deviceId: string): Promise<{ accessToken: string, refreshToken: string }> {
     const accessToken = jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
-    const refreshToken = jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '1d' });
+    const refreshToken = jwt.sign({ userId: user._id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '1d' });
     return { accessToken, refreshToken }
   }
 
@@ -22,6 +36,10 @@ class jwtService {
     } catch (err) {
       return false;
     }
+  }
+
+  async decodeToken(token) {
+    return jwt.decode(token)
   }
 
   async getUserIdByToken(token: string): Promise<string | null> {

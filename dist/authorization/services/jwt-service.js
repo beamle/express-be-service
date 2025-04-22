@@ -20,10 +20,22 @@ const JwtServiceErrors = {
     NO_TOKEN_PROVIDED: { message: "Unauthorized. You didn't pass jwt token", field: "", status: 404 },
 };
 class jwtService {
-    createJWT(user) {
+    createAccessToken(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return jsonwebtoken_1.default.sign({ userId: user._id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '10h' });
+        });
+    }
+    createRefreshToken(user, deviceId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const refreshToken = jsonwebtoken_1.default.sign({ userId: user._id, deviceId }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '1d' });
+            const refreshTokenPayload = jsonwebtoken_1.default.decode(refreshToken);
+            return Object.assign({ refreshToken }, refreshTokenPayload);
+        });
+    }
+    createJWT(user, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
             const accessToken = jsonwebtoken_1.default.sign({ userId: user._id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '10h' });
-            const refreshToken = jsonwebtoken_1.default.sign({ userId: user._id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '1d' });
+            const refreshToken = jsonwebtoken_1.default.sign({ userId: user._id, deviceId }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '1d' });
             return { accessToken, refreshToken };
         });
     }
@@ -36,6 +48,11 @@ class jwtService {
             catch (err) {
                 return false;
             }
+        });
+    }
+    decodeToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return jsonwebtoken_1.default.decode(token);
         });
     }
     getUserIdByToken(token) {

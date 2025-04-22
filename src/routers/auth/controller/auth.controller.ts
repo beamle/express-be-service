@@ -35,7 +35,11 @@ class AuthController {
     try {
       const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
       if (user) {
-        const { accessToken, refreshToken } = await jwtService.createJWT(user)
+        const deviceId = uuid();
+        const accessToken = await jwtService.createAccessToken(user)
+        const refreshToken = await jwtService.createRefreshToken(user, deviceId)
+        const decodedRefreshToken = await jwtService.decodeToken(refreshToken)
+
         res
           .status(200)
           .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
@@ -49,25 +53,64 @@ class AuthController {
     }
   }
 
-  async refreshToken(req: Request, res: Response) {
-    // GET refreshToken from cookie
-    // Generate new tokens pair
-    // Add previous refreshToken to blackList
-    // Send back
+  async updateTokens(req: Request, res: Response) {
     try {
-      const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
-      if (user) {
-        const { accessToken, refreshToken } = await jwtService.createJWT(user)
-        res
-          .status(200)
-          .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
-          .json({ accessToken });
-        return
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken) {
+        return res.status(401).json({ message: 'No refresh token' });
       }
+
+      const { deviceId, iat } = await jwtService.decodeToken(refreshToken);
+      console.log(deviceId, iat)
+
+      // const session = await sessionsRepository.findSession(deviceId, iat);
+      // if (!session) {
+      //   return res.status(401).json({ message: 'Invalid or expired refresh token' });
+      // }
+      //
+      // const newAccessToken = await jwtService.createAccessJWT(session.userId);
+      // const {
+      //   refreshToken: newRefreshToken,
+      //   iat: newIat,
+      //   exp
+      // } = await jwtService.createRefreshJWT(deviceId, session.userId);
+      //
+      // await sessionsRepository.updateSessionData({
+      //   ...session,
+      //   iat: newIat,
+      //   exp
+      // });
+
+      res
+        .status(200)
+      return
+        // .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
+        // .json({ accessToken: newAccessToken });
+
     } catch (e) {
-      handleError(res, e)
+      return res.status(401).json({ message: 'Unauthorized' });
     }
   }
+  //
+  // async updateTokens(req: Request, res: Response) {
+  //   // GET refreshToken from cookie
+  //   // Generate new tokens pair
+  //   // Add previous refreshToken to blackList
+  //   // Send back
+  //   try {
+  //     const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
+  //     if (user) {
+  //       const { accessToken, refreshToken } = await jwtService.createJWT(user)
+  //       res
+  //         .status(200)
+  //         .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+  //         .json({ accessToken });
+  //       return
+  //     }
+  //   } catch (e) {
+  //     handleError(res, e)
+  //   }
+  // }
 
 
   async registration(req: Request, res: Response) {
