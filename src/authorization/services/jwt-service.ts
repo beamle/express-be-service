@@ -38,8 +38,8 @@ class jwtService {
     }
   }
 
-  async decodeToken(token) {
-    return jwt.decode(token)
+  async decodeToken(token: string) {
+    return jwt.decode(token) as RefreshTokenPayloadType
   }
 
   async getUserIdByToken(token: string): Promise<string | null> {

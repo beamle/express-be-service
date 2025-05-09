@@ -37,9 +37,7 @@ class AuthController {
       if (user) {
         const deviceId = uuid();
         const accessToken = await jwtService.createAccessToken(user)
-        const refreshToken = await jwtService.createRefreshToken(user, deviceId)
-        const decodedRefreshToken = await jwtService.decodeToken(refreshToken)
-
+        const { refreshToken } = await jwtService.createRefreshToken(user, deviceId)
         res
           .status(200)
           .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
@@ -53,6 +51,9 @@ class AuthController {
     }
   }
 
+// Todo:
+  // 1. Otmetitj, starey refreshToken kak ne validnyj
+  // 2. Sozdatj novyj REFRESH token i ACCESS token
   async updateTokens(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;

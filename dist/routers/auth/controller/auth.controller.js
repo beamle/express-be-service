@@ -48,8 +48,7 @@ class AuthController {
                 if (user) {
                     const deviceId = (0, uuidv4_1.uuid)();
                     const accessToken = yield jwt_service_1.default.createAccessToken(user);
-                    const refreshToken = yield jwt_service_1.default.createRefreshToken(user, deviceId);
-                    const decodedRefreshToken = yield jwt_service_1.default.decodeToken(refreshToken);
+                    const { refreshToken } = yield jwt_service_1.default.createRefreshToken(user, deviceId);
                     res
                         .status(200)
                         .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
@@ -64,6 +63,9 @@ class AuthController {
             }
         });
     }
+    // Todo:
+    // 1. Otmetitj, starey refreshToken kak ne validnyj
+    // 2. Sozdatj novyj REFRESH token i ACCESS token
     updateTokens(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
