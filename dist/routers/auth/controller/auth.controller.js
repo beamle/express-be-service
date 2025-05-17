@@ -80,7 +80,6 @@ class AuthController {
                 // if (!session) {
                 //   return res.status(401).json({ message: 'Invalid or expired refresh token' });
                 // }
-                //
                 // const newAccessToken = await jwtService.createAccessJWT(session.userId);
                 // const {
                 //   refreshToken: newRefreshToken,

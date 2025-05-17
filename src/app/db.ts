@@ -56,6 +56,18 @@ export type CommentDBType = {
   createdAt: string
 }
 
+export type SessionDBType = {
+  _id?: ObjectId
+  id?: any
+  refreshToken: string
+}
+
+export type RefreshTokenDBType = {
+  _id?: ObjectId
+  id?: any
+  refreshToken: string
+}
+
 export type MeViewModel = {
   email: string
   login: string
@@ -101,6 +113,8 @@ export let blogsCollection: Collection<BlogType>
 export let postsCollection: Collection<PostType>
 export let usersCollection: Collection<UserType>
 export let commentsCollection: Collection<CommentDBType>
+export let sessionCollection: Collection<SessionDBType>
+export let refreshTokenBlacklistCollection: Collection<RefreshTokenDBType>
 
 
 export async function runDb(url: string) {
@@ -123,6 +137,8 @@ export async function runDb(url: string) {
     blogsCollection = db.collection<BlogType>(SETTINGS.PATH.BLOGS)
     usersCollection = db.collection<UserType>(SETTINGS.PATH.USERS)
     commentsCollection = db.collection<CommentDBType>(SETTINGS.PATH.COMMENTS)
+    // sessionCollection = db.collection<SessionDBType>(SETTINGS.PATH.SESSION)
+    refreshTokenBlacklistCollection = db.collection<RefreshTokenDBType>(SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST)
 
     console.log("Conntected to collections!")
   } catch (e) {

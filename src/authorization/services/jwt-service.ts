@@ -23,12 +23,6 @@ class jwtService {
     };
   }
 
-  async createJWT(user: UserType, deviceId: string): Promise<{ accessToken: string, refreshToken: string }> {
-    const accessToken = jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
-    const refreshToken = jwt.sign({ userId: user._id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '1d' });
-    return { accessToken, refreshToken }
-  }
-
   async isTokenValid(token: string, key: string): Promise<boolean> {
     try {
       jwt.verify(token, key);

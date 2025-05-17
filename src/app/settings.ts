@@ -11,6 +11,8 @@ export const SETTINGS = {
     AUTH: '/auth',
     COMMENTS: '/comments',
     EMAIL: '/email',
+    SESSION: '/session',
+    REFRESH_TOKEN_BLACKLIST: '/refresh-token-blacklist',
     TESTING: '/testing',
   },
   DB_NAME: process.env.DB_NAME || "lesson-2-3",
