@@ -23,6 +23,7 @@ const auth_service_1 = __importDefault(require("../auth.service"));
 const uuidv4_1 = require("uuidv4");
 const mongodb_1 = require("mongodb");
 const CustomError_1 = require("../../../helpers/CustomError");
+const session_repository_1 = require("../../session/session.repository");
 exports.AuthErrors = {
     EMAIL_CONFIRMATION_PROBLEM: {
         message: "Something wrong with email confirmation. Code is confirmed already or expirtationDate has expired",
@@ -74,8 +75,20 @@ class AuthController {
                 if (!refreshToken) {
                     return res.status(401).json({ message: 'No refresh token' });
                 }
-                const { deviceId, iat } = yield jwt_service_1.default.decodeToken(refreshToken);
+                const decoded = yield jwt_service_1.default.decodeToken(refreshToken);
+                if (!decoded || !decoded.deviceId || !decoded.iat) {
+                    return res.status(401).json({ message: 'Invalid refresh token' });
+                }
+                const { deviceId, iat, userId } = decoded;
                 console.log(deviceId, iat);
+                yield session_repository_1.sessionRepository.addRefreshTokenToBlackList(refreshToken);
+                const user = yield users_queryRepository_1.default.getUserBy({ id: userId });
+                if (!user) {
+                    return res.status(401).json({ message: 'No user found with such Id attached to refreshToken' });
+                }
+                // WHY I USE UserModel in jwtService
+                const newAccessToken = yield jwt_service_1.default.createAccessToken(user);
+                const newRefreshToken = yield jwt_service_1.default.createRefreshToken(user, deviceId);
                 // const session = await sessionsRepository.findSession(deviceId, iat);
                 // if (!session) {
                 //   return res.status(401).json({ message: 'Invalid or expired refresh token' });

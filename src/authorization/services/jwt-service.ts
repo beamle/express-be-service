@@ -1,4 +1,4 @@
-import { UserType } from "../../app/db";
+import { UserType, UserTypeViewModel } from "../../app/db";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { SETTINGS } from "../../app/settings";
 import { CustomError } from "../../helpers/CustomError";
@@ -9,12 +9,12 @@ const JwtServiceErrors = {
 }
 
 class jwtService {
-  async createAccessToken(user: UserType): Promise<string> {
-    return jwt.sign({ userId: user._id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
+  async createAccessToken(user: UserTypeViewModel): Promise<string> {
+    return jwt.sign({ userId: user.id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
   }
 
-  async createRefreshToken(user: UserType, deviceId: string): Promise<{ refreshToken: string } & RefreshTokenPayloadType> {
-    const refreshToken = jwt.sign({ userId: user._id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '1d' });
+  async createRefreshToken(user: UserTypeViewModel, deviceId: string): Promise<{ refreshToken: string } & RefreshTokenPayloadType> {
+    const refreshToken = jwt.sign({ userId: user.id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '1d' });
     const refreshTokenPayload = jwt.decode(refreshToken) as RefreshTokenPayloadType;
 
     return {

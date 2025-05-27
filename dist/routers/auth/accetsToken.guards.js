@@ -22,7 +22,8 @@ const accessTokenGuard = (req, res, next) => __awaiter(void 0, void 0, void 0, f
     }
     try {
         const payload = yield jwt_service_1.default.isTokenValid(refreshToken, "refresh token");
-        req.user = payload;
+        // req.user = payload;
+        return res.sendStatus(200);
         next();
     }
     catch (err) {

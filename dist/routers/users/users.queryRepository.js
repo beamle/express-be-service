@@ -59,6 +59,32 @@ class UsersQueryRepository {
             return null;
         });
     }
+    findUserBy(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
+            if (id) {
+                const user = yield users_repository_1.default.findUserBy({ _id: new mongodb_1.ObjectId(id) });
+                if (!user) {
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_ID);
+                }
+                return user;
+            }
+            else if (email) {
+                const existingUserByEmail = yield users_repository_1.default.findUserBy({ email: email });
+                if (!existingUserByEmail) {
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+                }
+                return existingUserByEmail;
+            }
+            else if (login) {
+                const existingUserByLogin = yield users_repository_1.default.findUserBy({ login: login });
+                if (!existingUserByLogin) {
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+                }
+                return existingUserByLogin;
+            }
+            return null;
+        });
+    }
     getUserBy(_a) {
         return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
             if (id) {

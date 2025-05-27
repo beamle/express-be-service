@@ -39,6 +39,34 @@ class UsersQueryRepository {
 
   }
 
+  async findUserBy({ email, login, id }: Partial<UserType>): Promise<UserType | null> {
+    if (id) {
+      const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
+      if (!user) {
+        throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
+      }
+      return user
+    }
+
+    else if(email) {
+      const existingUserByEmail = await usersRepository.findUserBy({ email: email });
+      if (!existingUserByEmail) {
+        throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+      }
+      return existingUserByEmail
+    }
+
+    else if(login) {
+      const existingUserByLogin = await usersRepository.findUserBy({ login: login });
+      if (!existingUserByLogin) {
+        throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+      }
+      return existingUserByLogin
+    }
+
+    return null
+  }
+
   async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | null> {
     if (id) {
       const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })

@@ -9,7 +9,8 @@ export const accessTokenGuard = async (req:Request, res: Response, next: NextFun
 
   try {
     const payload = await jwtService.isTokenValid(refreshToken, "refresh token");
-    req.user = payload;
+    // req.user = payload;
+    return res.sendStatus(200)
     next();
   } catch (err) {
     return res.sendStatus(401);

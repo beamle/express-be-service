@@ -1,5 +1,6 @@
-import { usersCollection, UsersSortingData, UserType } from "../../app/db";
+import { usersCollection, UsersSortingData, UserType, UserTypeViewModel } from "../../app/db";
 import { Filter, ObjectId } from "mongodb";
+import usersQueryRepository from "./users.queryRepository";
 
 type UserFilter = Partial<{
   _id?: ObjectId
@@ -23,7 +24,7 @@ class UsersRepository {
     return users
   }
 
-  async findUserBy(filter: UserFilterType) {
+  async findUserBy(filter: UserFilterType): Promise<UserType | null> {
     const user = await usersCollection.findOne(filter as Filter<any>) // to allow passing mongodb Query strings
 
     return user

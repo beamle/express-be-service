@@ -6,6 +6,7 @@ export const UsersErrors = {
   NO_USER_WITH_SUCH_EMAIL: { message: "User with such email was not found!", field: "email", status: 400 },
   NO_USER_WITH_SUCH_CODE_EXIST: { message: "User with such confirmation code does not exist!", field: "code", status: 400 },
   INCORRECT_PASSWORD: { message: "Wrong password", field: "password", status: 401 },
+  NO_PASSWORD: { message: "No password provided for user", field: "password", status: 401 },
   INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 },
   USER_WITH_SUCH_EMAIL_ALREADY_EXIST: { message: "Such email already in use", field: "email", status: 400 },
   USER_WITH_SUCH_LOGIN_ALREADY_EXIST: { message: "Such login already in use", field: "login", status: 400 }

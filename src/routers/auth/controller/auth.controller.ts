@@ -10,6 +10,7 @@ import { UserTypeViewModel } from "../../../app/db";
 import { uuid } from "uuidv4";
 import { ObjectId } from "mongodb";
 import { CustomError } from "../../../helpers/CustomError";
+import { sessionRepository } from "../../session/session.repository";
 
 export const AuthErrors = {
   EMAIL_CONFIRMATION_PROBLEM: {
@@ -54,15 +55,32 @@ class AuthController {
 // Todo:
   // 1. Otmetitj, starey refreshToken kak ne validnyj
   // 2. Sozdatj novyj REFRESH token i ACCESS token
-  async updateTokens(req: Request, res: Response) {
+  async updateTokens(req: Request, res: Response): Promise<any> {
     try {
       const refreshToken = req.cookies?.refreshToken;
       if (!refreshToken) {
         return res.status(401).json({ message: 'No refresh token' });
       }
 
-      const { deviceId, iat } = await jwtService.decodeToken(refreshToken);
+      const decoded = await jwtService.decodeToken(refreshToken);
+      if (!decoded || !decoded.deviceId || !decoded.iat) {
+        return res.status(401).json({ message: 'Invalid refresh token' });
+      }
+
+      const { deviceId, iat, userId } = decoded;
       console.log(deviceId, iat)
+
+      await sessionRepository.addRefreshTokenToBlackList(refreshToken)
+      const user = await usersQueryRepository.getUserBy({ id: userId })
+
+      if (!user) {
+        return res.status(401).json({ message: 'No user found with such Id attached to refreshToken' });
+      }
+
+      // WHY I USE UserModel in jwtService
+      const newAccessToken = await jwtService.createAccessToken(user);
+      const newRefreshToken = await jwtService.createRefreshToken(user, deviceId);
+
 
       // const session = await sessionsRepository.findSession(deviceId, iat);
       // if (!session) {
@@ -85,13 +103,14 @@ class AuthController {
       res
         .status(200)
       return
-        // .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
-        // .json({ accessToken: newAccessToken });
+      // .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
+      // .json({ accessToken: newAccessToken });
 
     } catch (e) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
   }
+
   //
   // async updateTokens(req: Request, res: Response) {
   //   // GET refreshToken from cookie

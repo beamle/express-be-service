@@ -38,7 +38,7 @@ exports.sessionRepository = {
     addRefreshTokenToBlackList(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             const refreshTokenObj = {
-                id: String(Math.floor(Math.random() * 223)),
+                // id: String(Math.floor(Math.random() * 223)),
                 refreshToken
             };
             const posts = yield db_1.refreshTokenBlacklistCollection.insertOne(refreshTokenObj);

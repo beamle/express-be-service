@@ -19,6 +19,7 @@ const Errors_1 = require("./meta/Errors");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const date_fns_1 = require("date-fns");
 const uuidv4_1 = require("uuidv4");
+const users_queryRepository_1 = __importDefault(require("./users.queryRepository"));
 const EXPIRATION_TIME_EXTRA = {
     ONE_MINUTE: { minutes: 1 },
     FIVE_MINUTES: { minutes: 5 }
@@ -54,15 +55,19 @@ class UsersService {
     }
     checkCredentials(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield users_repository_1.default.findUserBy({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
+            // const user = await usersRepository.findUserBy({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] })
+            const user = yield users_queryRepository_1.default.findUserBy({ login: loginOrEmail, email: loginOrEmail });
             if (!user) {
                 throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+            }
+            if (!user.password) {
+                throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_PASSWORD);
             }
             const isMatch = yield bcrypt_1.default.compare(password, user.password);
             if (!isMatch) {
                 throw new CustomError_1.CustomError(Errors_1.UsersErrors.INCORRECT_PASSWORD);
             }
-            return user;
+            return users_queryRepository_1.default.mapUserWithId(user);
         });
     }
     getMe(token) {

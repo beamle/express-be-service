@@ -29,7 +29,7 @@ export const sessionRepository = {
   async addRefreshTokenToBlackList(refreshToken: string) {
 
     const refreshTokenObj = {
-      id: String(Math.floor(Math.random() * 223)),
+      // id: String(Math.floor(Math.random() * 223)),
       refreshToken
     }
 

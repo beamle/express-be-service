@@ -2,10 +2,11 @@ import { ObjectId } from "mongodb";
 import usersRepository from "./users.repository";
 import { CustomError } from "../../helpers/CustomError";
 import { UsersErrors } from "./meta/Errors";
-import { UserCreationType, UserType } from "../../app/db";
+import { UserCreationType, UserType, UserTypeViewModel } from "../../app/db";
 import bcrypt from "bcrypt";
 import { add } from "date-fns";
 import { uuid } from "uuidv4";
+import usersQueryRepository from "./users.queryRepository";
 
 const EXPIRATION_TIME_EXTRA = {
   ONE_MINUTE: { minutes: 1 },
@@ -44,11 +45,16 @@ class UsersService {
     return result
   }
 
-  async checkCredentials(loginOrEmail: string, password: string) {
-    const user = await usersRepository.findUserBy({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] })
+  async checkCredentials(loginOrEmail: string, password: string): Promise<UserTypeViewModel> {
+    // const user = await usersRepository.findUserBy({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] })
+    const user = await usersQueryRepository.findUserBy({ login: loginOrEmail, email: loginOrEmail })
 
     if (!user) {
       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN)
+    }
+
+    if(!user.password) {
+      throw new CustomError(UsersErrors.NO_PASSWORD)
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
@@ -57,7 +63,7 @@ class UsersService {
       throw new CustomError(UsersErrors.INCORRECT_PASSWORD)
     }
 
-    return user
+    return usersQueryRepository.mapUserWithId(user)
   }
 
   async getMe(token: string) {
