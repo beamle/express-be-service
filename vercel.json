@@ -1,16 +1,9 @@
 {
   "version": 2,
-  "name": "express-to-vercel",
-  "builds": [
+  "rewrites": [
     {
-      "src": "dist/app/index.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/app/index.js"
+      "source": "/(.*)",
+      "destination": "/src/app/index.ts"
     }
   ]
 }
