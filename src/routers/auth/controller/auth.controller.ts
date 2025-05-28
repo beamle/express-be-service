@@ -11,6 +11,7 @@ import { uuid } from "uuidv4";
 import { ObjectId } from "mongodb";
 import { CustomError } from "../../../helpers/CustomError";
 import { sessionRepository } from "../../session/session.repository";
+import { UsersErrors } from "../../users/meta/Errors";
 
 export const AuthErrors = {
   EMAIL_CONFIRMATION_PROBLEM: {
@@ -52,9 +53,29 @@ class AuthController {
     }
   }
 
-// Todo:
-  // 1. Otmetitj, starey refreshToken kak ne validnyj
-  // 2. Sozdatj novyj REFRESH token i ACCESS token
+  async logout(req: Request, res: Response): Promise<any> {
+    try {
+      debugger
+      const refreshToken = req.cookies?.refreshToken;
+
+      if (!refreshToken) {
+        return res.status(401).json({ message: 'No refresh token' });
+      }
+
+      const decoded = await jwtService.decodeToken(refreshToken);
+      if (!decoded || !decoded.deviceId || !decoded.iat) {
+        return res.status(401).json({ message: 'Invalid refresh token' });
+      }
+
+      await sessionRepository.addRefreshTokenToBlackList(refreshToken)
+
+      res.sendStatus(204)
+      return
+    } catch (e) {
+      handleError(res, e)
+    }
+  }
+
   async updateTokens(req: Request, res: Response): Promise<any> {
     try {
       const refreshToken = req.cookies?.refreshToken;
@@ -74,64 +95,23 @@ class AuthController {
       const user = await usersQueryRepository.getUserBy({ id: userId })
 
       if (!user) {
+        // throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN)
         return res.status(401).json({ message: 'No user found with such Id attached to refreshToken' });
       }
 
-      // WHY I USE UserModel in jwtService
       const newAccessToken = await jwtService.createAccessToken(user);
-      const newRefreshToken = await jwtService.createRefreshToken(user, deviceId);
-
-
-      // const session = await sessionsRepository.findSession(deviceId, iat);
-      // if (!session) {
-      //   return res.status(401).json({ message: 'Invalid or expired refresh token' });
-      // }
-
-      // const newAccessToken = await jwtService.createAccessJWT(session.userId);
-      // const {
-      //   refreshToken: newRefreshToken,
-      //   iat: newIat,
-      //   exp
-      // } = await jwtService.createRefreshJWT(deviceId, session.userId);
-      //
-      // await sessionsRepository.updateSessionData({
-      //   ...session,
-      //   iat: newIat,
-      //   exp
-      // });
+      const { refreshToken: newRefreshToken } = await jwtService.createRefreshToken(user, deviceId);
 
       res
         .status(200)
+        .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
+        // .header('Authorization', accessToken)
+        .json({ accessToken: newAccessToken });
       return
-      // .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
-      // .json({ accessToken: newAccessToken });
-
     } catch (e) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Unauthorized random error?' });
     }
   }
-
-  //
-  // async updateTokens(req: Request, res: Response) {
-  //   // GET refreshToken from cookie
-  //   // Generate new tokens pair
-  //   // Add previous refreshToken to blackList
-  //   // Send back
-  //   try {
-  //     const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
-  //     if (user) {
-  //       const { accessToken, refreshToken } = await jwtService.createJWT(user)
-  //       res
-  //         .status(200)
-  //         .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
-  //         .json({ accessToken });
-  //       return
-  //     }
-  //   } catch (e) {
-  //     handleError(res, e)
-  //   }
-  // }
-
 
   async registration(req: Request, res: Response) {
     const { email, password, login } = req.body

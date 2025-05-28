@@ -11,4 +11,5 @@ authRouter.post("/registration", ...authValidators, inputCheckErrorsFormatter, a
 authRouter.post("/registration-confirmation", authController.confirmEmail)
 authRouter.post("/registration-email-resending", authController.resendEmail)
 authRouter.post("/refresh-token", authController.updateTokens)
+authRouter.post("/logout", authController.logout)
 authRouter.get("/me", bearerAuthorizationValidator, authController.me)

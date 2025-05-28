@@ -15,4 +15,5 @@ exports.authRouter.post("/registration", ...auth_middlewares_1.authValidators, v
 exports.authRouter.post("/registration-confirmation", auth_controller_1.default.confirmEmail);
 exports.authRouter.post("/registration-email-resending", auth_controller_1.default.resendEmail);
 exports.authRouter.post("/refresh-token", auth_controller_1.default.updateTokens);
+exports.authRouter.post("/logout", auth_controller_1.default.logout);
 exports.authRouter.get("/me", bearerAuthorizationValidator_1.bearerAuthorizationValidator, auth_controller_1.default.me);
