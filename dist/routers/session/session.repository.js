@@ -41,7 +41,7 @@ exports.sessionRepository = {
                 // id: String(Math.floor(Math.random() * 223)),
                 refreshToken
             };
-            const posts = yield db_1.refreshTokenBlacklistCollection.insertOne(refreshTokenObj);
+            return yield db_1.refreshTokenBlacklistCollection.insertOne(refreshTokenObj);
         });
     },
     checkIfRefreshTokenInBlackList(refreshToken) {

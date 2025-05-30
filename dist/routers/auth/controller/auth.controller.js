@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,13 +40,15 @@ const users_service_1 = __importDefault(require("../../users/users.service"));
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
 const jwt_service_1 = __importDefault(require("../../../authorization/services/jwt-service"));
 const users_queryRepository_1 = __importDefault(require("../../users/users.queryRepository"));
-const email_manager_1 = __importDefault(require("../../../managers/email.manager"));
+const email_manager_1 = __importStar(require("../../../managers/email.manager"));
 const users_repository_1 = __importDefault(require("../../users/users.repository"));
 const auth_service_1 = __importDefault(require("../auth.service"));
 const uuidv4_1 = require("uuidv4");
 const mongodb_1 = require("mongodb");
-const CustomError_1 = require("../../../helpers/CustomError");
-const session_repository_1 = require("../../session/session.repository");
+const session_service_1 = __importDefault(require("../../session/session.service"));
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 exports.AuthErrors = {
     EMAIL_CONFIRMATION_PROBLEM: {
         message: "Something wrong with email confirmation. Code is confirmed already or expirtationDate has expired",
@@ -37,7 +62,7 @@ exports.AuthErrors = {
     },
     EMAIL_ALREADY_CONFIRMED: {
         message: "Your email is already confirmed",
-        field: "code",
+        field: "email",
         status: 400
     },
 };
@@ -68,16 +93,8 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                debugger;
                 const refreshToken = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
-                if (!refreshToken) {
-                    return res.status(401).json({ message: 'No refresh token' });
-                }
-                const decoded = yield jwt_service_1.default.decodeToken(refreshToken);
-                if (!decoded || !decoded.deviceId || !decoded.iat) {
-                    return res.status(401).json({ message: 'Invalid refresh token' });
-                }
-                yield session_repository_1.sessionRepository.addRefreshTokenToBlackList(refreshToken);
+                yield session_service_1.default.logout(refreshToken);
                 res.sendStatus(204);
                 return;
             }
@@ -91,32 +108,16 @@ class AuthController {
             var _a;
             try {
                 const refreshToken = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
-                if (!refreshToken) {
-                    return res.status(401).json({ message: 'No refresh token' });
-                }
-                const decoded = yield jwt_service_1.default.decodeToken(refreshToken);
-                if (!decoded || !decoded.deviceId || !decoded.iat) {
-                    return res.status(401).json({ message: 'Invalid refresh token' });
-                }
-                const { deviceId, iat, userId } = decoded;
-                console.log(deviceId, iat);
-                yield session_repository_1.sessionRepository.addRefreshTokenToBlackList(refreshToken);
-                const user = yield users_queryRepository_1.default.getUserBy({ id: userId });
-                if (!user) {
-                    // throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN)
-                    return res.status(401).json({ message: 'No user found with such Id attached to refreshToken' });
-                }
-                const newAccessToken = yield jwt_service_1.default.createAccessToken(user);
-                const { refreshToken: newRefreshToken } = yield jwt_service_1.default.createRefreshToken(user, deviceId);
+                const { accessToken, refreshToken: newRefreshToken } = yield session_service_1.default.updateTokens(refreshToken);
                 res
                     .status(200)
                     .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
                     // .header('Authorization', accessToken)
-                    .json({ accessToken: newAccessToken });
+                    .json({ accessToken: accessToken });
                 return;
             }
             catch (e) {
-                return res.status(401).json({ message: 'Unauthorized random error?' });
+                (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
             }
         });
     }
@@ -130,7 +131,7 @@ class AuthController {
                 const user = yield users_queryRepository_1.default.getUserByEmail({ email });
                 // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
                 try {
-                    yield email_manager_1.default.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+                    yield email_manager_1.default.sendEmailConfirmationMessage(user, (0, email_manager_1.generateEmailConfirmationMessage)(user.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
                 }
                 catch (e) {
                     (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
@@ -151,12 +152,14 @@ class AuthController {
             try {
                 const user = yield users_queryRepository_1.default.getUserByEmail({ email });
                 if (user.emailConfirmation.isConfirmed) {
-                    throw new CustomError_1.CustomError(exports.AuthErrors.EMAIL_ALREADY_CONFIRMED);
+                    res.status(401).json(exports.AuthErrors.EMAIL_ALREADY_CONFIRMED);
+                    return;
+                    // throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
                 }
                 const newConfirmationCode = (0, uuidv4_1.uuid)();
                 yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
                 const updatedUser = yield users_queryRepository_1.default.getUserByEmail({ email });
-                yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode), "Resending registration email"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+                yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, (0, email_manager_1.generateEmailConfirmationResendMessage)(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
                 res.sendStatus(204);
                 return;
             }
@@ -174,7 +177,9 @@ class AuthController {
                     return;
                 }
                 else {
-                    throw new CustomError_1.CustomError(exports.AuthErrors.ACCOUNT_ALREADY_CONFIRMED);
+                    res.status(401).json(exports.AuthErrors.EMAIL_ALREADY_CONFIRMED);
+                    return;
+                    // throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
                 }
             }
             catch (e) {
@@ -195,10 +200,3 @@ class AuthController {
     }
 }
 exports.default = new AuthController();
-// utils
-const generateEmailConfirmationMessage = (code) => {
-    return "<h1>Thank you for your registration</h1>\n" +
-        " <p>To finish registration please follow the link below:\n" +
-        `     <a href=https://somesite.com/confirm-registration?code=${code}>complete registration</a>\n` +
-        " </p>\n";
-};

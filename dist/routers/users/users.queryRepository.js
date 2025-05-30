@@ -89,23 +89,20 @@ class UsersQueryRepository {
         return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
             if (id) {
                 const user = yield users_repository_1.default.findUserBy({ _id: new mongodb_1.ObjectId(id) });
-                if (!user) {
+                if (!user)
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_ID);
-                }
                 return this.mapUserWithId(user);
             }
             else if (email) {
                 const existingUserByEmail = yield users_repository_1.default.findUserBy({ email: email });
-                if (existingUserByEmail) {
+                if (existingUserByEmail)
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.USER_WITH_SUCH_EMAIL_ALREADY_EXIST);
-                }
                 return null;
             }
             else if (login) {
                 const existingUserByLogin = yield users_repository_1.default.findUserBy({ login: login });
-                if (existingUserByLogin) {
+                if (existingUserByLogin)
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.USER_WITH_SUCH_LOGIN_ALREADY_EXIST);
-                }
                 return null;
             }
             return null;

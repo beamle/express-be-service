@@ -3,15 +3,20 @@ import { Request, Response } from "express";
 import { handleError, handleErrorAsArrayOfErrors } from "../../../helpers/validationHelpers";
 import jwtService from "../../../authorization/services/jwt-service";
 import usersQueryRepository from "../../users/users.queryRepository";
-import emailManager from "../../../managers/email.manager";
+import emailManager, {
+  generateEmailConfirmationMessage,
+  generateEmailConfirmationResendMessage
+} from "../../../managers/email.manager";
 import usersRepository from "../../users/users.repository";
 import authService from "../auth.service";
 import { UserTypeViewModel } from "../../../app/db";
 import { uuid } from "uuidv4";
 import { ObjectId } from "mongodb";
-import { CustomError } from "../../../helpers/CustomError";
 import { sessionRepository } from "../../session/session.repository";
-import { UsersErrors } from "../../users/meta/Errors";
+import sessionService from "../../session/session.service";
+function delay(ms:number){
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 export const AuthErrors = {
   EMAIL_CONFIRMATION_PROBLEM: {
@@ -26,7 +31,7 @@ export const AuthErrors = {
   },
   EMAIL_ALREADY_CONFIRMED: {
     message: "Your email is already confirmed",
-    field: "code",
+    field: "email",
     status: 400
   },
 }
@@ -55,19 +60,8 @@ class AuthController {
 
   async logout(req: Request, res: Response): Promise<any> {
     try {
-      debugger
       const refreshToken = req.cookies?.refreshToken;
-
-      if (!refreshToken) {
-        return res.status(401).json({ message: 'No refresh token' });
-      }
-
-      const decoded = await jwtService.decodeToken(refreshToken);
-      if (!decoded || !decoded.deviceId || !decoded.iat) {
-        return res.status(401).json({ message: 'Invalid refresh token' });
-      }
-
-      await sessionRepository.addRefreshTokenToBlackList(refreshToken)
+      await sessionService.logout(refreshToken)
 
       res.sendStatus(204)
       return
@@ -79,37 +73,15 @@ class AuthController {
   async updateTokens(req: Request, res: Response): Promise<any> {
     try {
       const refreshToken = req.cookies?.refreshToken;
-      if (!refreshToken) {
-        return res.status(401).json({ message: 'No refresh token' });
-      }
-
-      const decoded = await jwtService.decodeToken(refreshToken);
-      if (!decoded || !decoded.deviceId || !decoded.iat) {
-        return res.status(401).json({ message: 'Invalid refresh token' });
-      }
-
-      const { deviceId, iat, userId } = decoded;
-      console.log(deviceId, iat)
-
-      await sessionRepository.addRefreshTokenToBlackList(refreshToken)
-      const user = await usersQueryRepository.getUserBy({ id: userId })
-
-      if (!user) {
-        // throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN)
-        return res.status(401).json({ message: 'No user found with such Id attached to refreshToken' });
-      }
-
-      const newAccessToken = await jwtService.createAccessToken(user);
-      const { refreshToken: newRefreshToken } = await jwtService.createRefreshToken(user, deviceId);
-
+      const {accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens( refreshToken )
       res
         .status(200)
         .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
         // .header('Authorization', accessToken)
-        .json({ accessToken: newAccessToken });
+        .json({ accessToken: accessToken });
       return
     } catch (e) {
-      return res.status(401).json({ message: 'Unauthorized random error?' });
+      handleErrorAsArrayOfErrors(res, e)
     }
   }
 
@@ -142,13 +114,16 @@ class AuthController {
     try {
       const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
       if (user.emailConfirmation.isConfirmed) {
-        throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
+        res.status(401).json(AuthErrors.EMAIL_ALREADY_CONFIRMED);
+        return
+        // throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
       }
 
       const newConfirmationCode = uuid()
       await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode)
       const updatedUser = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-      await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationMessage(updatedUser.emailConfirmation.confirmationCode), "Resending registration email")      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+      await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationResendMessage(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation")      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+
       res.sendStatus(204)
       return
 
@@ -164,7 +139,9 @@ class AuthController {
         res.status(204).send()
         return
       } else {
-        throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
+        res.status(401).json(AuthErrors.EMAIL_ALREADY_CONFIRMED);
+        return
+        // throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
       }
     } catch (e) {
       handleErrorAsArrayOfErrors(res, e)
@@ -182,12 +159,3 @@ class AuthController {
 }
 
 export default new AuthController()
-
-// utils
-
-const generateEmailConfirmationMessage = (code: string) => {
-  return "<h1>Thank you for your registration</h1>\n" +
-    " <p>To finish registration please follow the link below:\n" +
-    `     <a href=https://somesite.com/confirm-registration?code=${code}>complete registration</a>\n` +
-    " </p>\n"
-}

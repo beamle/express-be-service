@@ -33,7 +33,7 @@ export const sessionRepository = {
       refreshToken
     }
 
-    const posts = await refreshTokenBlacklistCollection.insertOne(refreshTokenObj)
+    return await refreshTokenBlacklistCollection.insertOne(refreshTokenObj)
   },
 
   async checkIfRefreshTokenInBlackList(refreshToken: string) {

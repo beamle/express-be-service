@@ -1,0 +1,58 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SessionErrors = void 0;
+const CustomError_1 = require("../../helpers/CustomError");
+const jwt_service_1 = __importDefault(require("../../authorization/services/jwt-service"));
+const session_repository_1 = require("./session.repository");
+const users_service_1 = __importDefault(require("../users/users.service"));
+const Errors_1 = require("../users/meta/Errors");
+const settings_1 = require("../../app/settings");
+exports.SessionErrors = {
+    NO_REFRESH_TOKEN: { message: 'No refresh token', field: "refreshToken", status: 401 },
+    INVALID_REFRESH_TOKEN: { message: 'Invalid refresh token', field: "refreshToken", status: 401 },
+    REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST: {
+        message: 'Refresh token wasn\'t added to blacklist',
+        field: "refreshToken",
+        status: 401
+    },
+};
+class SessionService {
+    updateTokens(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { userId, deviceId } = yield jwt_service_1.default.parseAndValidateRefreshToken(refreshToken, settings_1.SETTINGS.JWT_SECRET);
+            const result = yield session_repository_1.sessionRepository.addRefreshTokenToBlackList(refreshToken);
+            if (!result.acknowledged) {
+                throw new CustomError_1.CustomError(exports.SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST);
+            }
+            const user = yield users_service_1.default.getUserBy({ id: userId });
+            if (!user) {
+                throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+            }
+            const newAccessToken = yield jwt_service_1.default.createAccessToken(user);
+            const { refreshToken: newRefreshToken } = yield jwt_service_1.default.createRefreshToken(user, deviceId);
+            return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+        });
+    }
+    logout(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield jwt_service_1.default.parseAndValidateRefreshToken(refreshToken, settings_1.SETTINGS.JWT_SECRET);
+            const result = yield session_repository_1.sessionRepository.addRefreshTokenToBlackList(refreshToken);
+            if (!result.acknowledged) {
+                throw new CustomError_1.CustomError(exports.SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST);
+            }
+        });
+    }
+}
+exports.default = new SessionService();

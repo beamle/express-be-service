@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const settings_1 = require("../../app/settings");
 const CustomError_1 = require("../../helpers/CustomError");
+const session_service_1 = require("../../routers/session/session.service");
 const JwtServiceErrors = {
     NO_CORRECT_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
     NO_TOKEN_PROVIDED: { message: "Unauthorized. You didn't pass jwt token", field: "", status: 404 },
@@ -41,6 +42,19 @@ class jwtService {
             catch (err) {
                 return false;
             }
+        });
+    }
+    parseAndValidateRefreshToken(token, key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const isValid = yield this.isTokenValid(token, key);
+            debugger;
+            if (!isValid)
+                throw new CustomError_1.CustomError(session_service_1.SessionErrors.INVALID_REFRESH_TOKEN);
+            const decoded = yield this.decodeToken(token);
+            if (!(decoded === null || decoded === void 0 ? void 0 : decoded.userId) || !(decoded === null || decoded === void 0 ? void 0 : decoded.deviceId) || !(decoded === null || decoded === void 0 ? void 0 : decoded.iat)) {
+                throw new CustomError_1.CustomError(session_service_1.SessionErrors.INVALID_REFRESH_TOKEN);
+            }
+            return decoded; // With userId, deviceId, iat
         });
     }
     decodeToken(token) {

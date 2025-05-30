@@ -2,6 +2,7 @@ import { UserType, UserTypeViewModel } from "../../app/db";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { SETTINGS } from "../../app/settings";
 import { CustomError } from "../../helpers/CustomError";
+import { SessionErrors } from "../../routers/session/session.service";
 
 const JwtServiceErrors = {
   NO_CORRECT_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
@@ -30,6 +31,19 @@ class jwtService {
     } catch (err) {
       return false;
     }
+  }
+
+  async parseAndValidateRefreshToken(token: string, key: string) {
+    const isValid = await this.isTokenValid(token, key);
+    debugger
+    if (!isValid) throw new CustomError(SessionErrors.INVALID_REFRESH_TOKEN);
+
+    const decoded = await this.decodeToken(token);
+    if (!decoded?.userId || !decoded?.deviceId || !decoded?.iat) {
+      throw new CustomError(SessionErrors.INVALID_REFRESH_TOKEN);
+    }
+
+    return decoded; // With userId, deviceId, iat
   }
 
   async decodeToken(token: string) {

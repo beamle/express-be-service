@@ -14,6 +14,30 @@ const EXPIRATION_TIME_EXTRA = {
 }
 
 class UsersService {
+  async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | null> {
+    if (id) {
+      const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
+      if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
+
+      return this.mapUserWithId(user)
+    }
+
+    else if(email) {
+      const existingUserByEmail = await usersRepository.findUserBy({ email: email });
+      if (existingUserByEmail) throw new CustomError(UsersErrors.USER_WITH_SUCH_EMAIL_ALREADY_EXIST);
+      return null
+    }
+
+    else if(login) {
+      const existingUserByLogin = await usersRepository.findUserBy({ login: login });
+      if (existingUserByLogin) throw new CustomError(UsersErrors.USER_WITH_SUCH_LOGIN_ALREADY_EXIST);
+      return null
+    }
+
+    return null
+
+  }
+
   async createUser(userData: UserCreationType, isConfirmed = false, createByAdmin = false): Promise<ObjectId> {
     const passwordHash = await this.generateHash(userData.password, 10)
 
@@ -79,6 +103,11 @@ class UsersService {
     const hash = await bcrypt.hash(password, salt)
 
     return hash
+  }
+
+  private mapUserWithId(user: UserType): UserTypeViewModel {
+    const { _id, password, ...rest } = user
+    return { ...rest, id: _id!.toString() }
   }
 }
 

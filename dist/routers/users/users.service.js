@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -25,6 +36,29 @@ const EXPIRATION_TIME_EXTRA = {
     FIVE_MINUTES: { minutes: 5 }
 };
 class UsersService {
+    getUserBy(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
+            if (id) {
+                const user = yield users_repository_1.default.findUserBy({ _id: new mongodb_1.ObjectId(id) });
+                if (!user)
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_ID);
+                return this.mapUserWithId(user);
+            }
+            else if (email) {
+                const existingUserByEmail = yield users_repository_1.default.findUserBy({ email: email });
+                if (existingUserByEmail)
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.USER_WITH_SUCH_EMAIL_ALREADY_EXIST);
+                return null;
+            }
+            else if (login) {
+                const existingUserByLogin = yield users_repository_1.default.findUserBy({ login: login });
+                if (existingUserByLogin)
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.USER_WITH_SUCH_LOGIN_ALREADY_EXIST);
+                return null;
+            }
+            return null;
+        });
+    }
     createUser(userData_1) {
         return __awaiter(this, arguments, void 0, function* (userData, isConfirmed = false, createByAdmin = false) {
             const passwordHash = yield this.generateHash(userData.password, 10);
@@ -85,6 +119,10 @@ class UsersService {
             const hash = yield bcrypt_1.default.hash(password, salt);
             return hash;
         });
+    }
+    mapUserWithId(user) {
+        const { _id, password } = user, rest = __rest(user, ["_id", "password"]);
+        return Object.assign(Object.assign({}, rest), { id: _id.toString() });
     }
 }
 exports.default = new UsersService();
