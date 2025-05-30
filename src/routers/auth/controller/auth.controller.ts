@@ -1,7 +1,6 @@
 import usersService from "../../users/users.service";
 import { Request, Response } from "express";
 import { handleError, handleErrorAsArrayOfErrors } from "../../../helpers/validationHelpers";
-import jwtService from "../../../authorization/services/jwt-service";
 import usersQueryRepository from "../../users/users.queryRepository";
 import emailManager, {
   generateEmailConfirmationMessage,
@@ -12,11 +11,7 @@ import authService from "../auth.service";
 import { UserTypeViewModel } from "../../../app/db";
 import { uuid } from "uuidv4";
 import { ObjectId } from "mongodb";
-import { sessionRepository } from "../../session/session.repository";
 import sessionService from "../../session/session.service";
-function delay(ms:number){
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
 
 export const AuthErrors = {
   EMAIL_CONFIRMATION_PROBLEM: {
@@ -34,35 +29,32 @@ export const AuthErrors = {
     field: "email",
     status: 400
   },
+  ACCOUNT_WAS_NOT_CREATED: {
+    message: "Email sending failed. Registration rolled back.",
+    field: "email",
+    status: 400
+  },
 }
 
 
 class AuthController {
   async login(req: Request, res: Response) {
     try {
-      const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
-      if (user) {
-        const deviceId = uuid();
-        const accessToken = await jwtService.createAccessToken(user)
-        const { refreshToken } = await jwtService.createRefreshToken(user, deviceId)
-        res
-          .status(200)
-          .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
-          // .header('Authorization', accessToken)
-          .json({ accessToken });
-        // res.status(200).json({ accessToken: accessToken })
-        return
-      }
+      const { accessToken, refreshToken } = await authService.login(req.body.loginOrEmail, req.body.password)
+      res
+        .status(200)
+        .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+        .json({ accessToken });
+      return
     } catch (e) {
       handleError(res, e)
     }
   }
 
-  async logout(req: Request, res: Response): Promise<any> {
+  async logout(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
       await sessionService.logout(refreshToken)
-
       res.sendStatus(204)
       return
     } catch (e) {
@@ -70,45 +62,29 @@ class AuthController {
     }
   }
 
-  async updateTokens(req: Request, res: Response): Promise<any> {
+  async updateTokens(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
-      const {accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens( refreshToken )
+      const { accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens(refreshToken)
       res
         .status(200)
         .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
-        // .header('Authorization', accessToken)
-        .json({ accessToken: accessToken });
+        .json({ accessToken });
       return
     } catch (e) {
       handleErrorAsArrayOfErrors(res, e)
     }
   }
 
-  async registration(req: Request, res: Response) {
-    const { email, password, login } = req.body
+  async registration(req: Request, res: Response): Promise<void> {
+    const { email, password, login } = req.body;
     try {
-      await usersQueryRepository.getUserBy({ email })
-      await usersQueryRepository.getUserBy({ login })
-
-      const createdUserId = await usersService.createUser({ email, password, login }, false)
-      const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-      // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
-
-      try {
-        await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation") // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-      } catch (e) {
-        handleErrorAsArrayOfErrors(res, e)
-        await usersRepository.deleteUser(createdUserId)
-      }
-      res.status(204).json(user)
-      return
-      // }
+      const user = await authService.registration({ email, password, login });
+      res.status(204).json(user);
     } catch (e) {
-      handleErrorAsArrayOfErrors(res, e)
+      handleErrorAsArrayOfErrors(res, e);
     }
   }
-
   async resendEmail(req: Request, res: Response) {
     const { email } = req.body
     try {

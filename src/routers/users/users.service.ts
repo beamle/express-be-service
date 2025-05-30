@@ -14,6 +14,7 @@ const EXPIRATION_TIME_EXTRA = {
 }
 
 class UsersService {
+  // TODO: change method. Currently by id it reutnr user but email and login checks for eixstence
   async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | null> {
     if (id) {
       const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
@@ -35,6 +36,31 @@ class UsersService {
     }
 
     return null
+
+  }
+
+  async findUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel> {
+    let user;
+    if (id) {
+      user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
+      if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
+
+      return this.mapUserWithId(user)
+    }
+
+    else if(email) {
+      user = await usersRepository.findUserBy({ email: email });
+      if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL);
+      return this.mapUserWithId(user)
+    }
+
+    else if(login) {
+      user = await usersRepository.findUserBy({ login: login });
+      if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_LOGIN);
+      return this.mapUserWithId(user)
+    }
+
+    throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN_OR_ID);
 
   }
 

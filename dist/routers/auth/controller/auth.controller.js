@@ -36,9 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthErrors = void 0;
-const users_service_1 = __importDefault(require("../../users/users.service"));
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
-const jwt_service_1 = __importDefault(require("../../../authorization/services/jwt-service"));
 const users_queryRepository_1 = __importDefault(require("../../users/users.queryRepository"));
 const email_manager_1 = __importStar(require("../../../managers/email.manager"));
 const users_repository_1 = __importDefault(require("../../users/users.repository"));
@@ -46,9 +44,6 @@ const auth_service_1 = __importDefault(require("../auth.service"));
 const uuidv4_1 = require("uuidv4");
 const mongodb_1 = require("mongodb");
 const session_service_1 = __importDefault(require("../../session/session.service"));
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 exports.AuthErrors = {
     EMAIL_CONFIRMATION_PROBLEM: {
         message: "Something wrong with email confirmation. Code is confirmed already or expirtationDate has expired",
@@ -65,24 +60,22 @@ exports.AuthErrors = {
         field: "email",
         status: 400
     },
+    ACCOUNT_WAS_NOT_CREATED: {
+        message: "Email sending failed. Registration rolled back.",
+        field: "email",
+        status: 400
+    },
 };
 class AuthController {
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const user = yield users_service_1.default.checkCredentials(req.body.loginOrEmail, req.body.password);
-                if (user) {
-                    const deviceId = (0, uuidv4_1.uuid)();
-                    const accessToken = yield jwt_service_1.default.createAccessToken(user);
-                    const { refreshToken } = yield jwt_service_1.default.createRefreshToken(user, deviceId);
-                    res
-                        .status(200)
-                        .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
-                        // .header('Authorization', accessToken)
-                        .json({ accessToken });
-                    // res.status(200).json({ accessToken: accessToken })
-                    return;
-                }
+                const { accessToken, refreshToken } = yield auth_service_1.default.login(req.body.loginOrEmail, req.body.password);
+                res
+                    .status(200)
+                    .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+                    .json({ accessToken });
+                return;
             }
             catch (e) {
                 (0, validationHelpers_1.handleError)(res, e);
@@ -112,8 +105,7 @@ class AuthController {
                 res
                     .status(200)
                     .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
-                    // .header('Authorization', accessToken)
-                    .json({ accessToken: accessToken });
+                    .json({ accessToken });
                 return;
             }
             catch (e) {
@@ -125,21 +117,8 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password, login } = req.body;
             try {
-                yield users_queryRepository_1.default.getUserBy({ email });
-                yield users_queryRepository_1.default.getUserBy({ login });
-                const createdUserId = yield users_service_1.default.createUser({ email, password, login }, false);
-                const user = yield users_queryRepository_1.default.getUserByEmail({ email });
-                // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
-                try {
-                    yield email_manager_1.default.sendEmailConfirmationMessage(user, (0, email_manager_1.generateEmailConfirmationMessage)(user.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-                }
-                catch (e) {
-                    (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);
-                    yield users_repository_1.default.deleteUser(createdUserId);
-                }
+                const user = yield auth_service_1.default.registration({ email, password, login });
                 res.status(204).json(user);
-                return;
-                // }
             }
             catch (e) {
                 (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);

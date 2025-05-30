@@ -36,6 +36,7 @@ const EXPIRATION_TIME_EXTRA = {
     FIVE_MINUTES: { minutes: 5 }
 };
 class UsersService {
+    // TODO: change method. Currently by id it reutnr user but email and login checks for eixstence
     getUserBy(_a) {
         return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
             if (id) {
@@ -57,6 +58,30 @@ class UsersService {
                 return null;
             }
             return null;
+        });
+    }
+    findUserBy(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
+            let user;
+            if (id) {
+                user = yield users_repository_1.default.findUserBy({ _id: new mongodb_1.ObjectId(id) });
+                if (!user)
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_ID);
+                return this.mapUserWithId(user);
+            }
+            else if (email) {
+                user = yield users_repository_1.default.findUserBy({ email: email });
+                if (!user)
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL);
+                return this.mapUserWithId(user);
+            }
+            else if (login) {
+                user = yield users_repository_1.default.findUserBy({ login: login });
+                if (!user)
+                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_LOGIN);
+                return this.mapUserWithId(user);
+            }
+            throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN_OR_ID);
         });
     }
     createUser(userData_1) {
