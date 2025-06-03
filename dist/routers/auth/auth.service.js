@@ -90,13 +90,9 @@ class AuthService {
     }
     confirmEmail(code, email) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
-            // findUserBy returns Null!
             let user = yield users_repository_1.default.findUserBy({ "emailConfirmation.confirmationCode": code });
-            if (!user) {
+            if (!user)
                 throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST);
-            }
-            // && user.emailConfirmation.expirationDate > new Date()
             if (user.emailConfirmation.confirmationCode === code) {
                 const result = yield users_repository_1.default.updateConfirmation(new mongodb_1.ObjectId(user._id));
                 return result;
@@ -104,6 +100,17 @@ class AuthService {
             else {
                 throw new CustomError_1.CustomError(auth_controller_1.AuthErrors.ACCOUNT_ALREADY_CONFIRMED);
             }
+        });
+    }
+    resendEmail(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield users_service_1.default.findUserBy({ email });
+            if (user.emailConfirmation.isConfirmed)
+                throw new CustomError_1.CustomError(auth_controller_1.AuthErrors.EMAIL_ALREADY_CONFIRMED);
+            const newConfirmationCode = (0, uuidv4_1.uuid)();
+            yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
+            const updatedUser = yield users_service_1.default.findUserBy({ email });
+            yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, (0, email_manager_1.generateEmailConfirmationResendMessage)(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
         });
     }
 }

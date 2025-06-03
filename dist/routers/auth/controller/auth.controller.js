@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,12 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthErrors = void 0;
 const validationHelpers_1 = require("../../../helpers/validationHelpers");
-const users_queryRepository_1 = __importDefault(require("../../users/users.queryRepository"));
-const email_manager_1 = __importStar(require("../../../managers/email.manager"));
-const users_repository_1 = __importDefault(require("../../users/users.repository"));
 const auth_service_1 = __importDefault(require("../auth.service"));
-const uuidv4_1 = require("uuidv4");
-const mongodb_1 = require("mongodb");
 const session_service_1 = __importDefault(require("../../session/session.service"));
 exports.AuthErrors = {
     EMAIL_CONFIRMATION_PROBLEM: {
@@ -127,18 +99,8 @@ class AuthController {
     }
     resendEmail(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { email } = req.body;
             try {
-                const user = yield users_queryRepository_1.default.getUserByEmail({ email });
-                if (user.emailConfirmation.isConfirmed) {
-                    res.status(401).json(exports.AuthErrors.EMAIL_ALREADY_CONFIRMED);
-                    return;
-                    // throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
-                }
-                const newConfirmationCode = (0, uuidv4_1.uuid)();
-                yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
-                const updatedUser = yield users_queryRepository_1.default.getUserByEmail({ email });
-                yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, (0, email_manager_1.generateEmailConfirmationResendMessage)(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+                yield auth_service_1.default.resendEmail(req.body.email);
                 res.sendStatus(204);
                 return;
             }

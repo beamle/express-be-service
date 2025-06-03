@@ -49,13 +49,14 @@ class UsersService {
     }
 
     else if(email) {
-      user = await usersRepository.findUserBy({ email: email });
+      user = await usersRepository.findUserBy({ email });
+      debugger
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL);
       return this.mapUserWithId(user)
     }
 
     else if(login) {
-      user = await usersRepository.findUserBy({ login: login });
+      user = await usersRepository.findUserBy({ login });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_LOGIN);
       return this.mapUserWithId(user)
     }

@@ -25,6 +25,7 @@ class UsersRepository {
     }
     findUserBy(filter) {
         return __awaiter(this, void 0, void 0, function* () {
+            debugger;
             const user = yield db_1.usersCollection.findOne(filter); // to allow passing mongodb Query strings
             return user;
         });

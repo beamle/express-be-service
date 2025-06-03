@@ -1,16 +1,6 @@
-import usersService from "../../users/users.service";
 import { Request, Response } from "express";
 import { handleError, handleErrorAsArrayOfErrors } from "../../../helpers/validationHelpers";
-import usersQueryRepository from "../../users/users.queryRepository";
-import emailManager, {
-  generateEmailConfirmationMessage,
-  generateEmailConfirmationResendMessage
-} from "../../../managers/email.manager";
-import usersRepository from "../../users/users.repository";
 import authService from "../auth.service";
-import { UserTypeViewModel } from "../../../app/db";
-import { uuid } from "uuidv4";
-import { ObjectId } from "mongodb";
 import sessionService from "../../session/session.service";
 
 export const AuthErrors = {
@@ -85,24 +75,12 @@ class AuthController {
       handleErrorAsArrayOfErrors(res, e);
     }
   }
+
   async resendEmail(req: Request, res: Response) {
-    const { email } = req.body
     try {
-      const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-      if (user.emailConfirmation.isConfirmed) {
-        res.status(401).json(AuthErrors.EMAIL_ALREADY_CONFIRMED);
-        return
-        // throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
-      }
-
-      const newConfirmationCode = uuid()
-      await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode)
-      const updatedUser = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-      await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationResendMessage(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation")      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-
+      await authService.resendEmail(req.body.email)
       res.sendStatus(204)
       return
-
     } catch (e) {
       handleErrorAsArrayOfErrors(res, e)
     }

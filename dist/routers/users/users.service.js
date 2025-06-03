@@ -70,13 +70,14 @@ class UsersService {
                 return this.mapUserWithId(user);
             }
             else if (email) {
-                user = yield users_repository_1.default.findUserBy({ email: email });
+                user = yield users_repository_1.default.findUserBy({ email });
+                debugger;
                 if (!user)
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL);
                 return this.mapUserWithId(user);
             }
             else if (login) {
-                user = yield users_repository_1.default.findUserBy({ login: login });
+                user = yield users_repository_1.default.findUserBy({ login });
                 if (!user)
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_LOGIN);
                 return this.mapUserWithId(user);

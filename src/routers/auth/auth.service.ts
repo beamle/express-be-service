@@ -6,10 +6,12 @@ import { AuthErrors } from "./controller/auth.controller";
 import usersService from "../users/users.service";
 import { uuid } from "uuidv4";
 import jwtService from "../../authorization/services/jwt-service";
-import usersQueryRepository from "../users/users.queryRepository";
 import { UserTypeViewModel } from "../../app/db";
-import emailManager, { generateEmailConfirmationMessage } from "../../managers/email.manager";
-import { handleErrorAsArrayOfErrors } from "../../helpers/validationHelpers";
+import emailManager, {
+  generateEmailConfirmationMessage,
+  generateEmailConfirmationResendMessage
+} from "../../managers/email.manager";
+import usersQueryRepository from "../users/users.queryRepository";
 
 class AuthService {
   async login(loginOrEmail: string, password: string) {
@@ -61,15 +63,10 @@ class AuthService {
     return user;
   }
 
-
   async confirmEmail(code: string, email: string) {
-    debugger
-    // findUserBy returns Null!
     let user = await usersRepository.findUserBy({ "emailConfirmation.confirmationCode": code })
-    if (!user) {
-      throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST)
-    }
-    // && user.emailConfirmation.expirationDate > new Date()
+    if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST)
+
     if (user.emailConfirmation.confirmationCode === code) {
       const result = await usersRepository.updateConfirmation(new ObjectId(user._id))
       return result
@@ -78,6 +75,17 @@ class AuthService {
     }
   }
 
+  async resendEmail(email: string) {
+    const user = await usersService.findUserBy({ email })
+    if (user.emailConfirmation.isConfirmed) throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
+
+    const newConfirmationCode = uuid()
+
+    await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode)
+    const updatedUser = await usersService.findUserBy({ email })
+    await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationResendMessage(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation")      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+
+  }
 }
 
 export default new AuthService()
