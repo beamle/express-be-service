@@ -83,9 +83,17 @@ class AuthService {
 
     await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode)
     const updatedUser = await usersService.findUserBy({ email })
-    await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationResendMessage(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation")      // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-
+    await emailManager.sendEmailConfirmationMessage(updatedUser, generateEmailConfirmationResendMessage(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation")
   }
+
+  // async confirmEmail(code: string, email: string) {
+  //   const result = await this.confirmEmail(code, email)
+  //   if (result) {
+  //     return
+  //   } else {
+  //     throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
+  //   }
+  // }
 }
 
 export default new AuthService()

@@ -112,16 +112,9 @@ class AuthController {
     confirmEmail(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield auth_service_1.default.confirmEmail(req.body.code, req.body.email);
-                if (result) {
-                    res.status(204).send();
-                    return;
-                }
-                else {
-                    res.status(401).json(exports.AuthErrors.EMAIL_ALREADY_CONFIRMED);
-                    return;
-                    // throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
-                }
+                yield auth_service_1.default.confirmEmail(req.body.code, req.body.email);
+                res.status(204).send();
+                return;
             }
             catch (e) {
                 (0, validationHelpers_1.handleErrorAsArrayOfErrors)(res, e);

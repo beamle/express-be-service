@@ -88,15 +88,9 @@ class AuthController {
 
   async confirmEmail(req: Request, res: Response) {
     try {
-      const result = await authService.confirmEmail(req.body.code, req.body.email)
-      if (result) {
-        res.status(204).send()
-        return
-      } else {
-        res.status(401).json(AuthErrors.EMAIL_ALREADY_CONFIRMED);
-        return
-        // throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
-      }
+      await authService.confirmEmail(req.body.code, req.body.email)
+      res.status(204).send()
+      return
     } catch (e) {
       handleErrorAsArrayOfErrors(res, e)
     }

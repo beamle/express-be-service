@@ -110,7 +110,7 @@ class AuthService {
             const newConfirmationCode = (0, uuidv4_1.uuid)();
             yield users_repository_1.default.updateUserConfirmationCode(new mongodb_1.ObjectId(user.id), newConfirmationCode);
             const updatedUser = yield users_service_1.default.findUserBy({ email });
-            yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, (0, email_manager_1.generateEmailConfirmationResendMessage)(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation"); // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
+            yield email_manager_1.default.sendEmailConfirmationMessage(updatedUser, (0, email_manager_1.generateEmailConfirmationResendMessage)(updatedUser.emailConfirmation.confirmationCode), "Registration confirmation");
         });
     }
 }
