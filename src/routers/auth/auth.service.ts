@@ -11,34 +11,19 @@ import emailManager, {
   generateEmailConfirmationMessage,
   generateEmailConfirmationResendMessage
 } from "../../managers/email.manager";
-import usersQueryRepository from "../users/users.queryRepository";
 
-class AuthService {
-  async login(loginOrEmail: string, password: string) {
+type LoginResponseType = { accessToken: string, refreshToken: string }
+
+export class AuthService {
+  async login(loginOrEmail: string, password: string): Promise<LoginResponseType> {
     const user = await usersService.checkCredentials(loginOrEmail, password)
-    if (!user) return null;
+    if (!user) throw new CustomError(UsersErrors.NO_USERS);
 
     const deviceId = uuid();
     const accessToken = await jwtService.createAccessToken(user)
     const { refreshToken } = await jwtService.createRefreshToken(user, deviceId)
     return { accessToken, refreshToken }
   }
-
-  // async registration(email: string, login:string, password: string) {
-  //   await usersQueryRepository.getUserBy({ email })
-  //   await usersQueryRepository.getUserBy({ login })
-  //
-  //   const createdUserId = await usersService.createUser({ email, password, login }, false)
-  //   const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-  //   // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
-  //
-  //   try {
-  //     await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation") // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-  //   } catch (e) {
-  //     handleErrorAsArrayOfErrors(res, e)
-  //     await usersRepository.deleteUser(createdUserId)
-  //   }
-  // }
 
   async registration(dto: { email: string; password: string; login: string }): Promise<UserTypeViewModel> {
     const { email, password, login } = dto;
@@ -67,9 +52,12 @@ class AuthService {
     let user = await usersRepository.findUserBy({ "emailConfirmation.confirmationCode": code })
     if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST)
 
+    if(user.emailConfirmation.isConfirmed) {
+      throw new CustomError(UsersErrors.EMAIL_ALREADY_CONFIRMED)
+    }
+
     if (user.emailConfirmation.confirmationCode === code) {
-      const result = await usersRepository.updateConfirmation(new ObjectId(user._id))
-      return result
+      return await usersRepository.updateConfirmation(new ObjectId(user._id))
     } else {
       throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
     }

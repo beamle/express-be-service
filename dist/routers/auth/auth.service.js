@@ -35,6 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuthService = void 0;
 const users_repository_1 = __importDefault(require("../users/users.repository"));
 const mongodb_1 = require("mongodb");
 const CustomError_1 = require("../../helpers/CustomError");
@@ -49,28 +50,13 @@ class AuthService {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield users_service_1.default.checkCredentials(loginOrEmail, password);
             if (!user)
-                return null;
+                throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USERS);
             const deviceId = (0, uuidv4_1.uuid)();
             const accessToken = yield jwt_service_1.default.createAccessToken(user);
             const { refreshToken } = yield jwt_service_1.default.createRefreshToken(user, deviceId);
             return { accessToken, refreshToken };
         });
     }
-    // async registration(email: string, login:string, password: string) {
-    //   await usersQueryRepository.getUserBy({ email })
-    //   await usersQueryRepository.getUserBy({ login })
-    //
-    //   const createdUserId = await usersService.createUser({ email, password, login }, false)
-    //   const user = await usersQueryRepository.getUserByEmail({ email }) as UserTypeViewModel
-    //   // const user = await usersQueryRepository.getUserBy({ email: createdUserId.toString() }) as UserTypeViewModel
-    //
-    //   try {
-    //     await emailManager.sendEmailConfirmationMessage(user, generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode), "Registration confirmation") // fIXME: ne dolzno bytj tut manager, a service nuzhno ispolzovatj
-    //   } catch (e) {
-    //     handleErrorAsArrayOfErrors(res, e)
-    //     await usersRepository.deleteUser(createdUserId)
-    //   }
-    // }
     registration(dto) {
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password, login } = dto;
@@ -93,9 +79,11 @@ class AuthService {
             let user = yield users_repository_1.default.findUserBy({ "emailConfirmation.confirmationCode": code });
             if (!user)
                 throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST);
+            if (user.emailConfirmation.isConfirmed) {
+                throw new CustomError_1.CustomError(Errors_1.UsersErrors.EMAIL_ALREADY_CONFIRMED);
+            }
             if (user.emailConfirmation.confirmationCode === code) {
-                const result = yield users_repository_1.default.updateConfirmation(new mongodb_1.ObjectId(user._id));
-                return result;
+                return yield users_repository_1.default.updateConfirmation(new mongodb_1.ObjectId(user._id));
             }
             else {
                 throw new CustomError_1.CustomError(auth_controller_1.AuthErrors.ACCOUNT_ALREADY_CONFIRMED);
@@ -114,4 +102,5 @@ class AuthService {
         });
     }
 }
+exports.AuthService = AuthService;
 exports.default = new AuthService();

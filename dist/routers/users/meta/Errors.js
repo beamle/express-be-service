@@ -14,5 +14,6 @@ exports.UsersErrors = {
     NO_PASSWORD: { message: "No password provided for user", field: "password", status: 401 },
     INTERNAL_SERVER_ERROR: { message: "Internal server error", field: "", status: 500 },
     USER_WITH_SUCH_EMAIL_ALREADY_EXIST: { message: "Such email already in use", field: "email", status: 400 },
-    USER_WITH_SUCH_LOGIN_ALREADY_EXIST: { message: "Such login already in use", field: "login", status: 400 }
+    USER_WITH_SUCH_LOGIN_ALREADY_EXIST: { message: "Such login already in use", field: "login", status: 400 },
+    EMAIL_ALREADY_CONFIRMED: { message: "Email is already confirmed", field: "code", status: 400 }
 };
