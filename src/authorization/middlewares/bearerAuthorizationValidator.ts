@@ -5,7 +5,6 @@ import { handleError } from "../../helpers/validationHelpers";
 
 export async function bearerAuthorizationValidator(req: Request, res: Response, next: NextFunction) {
   const auth = req.headers["authorization"]
-  debugger
 
   if (!auth) {
     res.status(401).json({ message: "No authorization header" })
@@ -29,5 +28,4 @@ export async function bearerAuthorizationValidator(req: Request, res: Response, 
   } catch (e) {
     handleError(res, e)
   }
-  // res.sendStatus(401)
 }

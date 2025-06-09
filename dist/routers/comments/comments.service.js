@@ -21,7 +21,6 @@ exports.CommentsErrors = {
 class CommentsService {
     updateComment(contentObj, commentId) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             const result = yield comments_repository_1.default.updateCommentById(contentObj.content, commentId);
             if (!result) {
                 throw new CustomError_1.CustomError(exports.CommentsErrors.NO_COMMENTS_FOUND);

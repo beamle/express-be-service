@@ -25,7 +25,6 @@ class UsersRepository {
   }
 
   async findUserBy(filter: UserFilterType): Promise<UserType | null> {
-    debugger
     const user = await usersCollection.findOne(filter as Filter<any>) // to allow passing mongodb Query strings
 
     return user

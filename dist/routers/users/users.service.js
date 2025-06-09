@@ -71,7 +71,6 @@ class UsersService {
             }
             else if (email) {
                 user = yield users_repository_1.default.findUserBy({ email });
-                debugger;
                 if (!user)
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL);
                 return this.mapUserWithId(user);

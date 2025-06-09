@@ -10,7 +10,6 @@ export const CommentsErrors = {
 
 class CommentsService {
   async updateComment(contentObj: { content: string }, commentId: ObjectId) {
-    debugger
     const result = await commentsRepository.updateCommentById(contentObj.content, commentId)
 
     if(!result) {

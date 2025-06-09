@@ -13,6 +13,16 @@ import commentsQueryRepository from "../../comments/comments.queryRepository";
 //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
 //https://github.com/goldbergyoni/nodebestpractices
 
+
+
+
+TODO: na vse testy chto padajut, dobavitj middleware, kotoryj budet bratj accessToken
+
+
+
+
+
+
 class PostsController {
   async getPosts(req: Request, res: Response) {
     const { blogId } = req.params
@@ -113,7 +123,7 @@ class PostsController {
     context: string, content: string
   }>, res: Response) {
     const { postId } = req.params
-    const { context, content } = req.body
+    const { content } = req.body
     const { userId, login } = req.context.user!
 
     try {

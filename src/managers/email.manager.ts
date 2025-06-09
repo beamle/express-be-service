@@ -12,13 +12,13 @@ export default new EmailManager()
 export const generateEmailConfirmationMessage = (code: string) => {
   return "<h1>Thank you for your registration</h1>\n" +
     " <p>To finish registration please follow the link below:\n" +
-    `     <a href=https://somesite.com/confirm-registration?code=${code}>complete registration</a>\n` +
+    `     <a href=https://some.com/confirm-registration?code=${code}>complete registration</a>\n` +
     " </p>\n"
 }
 
 export const generateEmailConfirmationResendMessage = (code: string) => {
   return "<h1>Thank you for your registration(1)</h1>\n" +
     " <p>To finish registration please follow the link below:\n" +
-    `     <a href=https://somesite.resend.com/confirm-registration?code=${code}>resending complete registration</a>\n` +
+    `     <a href=https://some.resend.com/confirm-registration?code=${code}>resending registration code</a>\n` +
     " </p>\n"
 }

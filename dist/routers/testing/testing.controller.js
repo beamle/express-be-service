@@ -16,7 +16,6 @@ const testing_repository_1 = __importDefault(require("./testing.repository"));
 class TestingController {
     clearDatabase(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            debugger;
             yield testing_repository_1.default.clearAllData();
             res.sendStatus(204);
         });

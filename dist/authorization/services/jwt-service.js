@@ -47,7 +47,6 @@ class jwtService {
     parseAndValidateRefreshToken(token, key) {
         return __awaiter(this, void 0, void 0, function* () {
             const isValid = yield this.isTokenValid(token, key);
-            debugger;
             if (!isValid)
                 throw new CustomError_1.CustomError(session_service_1.SessionErrors.INVALID_REFRESH_TOKEN);
             const decoded = yield this.decodeToken(token);

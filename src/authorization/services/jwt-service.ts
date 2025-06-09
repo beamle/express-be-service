@@ -35,7 +35,6 @@ class jwtService {
 
   async parseAndValidateRefreshToken(token: string, key: string) {
     const isValid = await this.isTokenValid(token, key);
-    debugger
     if (!isValid) throw new CustomError(SessionErrors.INVALID_REFRESH_TOKEN);
 
     const decoded = await this.decodeToken(token);
