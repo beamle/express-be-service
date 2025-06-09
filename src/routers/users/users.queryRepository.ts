@@ -42,29 +42,22 @@ class UsersQueryRepository {
   async findUserBy({ email, login, id }: Partial<UserType>): Promise<UserType | null> {
     if (id) {
       const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
-      if (!user) {
-        throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
-      }
-      return user
+      if (user) return user
+      
+      throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
     }
 
-    else if(email) {
-      const existingUserByEmail = await usersRepository.findUserBy({ email: email });
-      if (!existingUserByEmail) {
-        throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
-      }
-      return existingUserByEmail
+    if (email || login) {
+      const userByEmail = email ? await usersRepository.findUserBy({ email }) : null;
+      if (userByEmail) return userByEmail;
+
+      const userByLogin = login ? await usersRepository.findUserBy({ login }) : null;
+      if (userByLogin) return userByLogin;
+
+      throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
     }
 
-    else if(login) {
-      const existingUserByLogin = await usersRepository.findUserBy({ login: login });
-      if (!existingUserByLogin) {
-        throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
-      }
-      return existingUserByLogin
-    }
-
-    return null
+    return null;
   }
 
   async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | null> {
@@ -73,15 +66,11 @@ class UsersQueryRepository {
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
 
       return this.mapUserWithId(user)
-    }
-
-    else if(email) {
+    } else if (email) {
       const existingUserByEmail = await usersRepository.findUserBy({ email: email });
       if (existingUserByEmail) throw new CustomError(UsersErrors.USER_WITH_SUCH_EMAIL_ALREADY_EXIST);
       return null
-    }
-
-    else if(login) {
+    } else if (login) {
       const existingUserByLogin = await usersRepository.findUserBy({ login: login });
       if (existingUserByLogin) throw new CustomError(UsersErrors.USER_WITH_SUCH_LOGIN_ALREADY_EXIST);
       return null
@@ -95,6 +84,7 @@ class UsersQueryRepository {
     const { _id, password, ...rest } = user
     return { ...rest, id: _id!.toString() }
   }
+
   // mapUserOrUsersWithId(userOrUsers: UserType | UserType[]): UserTypeViewModel | UserTypeViewModel[] {
   //   if (Array.isArray(userOrUsers)) {
   //     return userOrUsers.map(({ _id, password, ...restOfUser }) => ({ ...restOfUser, id: _id!.toString() } as UserTypeViewModel))

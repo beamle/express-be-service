@@ -40,12 +40,8 @@ class CommentsController {
                     return res.status(403).json({ message: "You are not owner of the comment" });
                 }
                 const isCommentUpdated = yield comments_service_1.default.updateComment(Object.assign({}, req.body), new mongodb_1.ObjectId(searchableCommentId));
-                if (isCommentUpdated) {
+                if (isCommentUpdated)
                     return res.send(204);
-                }
-                // else {
-                //   return res.status(400).json({ message: "Failed to update the comment" })
-                // }
             }
             catch (error) {
                 (0, validationHelpers_1.handleError)(res, error);

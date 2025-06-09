@@ -149,14 +149,14 @@ class PostsController {
     createCommentForPost(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { postId } = req.params;
-            const { context } = req.body;
+            const { context, content } = req.body;
             const { userId, login } = req.context.user;
             try {
                 const post = yield posts_queryRepository_1.default.getPostById(new mongodb_1.ObjectId(postId));
                 const createdCommentId = yield posts_service_1.default.createCommentForPost(new mongodb_1.ObjectId(post.id), {
                     userId,
                     userLogin: login
-                }, context);
+                }, content);
                 const createdComment = yield comments_queryRepository_1.default.getLastCreatedCommentForPostBy(new mongodb_1.ObjectId(createdCommentId));
                 res.status(201).json(createdComment);
                 return;

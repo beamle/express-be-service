@@ -63,24 +63,18 @@ class UsersQueryRepository {
         return __awaiter(this, arguments, void 0, function* ({ email, login, id }) {
             if (id) {
                 const user = yield users_repository_1.default.findUserBy({ _id: new mongodb_1.ObjectId(id) });
-                if (!user) {
-                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_ID);
-                }
-                return user;
+                if (user)
+                    return user;
+                throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_ID);
             }
-            else if (email) {
-                const existingUserByEmail = yield users_repository_1.default.findUserBy({ email: email });
-                if (!existingUserByEmail) {
-                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
-                }
-                return existingUserByEmail;
-            }
-            else if (login) {
-                const existingUserByLogin = yield users_repository_1.default.findUserBy({ login: login });
-                if (!existingUserByLogin) {
-                    throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
-                }
-                return existingUserByLogin;
+            if (email || login) {
+                const userByEmail = email ? yield users_repository_1.default.findUserBy({ email }) : null;
+                if (userByEmail)
+                    return userByEmail;
+                const userByLogin = login ? yield users_repository_1.default.findUserBy({ login }) : null;
+                if (userByLogin)
+                    return userByLogin;
+                throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
             }
             return null;
         });

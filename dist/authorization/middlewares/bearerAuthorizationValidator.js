@@ -19,6 +19,7 @@ const validationHelpers_1 = require("../../helpers/validationHelpers");
 function bearerAuthorizationValidator(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         const auth = req.headers["authorization"];
+        debugger;
         if (!auth) {
             res.status(401).json({ message: "No authorization header" });
             return;

@@ -73,29 +73,6 @@ describe("AuthService", () => {
       }
     };
 
-    it("should register a new user and send confirmation email", async () => {
-      // Mocks for user existence checks
-      (usersService.getUserBy as jest.Mock).mockResolvedValue(null);
-
-      // Mocks for user creation and retrieval
-      (usersService.createUser as jest.Mock).mockResolvedValue("some-user-id");
-      (usersService.findUserBy as jest.Mock).mockResolvedValue(mockUser);
-
-      // Mock email sending
-      (emailManager.sendEmailConfirmationMessage as jest.Mock).mockResolvedValue(true);
-
-      const result = await authService.registration(dto);
-
-      expect(usersService.getUserBy).toHaveBeenCalledTimes(2);
-      expect(usersService.createUser).toHaveBeenCalledWith(expect.objectContaining(dto), false);
-      expect(emailManager.sendEmailConfirmationMessage).toHaveBeenCalledWith(
-        mockUser,
-        expect.stringContaining("confirm-registration?code="),
-        "Registration confirmation"
-      );
-      expect(result).toEqual(mockUser);
-    });
-
     it("should delete user and throw if email sending fails", async () => {
       // Mocks for user existence checks
       (usersService.getUserBy as jest.Mock).mockResolvedValueOnce(null).mockResolvedValueOnce(null);

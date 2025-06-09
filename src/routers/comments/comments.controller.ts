@@ -28,12 +28,8 @@ class CommentsController {
       }
 
       const isCommentUpdated = await commentsService.updateComment({ ...req.body }, new ObjectId(searchableCommentId))
-      if (isCommentUpdated) {
-        return res.send(204)
-      }
-      // else {
-      //   return res.status(400).json({ message: "Failed to update the comment" })
-      // }
+      if (isCommentUpdated) return res.send(204)
+
     } catch (error) {
       handleError(res, error)
     }

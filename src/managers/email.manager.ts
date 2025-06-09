@@ -19,6 +19,6 @@ export const generateEmailConfirmationMessage = (code: string) => {
 export const generateEmailConfirmationResendMessage = (code: string) => {
   return "<h1>Thank you for your registration(1)</h1>\n" +
     " <p>To finish registration please follow the link below:\n" +
-    `     <a href=https://somesite.resend.com/confirm-registration?code=${code}>complete registration</a>\n` +
+    `     <a href=https://somesite.resend.com/confirm-registration?code=${code}>resending complete registration</a>\n` +
     " </p>\n"
 }
