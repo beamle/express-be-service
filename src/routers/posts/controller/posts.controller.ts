@@ -16,7 +16,7 @@ import commentsQueryRepository from "../../comments/comments.queryRepository";
 
 
 
-TODO: na vse testy chto padajut, dobavitj middleware, kotoryj budet bratj accessToken
+// TODO: na vse testy chto padajut, dobavitj middleware, kotoryj budet bratj accessToken
 
 
 

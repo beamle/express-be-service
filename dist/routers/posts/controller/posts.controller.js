@@ -44,15 +44,7 @@ const CustomError_1 = require("../../../helpers/CustomError");
 const comments_queryRepository_1 = __importDefault(require("../../comments/comments.queryRepository"));
 //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
 //https://github.com/goldbergyoni/nodebestpractices
-TODO: na;
-vse;
-testy;
-chto;
-padajut, dobavitj;
-middleware, kotoryj;
-budet;
-bratj;
-accessToken;
+// TODO: na vse testy chto padajut, dobavitj middleware, kotoryj budet bratj accessToken
 class PostsController {
     getPosts(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

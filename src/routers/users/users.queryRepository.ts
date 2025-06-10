@@ -43,7 +43,7 @@ class UsersQueryRepository {
     if (id) {
       const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
       if (user) return user
-      
+
       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
     }
 
@@ -60,12 +60,12 @@ class UsersQueryRepository {
     return null;
   }
 
-  async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | null> {
+  async getUserBy({ email, login, id }: Partial<UserType>): Promise<Omit<UserTypeViewModel,"emailConfirmation"> | null> {
     if (id) {
       const user = await usersRepository.findUserBy({ _id: new ObjectId(id) })
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID)
 
-      return this.mapUserWithId(user)
+      return this.mapUserWithoutEmailConfirmation(user)
     } else if (email) {
       const existingUserByEmail = await usersRepository.findUserBy({ email: email });
       if (existingUserByEmail) throw new CustomError(UsersErrors.USER_WITH_SUCH_EMAIL_ALREADY_EXIST);
@@ -82,6 +82,11 @@ class UsersQueryRepository {
 
   mapUserWithId(user: UserType): UserTypeViewModel {
     const { _id, password, ...rest } = user
+    return { ...rest, id: _id!.toString() }
+  }
+
+  mapUserWithoutEmailConfirmation(user: UserType): Omit<UserTypeViewModel,"emailConfirmation"> {
+    const { _id, password, emailConfirmation, ...rest } = user
     return { ...rest, id: _id!.toString() }
   }
 

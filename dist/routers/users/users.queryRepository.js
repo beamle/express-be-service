@@ -85,7 +85,7 @@ class UsersQueryRepository {
                 const user = yield users_repository_1.default.findUserBy({ _id: new mongodb_1.ObjectId(id) });
                 if (!user)
                     throw new CustomError_1.CustomError(Errors_1.UsersErrors.NO_USER_WITH_SUCH_ID);
-                return this.mapUserWithId(user);
+                return this.mapUserWithoutEmailConfirmation(user);
             }
             else if (email) {
                 const existingUserByEmail = yield users_repository_1.default.findUserBy({ email: email });
@@ -104,6 +104,10 @@ class UsersQueryRepository {
     }
     mapUserWithId(user) {
         const { _id, password } = user, rest = __rest(user, ["_id", "password"]);
+        return Object.assign(Object.assign({}, rest), { id: _id.toString() });
+    }
+    mapUserWithoutEmailConfirmation(user) {
+        const { _id, password, emailConfirmation } = user, rest = __rest(user, ["_id", "password", "emailConfirmation"]);
         return Object.assign(Object.assign({}, rest), { id: _id.toString() });
     }
 }
