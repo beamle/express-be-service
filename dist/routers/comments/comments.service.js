@@ -17,6 +17,7 @@ const CustomError_1 = require("../../helpers/CustomError");
 const comments_repository_1 = __importDefault(require("./comments.repository"));
 exports.CommentsErrors = {
     NO_COMMENTS_FOUND: { message: "Comment with such Id was not found!", field: "id", status: 404 },
+    NOT_OWNER_OF_COMMENT: { message: "You are not owner of the comment", field: "", status: 403 },
 };
 class CommentsService {
     updateComment(contentObj, commentId) {

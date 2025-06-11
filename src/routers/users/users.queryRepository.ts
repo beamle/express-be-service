@@ -89,15 +89,6 @@ class UsersQueryRepository {
     const { _id, password, emailConfirmation, ...rest } = user
     return { ...rest, id: _id!.toString() }
   }
-
-  // mapUserOrUsersWithId(userOrUsers: UserType | UserType[]): UserTypeViewModel | UserTypeViewModel[] {
-  //   if (Array.isArray(userOrUsers)) {
-  //     return userOrUsers.map(({ _id, password, ...restOfUser }) => ({ ...restOfUser, id: _id!.toString() } as UserTypeViewModel))
-  //   }
-  //
-  //   const { _id, password, ...rest } = userOrUsers
-  //   return { ...rest, id: _id!.toString() } as UserTypeViewModel
-  // }
 }
 
 export default new UsersQueryRepository()

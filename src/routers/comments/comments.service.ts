@@ -6,6 +6,7 @@ import { Comment, CommentType } from "./comments.types";
 
 export const CommentsErrors = {
   NO_COMMENTS_FOUND: { message: "Comment with such Id was not found!", field: "id", status: 404 },
+  NOT_OWNER_OF_COMMENT: { message: "You are not owner of the comment", field: "", status: 403 },
 }
 
 class CommentsService {

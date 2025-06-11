@@ -41,18 +41,16 @@ class CommentsQueryRepository {
             const comments = yield db_1.commentsCollection
                 .find({ _id: commentId })
                 .toArray();
-            if (!comments) {
+            if (!comments)
                 throw new CustomError_1.CustomError(comments_service_1.CommentsErrors.NO_COMMENTS_FOUND);
-            }
             return this.mapToCommentType(comments[0]);
         });
     }
     getCommentBy(commentId) {
         return __awaiter(this, void 0, void 0, function* () {
             const comment = yield db_1.commentsCollection.findOne({ _id: commentId });
-            if (!comment) {
+            if (!comment)
                 throw new CustomError_1.CustomError(comments_service_1.CommentsErrors.NO_COMMENTS_FOUND);
-            }
             return this.mapToCommentType(comment);
         });
     }

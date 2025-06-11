@@ -37,9 +37,7 @@ function handleError(res, error) {
         return;
     }
     else {
-        // res.status(500).json(PostErrors.INTERNAL_SERVER_ERROR);
         res.status(500).json({ message: "Internal server error", field: "", status: 500 });
-        console.log(res, "RES");
         return;
     }
 }

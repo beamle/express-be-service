@@ -6,7 +6,6 @@ import { CommentsErrors } from "./comments.service";
 
 class CommentsQueryRepository {
   async getCommentsByPostId(sortingData: PostsSortingData, postId: string): Promise<CommentType[] | boolean> {
-
     const comments = await commentsCollection.find({ postId }, { projection: { postId: 0 } })
       .skip((sortingData.pageNumber - 1) * sortingData.pageSize)
       .limit(sortingData.pageSize)
@@ -19,28 +18,19 @@ class CommentsQueryRepository {
   }
 
   async getLastCreatedCommentForPostBy(commentId: ObjectId): Promise<CommentType> {
-
     const comments = await commentsCollection
       .find({ _id: commentId })
       .toArray()
-
-    if (!comments) {
-      throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND)
-    }
+    if (!comments) throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND)
 
     return this.mapToCommentType(comments[0])
   }
 
   async getCommentBy(commentId: ObjectId): Promise<CommentType> {
-
     const comment = await commentsCollection.findOne({ _id: commentId })
-
-    if (!comment) {
-      throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND)
-    }
+    if (!comment) throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND)
 
     return this.mapToCommentType(comment)
-
   }
 
   private mapCommentsToCommentType(comments: CommentType[]) {
