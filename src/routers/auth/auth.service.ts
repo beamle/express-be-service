@@ -57,7 +57,7 @@ export class AuthService {
     }
 
     if (user.emailConfirmation.confirmationCode === code) {
-      return await usersRepository.updateConfirmation(new ObjectId(user._id))
+      return await usersRepository.updateConfirmation(new ObjectId(user._id!))
     } else {
       throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
     }

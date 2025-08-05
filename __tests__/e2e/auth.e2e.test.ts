@@ -7,6 +7,8 @@ import { CustomError } from "../../src/helpers/CustomError";
 import { UsersErrors } from "../../src/routers/users/meta/Errors";
 import emailManager from "../../src/managers/email.manager";
 import usersRepository from "../../src/routers/users/users.repository";
+import sessionService, { SessionErrors } from "../../src/routers/session/session.service";
+import authController, { AuthErrors } from "../../src/routers/auth/controller/auth.controller";
 
 jest.mock('../../src/routers/users/users.service');
 jest.mock('../../src/authorization/services/jwt-service');
@@ -87,4 +89,68 @@ describe("AuthService", () => {
     });
   });
 
+
+  describe("updateTokens", () => {
+    const oldRefreshToken = "oldRefreshToken";
+    const newAccessToken = "newAccessToken";
+    const newRefreshToken = "newRefreshToken";
+
+    it("should return new access and refresh tokens and invalidate the old refresh token", async () => {
+      // Mock sessionService.updateTokens to simulate the token refresh process
+      (authController.updateTokens as jest.Mock).mockResolvedValue({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+
+      // Simulate a request with a valid old refresh token
+      const req = {
+        cookies: {
+          refreshToken: oldRefreshToken,
+        },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        cookie: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+      };
+
+      await authController.updateTokens(req as any, res as any);
+
+      // Assertions
+      expect(authController.updateTokens).toHaveBeenCalledWith(oldRefreshToken);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.cookie).toHaveBeenCalledWith('refreshToken', newRefreshToken, expect.objectContaining({
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'development', // Check secure flag based on environment
+      }));
+      expect(res.json).toHaveBeenCalledWith({ accessToken: newAccessToken });
+    });
+
+    it("should throw error if the refresh token is invalid or expired", async () => {
+      // Simulate invalid refresh token
+      const invalidRefreshToken = "invalidRefreshToken";
+
+      (authController.updateTokens as jest.Mock).mockRejectedValue(new CustomError(SessionErrors.INVALID_REFRESH_TOKEN));
+
+      // Simulate a request with an invalid refresh token
+      const req = {
+        cookies: {
+          refreshToken: invalidRefreshToken,
+        },
+      };
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+      };
+
+      await authController.updateTokens(req as any, res as any);
+
+      // Assertions
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        error: "Invalid or expired refresh token", // Customize the error message as needed
+      });
+    });
+  });
 })

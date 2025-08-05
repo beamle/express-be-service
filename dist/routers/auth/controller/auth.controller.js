@@ -45,7 +45,11 @@ class AuthController {
                 const { accessToken, refreshToken } = yield auth_service_1.default.login(req.body.loginOrEmail, req.body.password);
                 res
                     .status(200)
-                    .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
+                    .cookie('refreshToken', refreshToken, {
+                    httpOnly: true,
+                    sameSite: 'strict',
+                    secure: process.env.NODE_ENV === 'development'
+                })
                     .json({ accessToken });
                 return;
             }
@@ -76,7 +80,7 @@ class AuthController {
                 const { accessToken, refreshToken: newRefreshToken } = yield session_service_1.default.updateTokens(refreshToken);
                 res
                     .status(200)
-                    .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
+                    .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'development' })
                     .json({ accessToken });
                 return;
             }

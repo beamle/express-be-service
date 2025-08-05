@@ -33,8 +33,12 @@ class AuthController {
       const { accessToken, refreshToken } = await authService.login(req.body.loginOrEmail, req.body.password)
       res
         .status(200)
-        .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
-        .json({ accessToken });
+        .cookie('refreshToken', refreshToken, {
+          httpOnly: true,
+          sameSite: 'strict',
+          secure: process.env.NODE_ENV === 'development'
+        })
+        .json({ accessToken })
       return
     } catch (e) {
       handleError(res, e)
@@ -58,7 +62,7 @@ class AuthController {
       const { accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens(refreshToken)
       res
         .status(200)
-        .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict' })
+        .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict',  secure: process.env.NODE_ENV === 'development' })
         .json({ accessToken });
       return
     } catch (e) {

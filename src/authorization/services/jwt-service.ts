@@ -11,11 +11,11 @@ const JwtServiceErrors = {
 
 class jwtService {
   async createAccessToken(user: UserTypeViewModel): Promise<string> {
-    return jwt.sign({ userId: user.id }, SETTINGS.JWT_SECRET, { expiresIn: '10h' })
+    return jwt.sign({ userId: user.id }, SETTINGS.JWT_SECRET, { expiresIn: '10s' })
   }
 
   async createRefreshToken(user: UserTypeViewModel, deviceId: string): Promise<{ refreshToken: string } & RefreshTokenPayloadType> {
-    const refreshToken = jwt.sign({ userId: user.id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '1d' });
+    const refreshToken = jwt.sign({ userId: user.id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '15s' });
     const refreshTokenPayload = jwt.decode(refreshToken) as RefreshTokenPayloadType;
 
     return {
