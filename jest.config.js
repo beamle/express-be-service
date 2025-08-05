@@ -5,6 +5,7 @@ module.exports = {
   // testRegex: "__tests__/.*.e2e.test.ts$",
   testMatch: [
     "<rootDir>/__tests__/**/*.e2e.test.ts",
-    "<rootDir>/__tests__/integration/**/*.integration.test.ts"
+    "<rootDir>/__tests__/integration/**/*.integration.test.ts",
+    "<rootDir>/__tests__/unit/**/*.unit.test.ts"
   ]
 }

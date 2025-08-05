@@ -4,7 +4,7 @@ import { SETTINGS } from "../../app/settings";
 import { CustomError } from "../../helpers/CustomError";
 import { SessionErrors } from "../../routers/session/session.service";
 
-const JwtServiceErrors = {
+export const JwtServiceErrors = {
   NO_CORRECT_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
   NO_TOKEN_PROVIDED: { message: "Unauthorized. You didn't pass jwt token", field: "", status: 404 },
 }
