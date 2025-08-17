@@ -8,3 +8,4 @@ const express_1 = require("express");
 const testing_controller_1 = __importDefault(require("./testing.controller"));
 exports.testingRouter = (0, express_1.Router)();
 exports.testingRouter.delete("/all-data", testing_controller_1.default.clearDatabase);
+exports.testingRouter.get("/get-all-blacklisted-refresh-tokens", testing_controller_1.default.getAllBlackListedRefreshTokens);

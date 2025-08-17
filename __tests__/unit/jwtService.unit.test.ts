@@ -85,6 +85,7 @@ describe('jwtService', () => {
   describe('jwtService', () => {
     it('should spy on isTokenValid', async () => {
       // Spying on the method and mocking the return value
+      // @ts-ignore
       jest.spyOn(jwtService, 'isTokenValid').mockResolvedValue(true);
 
       const result = await jwtService.isTokenValid('validToken', 'secret');
@@ -96,6 +97,7 @@ describe('jwtService', () => {
       const mockDecoded = { userId: 'fakeUserId', deviceId: 'fakeDeviceId', iat: 1234567890, exp: 12234848 };
 
       // Spying on the decodeToken method and mocking the return value
+      // @ts-ignore
       jest.spyOn(jwtService, 'decodeToken').mockResolvedValue(mockDecoded);
 
       const decoded = await jwtService.decodeToken('validToken');
@@ -104,51 +106,56 @@ describe('jwtService', () => {
     });
   });
 
-  // describe('parseAndValidateRefreshToken', () => {
-  //   it('should return decoded token if valid', async () => {
-  //     const mockDecoded = { userId: fakeUser.id, deviceId, iat: 1234567890 };
-  //
-  //     // Spying and mocking methods without the 3rd argument (access type)
-  //     jest.spyOn(jwtService, 'isTokenValid').mockResolvedValue(true);  // Mocking the isTokenValid method
-  //     jest.spyOn(jwtService, 'decodeToken').mockResolvedValue(mockDecoded);  // Mocking the decodeToken method
-  //
-  //     // Call the method
-  //     const result = await jwtService.parseAndValidateRefreshToken('validRefreshToken', secret);
-  //
-  //     // Assert the result
-  //     expect(result).toEqual(mockDecoded);
-  //     expect(jwtService.isTokenValid).toHaveBeenCalledWith('validRefreshToken', secret);
-  //     expect(jwtService.decodeToken).toHaveBeenCalledWith('validRefreshToken');
-  //   });
-  //
-  //   it('should throw an error if token is invalid', async () => {
-  //     // Mocking isTokenValid to return false
-  //     jest.spyOn(jwtService, 'isTokenValid').mockResolvedValue(false);
-  //
-  //     // Call the method and check for error
-  //     await expect(jwtService.parseAndValidateRefreshToken('invalidRefreshToken', secret))
-  //       .rejects
-  //       .toThrow(new CustomError(SessionErrors.INVALID_REFRESH_TOKEN));
-  //
-  //     expect(jwtService.isTokenValid).toHaveBeenCalledWith('invalidRefreshToken', secret);
-  //   });
-  //
-  //   it('should throw an error if decoded token is missing required fields', async () => {
-  //     // Mock decoded token missing 'deviceId'
-  //     const mockDecoded = { userId: fakeUser.id, deviceId: null, iat: 1234567890 };
-  //
-  //     // Mocking isTokenValid and decodeToken methods
-  //     jest.spyOn(jwtService, 'isTokenValid').mockResolvedValue(true);
-  //     jest.spyOn(jwtService, 'decodeToken').mockResolvedValue(mockDecoded);
-  //
-  //     // Call the method and check for error
-  //     await expect(jwtService.parseAndValidateRefreshToken('invalidRefreshToken', secret))
-  //       .rejects
-  //       .toThrow(new CustomError(SessionErrors.INVALID_REFRESH_TOKEN));
-  //
-  //     expect(jwtService.decodeToken).toHaveBeenCalledWith('invalidRefreshToken');
-  //   });
-  // });
+  describe('parseAndValidateRefreshToken', () => {
+    it('should return decoded token if valid', async () => {
+      const mockDecoded = { userId: fakeUser.id, deviceId, iat: 1234567890 };
+
+      // Spying and mocking methods without the 3rd argument (access type)
+      // @ts-ignore
+      jest.spyOn(jwtService, 'isTokenValid').mockResolvedValue(true);  // Mocking the isTokenValid method
+      // @ts-ignore
+      jest.spyOn(jwtService, 'decodeToken').mockResolvedValue(mockDecoded);  // Mocking the decodeToken method
+
+      // Call the method
+      const result = await jwtService.parseAndValidateRefreshToken('validRefreshToken', secret);
+
+      // Assert the result
+      expect(result).toEqual(mockDecoded);
+      expect(jwtService.isTokenValid).toHaveBeenCalledWith('validRefreshToken', secret);
+      expect(jwtService.decodeToken).toHaveBeenCalledWith('validRefreshToken');
+    });
+
+    it('should throw an error if token is invalid', async () => {
+      // Mocking isTokenValid to return false
+      // @ts-ignore
+      jest.spyOn(jwtService, 'isTokenValid').mockResolvedValue(false);
+
+      // Call the method and check for error
+      await expect(jwtService.parseAndValidateRefreshToken('invalidRefreshToken', secret))
+        .rejects
+        .toThrow(new CustomError(SessionErrors.INVALID_REFRESH_TOKEN));
+
+      expect(jwtService.isTokenValid).toHaveBeenCalledWith('invalidRefreshToken', secret);
+    });
+
+    it('should throw an error if decoded token is missing required fields', async () => {
+      // Mock decoded token missing 'deviceId'
+      const mockDecoded = { userId: fakeUser.id, deviceId: null, iat: 1234567890 };
+
+      // Mocking isTokenValid and decodeToken methods
+      // @ts-ignore
+      jest.spyOn(jwtService, 'isTokenValid').mockResolvedValue(true);
+      // @ts-ignore
+      jest.spyOn(jwtService, 'decodeToken').mockResolvedValue(mockDecoded);
+
+      // Call the method and check for error
+      await expect(jwtService.parseAndValidateRefreshToken('invalidRefreshToken', secret))
+        .rejects
+        .toThrow(new CustomError(SessionErrors.INVALID_REFRESH_TOKEN));
+
+      expect(jwtService.decodeToken).toHaveBeenCalledWith('invalidRefreshToken');
+    });
+  });
 
 
   describe('decodeToken', () => {

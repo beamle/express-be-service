@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { handleError, handleErrorAsArrayOfErrors } from "../../../helpers/validationHelpers";
 import authService from "../auth.service";
 import sessionService from "../../session/session.service";
+import { CustomError } from "../../../helpers/CustomError";
 
 export const AuthErrors = {
   EMAIL_CONFIRMATION_PROBLEM: {
@@ -59,7 +60,11 @@ class AuthController {
   async updateTokens(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
+      debugger
       const { accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens(refreshToken)
+      const secondCall = sessionService.updateTokens(refreshToken); // old token
+      await secondCall.catch(err => console.log(err.message));
+      debugger
       res
         .status(200)
         .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict',  secure: process.env.NODE_ENV === 'development' })

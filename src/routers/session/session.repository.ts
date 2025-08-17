@@ -27,18 +27,13 @@ export const sessionRepository = {
   // },
 
   async addRefreshTokenToBlackList(refreshToken: string) {
-
-    const refreshTokenObj = {
-      // id: String(Math.floor(Math.random() * 223)),
-      refreshToken
-    }
-
+    const refreshTokenObj = { // id: String(Math.floor(Math.random() * 223)),
+      refreshToken }
     return await refreshTokenBlacklistCollection.insertOne(refreshTokenObj)
   },
 
   async checkIfRefreshTokenInBlackList(refreshToken: string) {
-    return await refreshTokenBlacklistCollection.findOne({ refreshToken })
+    const found = await refreshTokenBlacklistCollection.findOne({ refreshToken });
+    return !!found;
   },
-
-
 }

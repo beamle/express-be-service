@@ -27,10 +27,12 @@ exports.SessionErrors = {
         field: "refreshToken",
         status: 401
     },
+    INVALID_OR_EXPIRED_REFRESH_TOKEN: { message: 'Invalid or expired refresh token', field: "refreshToken", status: 401 },
 };
 class SessionService {
     updateTokens(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.checkIfRefreshTokenIsNotBlacklisted(refreshToken);
             const { userId, deviceId } = yield jwt_service_1.default.parseAndValidateRefreshToken(refreshToken, settings_1.SETTINGS.JWT_SECRET);
             const result = yield session_repository_1.sessionRepository.addRefreshTokenToBlackList(refreshToken);
             if (!result.acknowledged) {
@@ -47,11 +49,35 @@ class SessionService {
     }
     logout(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!refreshToken) {
+                throw new CustomError_1.CustomError(exports.SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+            }
+            const isInvalid = yield session_repository_1.sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+            if (isInvalid) {
+                throw new CustomError_1.CustomError(exports.SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+            }
             yield jwt_service_1.default.parseAndValidateRefreshToken(refreshToken, settings_1.SETTINGS.JWT_SECRET);
             const result = yield session_repository_1.sessionRepository.addRefreshTokenToBlackList(refreshToken);
             if (!result.acknowledged) {
                 throw new CustomError_1.CustomError(exports.SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST);
             }
+        });
+    }
+    // async logout(refreshToken: string) {
+    //   await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET)
+    //
+    //   const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken)
+    //   if (!result.acknowledged) {
+    //     throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST)
+    //   }
+    // }
+    checkIfRefreshTokenIsNotBlacklisted(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const isInvalid = yield session_repository_1.sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+            debugger;
+            if (isInvalid)
+                throw new CustomError_1.CustomError(exports.SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+            return true;
         });
     }
 }

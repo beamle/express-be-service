@@ -20,5 +20,12 @@ class TestingController {
             res.sendStatus(204);
         });
     }
+    getAllBlackListedRefreshTokens(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            debugger;
+            const result = yield testing_repository_1.default.getAllBlackListedRefreshTokens();
+            res.json(result);
+        });
+    }
 }
 exports.default = new TestingController();

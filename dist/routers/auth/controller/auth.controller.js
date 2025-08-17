@@ -77,7 +77,11 @@ class AuthController {
             var _a;
             try {
                 const refreshToken = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
+                debugger;
                 const { accessToken, refreshToken: newRefreshToken } = yield session_service_1.default.updateTokens(refreshToken);
+                const secondCall = session_service_1.default.updateTokens(refreshToken); // old token
+                yield secondCall.catch(err => console.log(err.message));
+                debugger;
                 res
                     .status(200)
                     .cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'development' })

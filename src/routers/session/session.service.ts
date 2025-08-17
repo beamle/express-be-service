@@ -13,10 +13,13 @@ export const SessionErrors = {
     field: "refreshToken",
     status: 401
   },
+  INVALID_OR_EXPIRED_REFRESH_TOKEN: { message: 'Invalid or expired refresh token', field: "refreshToken", status: 401 },
+
 }
 
 class SessionService {
   async updateTokens(refreshToken: string): Promise<{ accessToken: string, refreshToken: string }> {
+    await this.checkIfRefreshTokenIsNotBlacklisted(refreshToken)
     const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET)
 
     const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken)
@@ -36,12 +39,37 @@ class SessionService {
   }
 
   async logout(refreshToken: string) {
-    await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET)
-
-    const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken)
-    if (!result.acknowledged) {
-      throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST)
+    if (!refreshToken) {
+      throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
+
+    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+    if (isInvalid) {
+      throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+    }
+
+    await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+
+    const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken);
+    if (!result.acknowledged) {
+      throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST);
+    }
+  }
+
+  // async logout(refreshToken: string) {
+  //   await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET)
+  //
+  //   const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken)
+  //   if (!result.acknowledged) {
+  //     throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST)
+  //   }
+  // }
+
+  async checkIfRefreshTokenIsNotBlacklisted(refreshToken: string) {
+    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken)
+    debugger
+    if (isInvalid) throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN)
+    return true
   }
 }
 

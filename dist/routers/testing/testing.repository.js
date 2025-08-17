@@ -16,6 +16,14 @@ class TestingRepository {
             yield db_1.postsCollection.deleteMany({});
             yield db_1.blogsCollection.deleteMany({});
             yield db_1.usersCollection.deleteMany({});
+            yield db_1.commentsCollection.deleteMany({});
+            // await sessionCollection.deleteMany({})
+            yield db_1.refreshTokenBlacklistCollection.deleteMany({});
+        });
+    }
+    getAllBlackListedRefreshTokens() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield db_1.refreshTokenBlacklistCollection.find().toArray();
         });
     }
 }

@@ -38,7 +38,6 @@ exports.sessionRepository = {
     addRefreshTokenToBlackList(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             const refreshTokenObj = {
-                // id: String(Math.floor(Math.random() * 223)),
                 refreshToken
             };
             return yield db_1.refreshTokenBlacklistCollection.insertOne(refreshTokenObj);
@@ -46,7 +45,8 @@ exports.sessionRepository = {
     },
     checkIfRefreshTokenInBlackList(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield db_1.refreshTokenBlacklistCollection.findOne({ refreshToken });
+            const found = yield db_1.refreshTokenBlacklistCollection.findOne({ refreshToken });
+            return !!found;
         });
     },
 };

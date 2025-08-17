@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.JwtServiceErrors = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const settings_1 = require("../../app/settings");
 const CustomError_1 = require("../../helpers/CustomError");
 const session_service_1 = require("../../routers/session/session.service");
-const JwtServiceErrors = {
+exports.JwtServiceErrors = {
     NO_CORRECT_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
     NO_TOKEN_PROVIDED: { message: "Unauthorized. You didn't pass jwt token", field: "", status: 404 },
 };
@@ -64,14 +65,14 @@ class jwtService {
     getUserIdByToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!token || token === "undefined") {
-                throw new CustomError_1.CustomError(JwtServiceErrors.NO_TOKEN_PROVIDED);
+                throw new CustomError_1.CustomError(exports.JwtServiceErrors.NO_TOKEN_PROVIDED);
             }
             try {
                 const result = jsonwebtoken_1.default.verify(token, settings_1.SETTINGS.JWT_SECRET);
                 return result.userId;
             }
             catch (e) {
-                throw new CustomError_1.CustomError(JwtServiceErrors.NO_CORRECT_TOKEN_PROVIDED);
+                throw new CustomError_1.CustomError(exports.JwtServiceErrors.NO_CORRECT_TOKEN_PROVIDED);
             }
         });
     }
