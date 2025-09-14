@@ -13,6 +13,7 @@ export const SETTINGS = {
     EMAIL: '/email',
     SESSION: '/session',
     REFRESH_TOKEN_BLACKLIST: '/refresh-token-blacklist',
+    REQUEST_CASES: '/request-cases-list',
     TESTING: '/testing',
   },
   DB_NAME: process.env.DB_NAME || "lesson-2-3",
