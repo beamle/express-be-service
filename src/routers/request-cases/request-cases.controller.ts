@@ -1,12 +1,17 @@
+import { log } from "console";
+import requestCasesRepository from "./request-cases.repository";
+
 export class RequestCasesMetadataController {
   async saveRequestMetadata(req: any, res: Response) {
-    const { id: searchableCommentId } = req.params
+    const { IP, baseURL, date } = req;
+    console.log(IP, baseURL, date);
+
     try {
-      const requestMeta = await requestCaseMetadata.saveRequestMetadata(new ObjectId(searchableCommentId))
-      res.status(200).json(comment)
-      return
+      const requestMeta = await requestCasesRepository.create();
+      res.status(200).json();
+      return;
     } catch (e) {
-      handleError(res, e)
+      handleError(res, e);
     }
   }
 }
