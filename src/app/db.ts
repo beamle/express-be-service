@@ -70,7 +70,7 @@ export type RefreshTokenDBType = {
 
 export type RequestCasesMetadataDBType = {
   IP: string;
-  URL: string;
+  baseURL: string;
   date: Date;
 };
 

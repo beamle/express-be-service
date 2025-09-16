@@ -1,12 +1,15 @@
 import { ObjectId } from "mongodb";
 import { requestCasesMetadataCollection } from "../../app/db";
 
-class RequestCasesMetadataRepository {
-  async create(IP: string, URL: string, date: Date): Promise<ObjectId> {
-    const metadataObj = { URL, IP, date };
+class RequestCasesLimiterManager {
+  async create(metadataObj: {
+    IP: string;
+    baseURL: string;
+    date: Date;
+  }): Promise<ObjectId> {
     const result = await requestCasesMetadataCollection.insertOne(metadataObj);
     return result.insertedId;
   }
 }
 
-export default new RequestCasesMetadataRepository();
+export default new RequestCasesLimiterManager();

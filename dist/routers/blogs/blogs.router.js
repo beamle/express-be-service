@@ -11,14 +11,15 @@ const authorization_middleware_1 = require("../../authorization/middlewares/auth
 const validationHelpers_1 = require("../../helpers/validationHelpers");
 const posts_middlewares_1 = require("../posts/posts.middlewares");
 const posts_controller_1 = __importDefault(require("../posts/controller/posts.controller"));
+const request_cases_middleware_1 = __importDefault(require("../request-cases-limiter/request-cases.middleware"));
 exports.blogsRouter = (0, express_1.Router)({ mergeParams: true });
-exports.blogsRouter.get("/", blogs_controller_1.default.getBlogs);
+exports.blogsRouter.get("/", request_cases_middleware_1.default, blogs_controller_1.default.getBlogs);
 exports.blogsRouter.get("/test-cord", (req, res) => {
-    res.json({ message: 'CORS is working!' });
+    res.json({ message: "CORS is working!" });
 });
-exports.blogsRouter.get('/:blogId/posts', 
+exports.blogsRouter.get("/:blogId/posts", 
 // authMiddleware,
-blogs_middlewares_1.blogIdAsParamValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.getPosts);
+request_cases_middleware_1.default, blogs_middlewares_1.blogIdAsParamValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.getPosts);
 exports.blogsRouter.get("/:id", 
 // blogIdInputValidator,
 validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.getBlogById);

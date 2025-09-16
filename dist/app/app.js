@@ -20,13 +20,13 @@ function addContext(req, res, next) {
     next();
 }
 exports.app = (0, express_1.default)();
-exports.app.options('*', (0, cors_1.default)()); // Enable preflight for all rou
+exports.app.options("*", (0, cors_1.default)()); // Enable preflight for all rou
 exports.app.use((0, cors_1.default)());
 exports.app.use((0, cookie_parser_1.default)());
 exports.app.use(express_1.default.json()); // The request body will be available as a raw stream of data in req.body, but req.body will be undefined unless you manually parse it.
 exports.app.use(addContext);
-exports.app.get('/', (req, res) => {
-    res.status(200).json({ version: '1.0' });
+exports.app.get("/", (req, res) => {
+    res.status(200).json({ version: "1.0" });
 });
 exports.app.use(settings_1.SETTINGS.PATH.AUTH, auth_router_1.authRouter);
 exports.app.use(settings_1.SETTINGS.PATH.BLOGS, blogs_router_1.blogsRouter);

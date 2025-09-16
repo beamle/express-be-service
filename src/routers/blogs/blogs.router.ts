@@ -1,36 +1,45 @@
 import { Router } from "express";
 import blogsController from "./controller/blogs.controller";
-import { blogIdAsParamValidator, blogInputValidators } from "./blogs.middlewares";
+import {
+  blogIdAsParamValidator,
+  blogInputValidators,
+} from "./blogs.middlewares";
 import { authMiddleware } from "../../authorization/middlewares/authorization.middleware";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 import {
   postContentInputValidator,
   postShortDescriptionInputValidator,
-  postTitleInputValidator
+  postTitleInputValidator,
 } from "../posts/posts.middlewares";
 import postsController from "../posts/controller/posts.controller";
+import requestLimiterMiddleware from "../request-cases-limiter/request-cases.middleware";
 
 export const blogsRouter = Router({ mergeParams: true });
 
-blogsRouter.get("/", blogsController.getBlogs)
+blogsRouter.get("/", requestLimiterMiddleware, blogsController.getBlogs);
 
 blogsRouter.get("/test-cord", (req, res) => {
-  res.json({ message: 'CORS is working!' })
-})
+  res.json({ message: "CORS is working!" });
+});
 
-blogsRouter.get('/:blogId/posts',
+blogsRouter.get(
+  "/:blogId/posts",
   // authMiddleware,
+  requestLimiterMiddleware,
   blogIdAsParamValidator,
   inputCheckErrorsFormatter,
   postsController.getPosts
-)
+);
 
-blogsRouter.get("/:id",
+blogsRouter.get(
+  "/:id",
   // blogIdInputValidator,
   inputCheckErrorsFormatter,
-  blogsController.getBlogById)
+  blogsController.getBlogById
+);
 
-blogsRouter.post("/:blogId/posts",
+blogsRouter.post(
+  "/:blogId/posts",
   authMiddleware,
   blogIdAsParamValidator,
   postContentInputValidator,
@@ -38,22 +47,24 @@ blogsRouter.post("/:blogId/posts",
   postTitleInputValidator,
   inputCheckErrorsFormatter,
   postsController.createPost
-)
+);
 
-blogsRouter.post("/",
+blogsRouter.post(
+  "/",
   authMiddleware,
   ...blogInputValidators,
   inputCheckErrorsFormatter,
   blogsController.createBlog
-)
+);
 
-blogsRouter.put("/:id",
+blogsRouter.put(
+  "/:id",
   authMiddleware,
   ...blogInputValidators,
   // blogIdInputValidator,
   inputCheckErrorsFormatter,
   blogsController.updateBlog
-)
+);
 // blogsRouter.put("/:id", (req, res) => blogsController.updateBlog(req, res)) // If you pass directly like that,
 // then THIS obj is lost, because This is because JavaScript’s default
 // behavior is that function references lose their original THIS context
@@ -63,10 +74,12 @@ blogsRouter.put("/:id",
 // function declaration "THIS" depends on WHERE the function is called (context)
 // Not where its being declared. So i pass the METHOD without blogsController itself.
 // with callback i call updateBlog explicitly from blogsController object -> BINDS THIS no blogsController object.
-blogsRouter.delete("/:id",
+blogsRouter.delete(
+  "/:id",
   authMiddleware,
   // middlewareObjectIdChecker,
   // blogIdInputValidator,
   inputCheckErrorsFormatter,
-  blogsController.deleteBlog)
+  blogsController.deleteBlog
+);
 // blogsRouter.delete("/:id", blogsController.deleteBlog.bind(blogsController))

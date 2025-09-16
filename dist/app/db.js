@@ -9,11 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshTokenBlacklistCollection = exports.sessionCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = void 0;
+exports.refreshTokenBlacklistCollection = exports.requestCasesMetadataCollection = exports.sessionCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = void 0;
 exports.runDb = runDb;
 const mongodb_1 = require("mongodb");
 const settings_1 = require("./settings");
-const { CollectionMongoClient, ServerApiVersion } = require('mongodb');
+const { CollectionMongoClient, ServerApiVersion } = require("mongodb");
 function runDb(url) {
     return __awaiter(this, void 0, void 0, function* () {
         const client = new mongodb_1.MongoClient(url, {
@@ -21,7 +21,7 @@ function runDb(url) {
                 version: ServerApiVersion.v1,
                 strict: true,
                 deprecationErrors: true,
-            }
+            },
         });
         try {
             yield client.connect();
@@ -33,7 +33,9 @@ function runDb(url) {
             exports.blogsCollection = db.collection(settings_1.SETTINGS.PATH.BLOGS);
             exports.usersCollection = db.collection(settings_1.SETTINGS.PATH.USERS);
             exports.commentsCollection = db.collection(settings_1.SETTINGS.PATH.COMMENTS);
+            exports.requestCasesMetadataCollection = db.collection(settings_1.SETTINGS.PATH.REQUEST_CASES);
             // sessionCollection = db.collection<SessionDBType>(SETTINGS.PATH.SESSION)
+            exports.refreshTokenBlacklistCollection = db.collection(settings_1.SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST);
             exports.refreshTokenBlacklistCollection = db.collection(settings_1.SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST);
             console.log("Conntected to collections!");
         }
