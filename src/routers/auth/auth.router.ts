@@ -3,13 +3,37 @@ import { Router } from "express";
 import { bearerAuthorizationValidator } from "../../authorization/middlewares/bearerAuthorizationValidator";
 import { authValidators } from "./auth.middlewares";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
+import requestLimiterMiddleware from "../request-cases-limiter/request-cases.middleware";
 
-export const authRouter = Router({})
+export const authRouter = Router({});
 
-authRouter.post("/login", authController.login)
-authRouter.post("/registration", ...authValidators, inputCheckErrorsFormatter, authController.registration)
-authRouter.post("/registration-confirmation", authController.confirmEmail)
-authRouter.post("/registration-email-resending", authController.resendEmail)
-authRouter.post("/refresh-token", authController.updateTokens)
-authRouter.post("/logout", authController.logout)
-authRouter.get("/me", bearerAuthorizationValidator, authController.me)
+authRouter.post("/login", requestLimiterMiddleware, authController.login);
+authRouter.post(
+  "/registration",
+  requestLimiterMiddleware,
+  ...authValidators,
+  inputCheckErrorsFormatter,
+  authController.registration
+);
+authRouter.post(
+  "/registration-confirmation",
+  requestLimiterMiddleware,
+  authController.confirmEmail
+);
+authRouter.post(
+  "/registration-email-resending",
+  requestLimiterMiddleware,
+  authController.resendEmail
+);
+authRouter.post(
+  "/refresh-token",
+  requestLimiterMiddleware,
+  authController.updateTokens
+);
+authRouter.post("/logout", requestLimiterMiddleware, authController.logout);
+authRouter.get(
+  "/me",
+  requestLimiterMiddleware,
+  bearerAuthorizationValidator,
+  authController.me
+);

@@ -68,6 +68,31 @@ export type RefreshTokenDBType = {
   refreshToken: string;
 };
 
+export type UserSessionDBType = {
+  _id: string;
+  user_id: string;
+  device_id: string;
+  device_name: string;
+  ip: string;
+  iat: Date;
+  exp: Date;
+};
+
+type WithId<T> = Omit<T, "_id"> & { id: string };
+
+export type UserSession = WithId<UserSessionDBType>;
+
+// export type UserSessionDBType = {
+//   _id?: ObjectId;
+//   id?: any;
+//   user_id: string;
+//   device_id: string;
+//   device_name: string;
+//   ip: string;
+//   iat: Date;
+//   exp: Date;
+// };
+
 export type RequestCasesMetadataDBType = {
   IP: string;
   baseURL: string;
@@ -125,6 +150,7 @@ export let commentsCollection: Collection<CommentDBType>;
 export let sessionCollection: Collection<SessionDBType>;
 export let requestCasesMetadataCollection: Collection<RequestCasesMetadataDBType>;
 export let refreshTokenBlacklistCollection: Collection<RefreshTokenDBType>;
+export let userSessionsCollection: Collection<RefreshTokenDBType>;
 
 export async function runDb(url: string) {
   const client = new MongoClient(url, {

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshTokenBlacklistCollection = exports.requestCasesMetadataCollection = exports.sessionCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = void 0;
+exports.userSessionsCollection = exports.refreshTokenBlacklistCollection = exports.requestCasesMetadataCollection = exports.sessionCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = void 0;
 exports.runDb = runDb;
 const mongodb_1 = require("mongodb");
 const settings_1 = require("./settings");

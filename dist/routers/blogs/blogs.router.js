@@ -22,10 +22,10 @@ exports.blogsRouter.get("/:blogId/posts",
 request_cases_middleware_1.default, blogs_middlewares_1.blogIdAsParamValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.getPosts);
 exports.blogsRouter.get("/:id", 
 // blogIdInputValidator,
-validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.getBlogById);
-exports.blogsRouter.post("/:blogId/posts", authorization_middleware_1.authMiddleware, blogs_middlewares_1.blogIdAsParamValidator, posts_middlewares_1.postContentInputValidator, posts_middlewares_1.postShortDescriptionInputValidator, posts_middlewares_1.postTitleInputValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.createPost);
-exports.blogsRouter.post("/", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.createBlog);
-exports.blogsRouter.put("/:id", authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, 
+request_cases_middleware_1.default, validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.getBlogById);
+exports.blogsRouter.post("/:blogId/posts", authorization_middleware_1.authMiddleware, request_cases_middleware_1.default, blogs_middlewares_1.blogIdAsParamValidator, posts_middlewares_1.postContentInputValidator, posts_middlewares_1.postShortDescriptionInputValidator, posts_middlewares_1.postTitleInputValidator, validationHelpers_1.inputCheckErrorsFormatter, posts_controller_1.default.createPost);
+exports.blogsRouter.post("/", authorization_middleware_1.authMiddleware, request_cases_middleware_1.default, ...blogs_middlewares_1.blogInputValidators, validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.createBlog);
+exports.blogsRouter.put("/:id", request_cases_middleware_1.default, authorization_middleware_1.authMiddleware, ...blogs_middlewares_1.blogInputValidators, 
 // blogIdInputValidator,
 validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.updateBlog);
 // blogsRouter.put("/:id", (req, res) => blogsController.updateBlog(req, res)) // If you pass directly like that,
@@ -36,7 +36,7 @@ validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.update
 // function declaration "THIS" depends on WHERE the function is called (context)
 // Not where its being declared. So i pass the METHOD without blogsController itself.
 // with callback i call updateBlog explicitly from blogsController object -> BINDS THIS no blogsController object.
-exports.blogsRouter.delete("/:id", authorization_middleware_1.authMiddleware, 
+exports.blogsRouter.delete("/:id", request_cases_middleware_1.default, authorization_middleware_1.authMiddleware, 
 // middlewareObjectIdChecker,
 // blogIdInputValidator,
 validationHelpers_1.inputCheckErrorsFormatter, blogs_controller_1.default.deleteBlog);

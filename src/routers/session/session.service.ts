@@ -6,36 +6,57 @@ import { UsersErrors } from "../users/meta/Errors";
 import { SETTINGS } from "../../app/settings";
 
 export const SessionErrors = {
-  NO_REFRESH_TOKEN: { message: 'No refresh token', field: "refreshToken", status: 401 },
-  INVALID_REFRESH_TOKEN: { message: 'Invalid refresh token', field: "refreshToken", status: 401 },
-  REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST: {
-    message: 'Refresh token wasn\'t added to blacklist',
+  NO_REFRESH_TOKEN: {
+    message: "No refresh token",
     field: "refreshToken",
-    status: 401
+    status: 401,
   },
-  INVALID_OR_EXPIRED_REFRESH_TOKEN: { message: 'Invalid or expired refresh token', field: "refreshToken", status: 401 },
-
-}
+  INVALID_REFRESH_TOKEN: {
+    message: "Invalid refresh token",
+    field: "refreshToken",
+    status: 401,
+  },
+  REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST: {
+    message: "Refresh token wasn't added to blacklist",
+    field: "refreshToken",
+    status: 401,
+  },
+  INVALID_OR_EXPIRED_REFRESH_TOKEN: {
+    message: "Invalid or expired refresh token",
+    field: "refreshToken",
+    status: 401,
+  },
+};
 
 class SessionService {
-  async updateTokens(refreshToken: string): Promise<{ accessToken: string, refreshToken: string }> {
-    await this.checkIfRefreshTokenIsNotBlacklisted(refreshToken)
-    const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET)
+  async updateTokens(
+    refreshToken: string
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    await this.checkIfRefreshTokenIsNotBlacklisted(refreshToken);
+    const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(
+      refreshToken,
+      SETTINGS.JWT_SECRET
+    );
 
-    const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken)
+    const result = await sessionRepository.addRefreshTokenToBlackList(
+      refreshToken
+    );
     if (!result.acknowledged) {
-      throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST)
+      throw new CustomError(
+        SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST
+      );
     }
 
-    const user = await usersService.getUserBy({ id: userId })
+    const user = await usersService.getUserBy({ id: userId });
     if (!user) {
-      throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN)
+      throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
     }
 
     const newAccessToken = await jwtService.createAccessToken(user);
-    const { refreshToken: newRefreshToken } = await jwtService.createRefreshToken(user, deviceId);
+    const { refreshToken: newRefreshToken } =
+      await jwtService.createRefreshToken(user, deviceId);
 
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken }
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
 
   async logout(refreshToken: string) {
@@ -43,33 +64,36 @@ class SessionService {
       throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
 
-    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(
+      refreshToken
+    );
     if (isInvalid) {
       throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
 
-    await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+    await jwtService.parseAndValidateRefreshToken(
+      refreshToken,
+      SETTINGS.JWT_SECRET
+    );
 
-    const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken);
+    const result = await sessionRepository.addRefreshTokenToBlackList(
+      refreshToken
+    );
     if (!result.acknowledged) {
-      throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST);
+      throw new CustomError(
+        SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST
+      );
     }
   }
 
-  // async logout(refreshToken: string) {
-  //   await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET)
-  //
-  //   const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken)
-  //   if (!result.acknowledged) {
-  //     throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST)
-  //   }
-  // }
-
   async checkIfRefreshTokenIsNotBlacklisted(refreshToken: string) {
-    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken)
-    debugger
-    if (isInvalid) throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN)
-    return true
+    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(
+      refreshToken
+    );
+    debugger;
+    if (isInvalid)
+      throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+    return true;
   }
 }
 

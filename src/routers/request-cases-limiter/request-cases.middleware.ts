@@ -12,6 +12,7 @@ const requestLimiterMiddleware = async (
   try {
     const IP = req.ip;
     const baseURL = req.baseUrl;
+    const originalUrl = req.originalUrl;
     const now = new Date();
     const tenSecondsAgo = new Date(now.getTime() - 10_000);
     debugger;
@@ -35,7 +36,7 @@ const requestLimiterMiddleware = async (
     }
 
     console.log(
-      `[RateLimit] ${IP} -> ${baseURL} | ${recentRequestsCount} requests in last 10s`
+      `[RateLimit] ${IP} -> ${originalUrl} | ${recentRequestsCount} | "requests in last 10s`
     );
 
     await requestCasesLimiterManager.create({ IP, baseURL, date: now });

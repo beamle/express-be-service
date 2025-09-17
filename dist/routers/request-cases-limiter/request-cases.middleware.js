@@ -19,6 +19,7 @@ const requestLimiterMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     try {
         const IP = req.ip;
         const baseURL = req.baseUrl;
+        const originalUrl = req.originalUrl;
         const now = new Date();
         const tenSecondsAgo = new Date(now.getTime() - 10000);
         debugger;
@@ -36,7 +37,7 @@ const requestLimiterMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
             res.status(429).json({ message: "Too many requests. Please wait." });
             return;
         }
-        console.log(`[RateLimit] ${IP} -> ${baseURL} | ${recentRequestsCount} requests in last 10s`);
+        console.log(`[RateLimit] ${IP} -> ${originalUrl} | ${recentRequestsCount} | "requests in last 10s`);
         yield request_cases_limiter_manager_1.default.create({ IP, baseURL, date: now });
         next();
     }

@@ -1,39 +1,23 @@
 import { refreshTokenBlacklistCollection } from "../../app/db";
 
 export const sessionRepository = {
-  async findSession() {
-
-    // const posts = await postsCollection
-    //   .find(blogId ? { blogId: blogId.toString() } : {}, { projection: { _id: 0 } })
-    //   .skip((pageNumber - 1) * pageSize)
-    //   .limit(pageSize)
-    //   .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
-    //   .toArray()
-
-    // return session
-  },
-
-  // async addRefreshTokenToBlackList (refreshToken: string) {
-  //
-  //   const newSession: PostType = {
-  //     id: String(Math.floor(Math.random() * 223)),
-  //     ...input,
-  //     blogName: blog.name,
-  //     blogId: input.blogId || String(blogIdAsParam),
-  //     createdAt: new Date().toISOString()
-  //   }
-  //
-  //   const posts = await sessionCollection.insertOne(refreshToken)
-  // },
-
   async addRefreshTokenToBlackList(refreshToken: string) {
-    const refreshTokenObj = { // id: String(Math.floor(Math.random() * 223)),
-      refreshToken }
-    return await refreshTokenBlacklistCollection.insertOne(refreshTokenObj)
+    const refreshTokenObj = { refreshToken };
+    return await refreshTokenBlacklistCollection.insertOne({ refreshToken });
   },
 
   async checkIfRefreshTokenInBlackList(refreshToken: string) {
-    const found = await refreshTokenBlacklistCollection.findOne({ refreshToken });
+    const found = await refreshTokenBlacklistCollection.findOne({
+      refreshToken,
+    });
     return !!found;
   },
-}
+
+  async createUserSession() {},
+
+  async create(session: any): Promise<void> {},
+  async findByDeviceId(deviceId: string): Promise<any | null> {},
+  async updateIat(deviceId: string, newIat: Date): Promise<void> {},
+  async deleteByDeviceId(deviceId: string): Promise<void> {},
+  // async findAllByUser(userId: string): Promise<any[]> {},
+};

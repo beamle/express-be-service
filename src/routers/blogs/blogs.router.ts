@@ -34,6 +34,7 @@ blogsRouter.get(
 blogsRouter.get(
   "/:id",
   // blogIdInputValidator,
+  requestLimiterMiddleware,
   inputCheckErrorsFormatter,
   blogsController.getBlogById
 );
@@ -41,6 +42,7 @@ blogsRouter.get(
 blogsRouter.post(
   "/:blogId/posts",
   authMiddleware,
+  requestLimiterMiddleware,
   blogIdAsParamValidator,
   postContentInputValidator,
   postShortDescriptionInputValidator,
@@ -52,6 +54,7 @@ blogsRouter.post(
 blogsRouter.post(
   "/",
   authMiddleware,
+  requestLimiterMiddleware,
   ...blogInputValidators,
   inputCheckErrorsFormatter,
   blogsController.createBlog
@@ -59,6 +62,7 @@ blogsRouter.post(
 
 blogsRouter.put(
   "/:id",
+  requestLimiterMiddleware,
   authMiddleware,
   ...blogInputValidators,
   // blogIdInputValidator,
@@ -76,6 +80,7 @@ blogsRouter.put(
 // with callback i call updateBlog explicitly from blogsController object -> BINDS THIS no blogsController object.
 blogsRouter.delete(
   "/:id",
+  requestLimiterMiddleware,
   authMiddleware,
   // middlewareObjectIdChecker,
   // blogIdInputValidator,

@@ -20,14 +20,26 @@ const users_service_1 = __importDefault(require("../users/users.service"));
 const Errors_1 = require("../users/meta/Errors");
 const settings_1 = require("../../app/settings");
 exports.SessionErrors = {
-    NO_REFRESH_TOKEN: { message: 'No refresh token', field: "refreshToken", status: 401 },
-    INVALID_REFRESH_TOKEN: { message: 'Invalid refresh token', field: "refreshToken", status: 401 },
-    REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST: {
-        message: 'Refresh token wasn\'t added to blacklist',
+    NO_REFRESH_TOKEN: {
+        message: "No refresh token",
         field: "refreshToken",
-        status: 401
+        status: 401,
     },
-    INVALID_OR_EXPIRED_REFRESH_TOKEN: { message: 'Invalid or expired refresh token', field: "refreshToken", status: 401 },
+    INVALID_REFRESH_TOKEN: {
+        message: "Invalid refresh token",
+        field: "refreshToken",
+        status: 401,
+    },
+    REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST: {
+        message: "Refresh token wasn't added to blacklist",
+        field: "refreshToken",
+        status: 401,
+    },
+    INVALID_OR_EXPIRED_REFRESH_TOKEN: {
+        message: "Invalid or expired refresh token",
+        field: "refreshToken",
+        status: 401,
+    },
 };
 class SessionService {
     updateTokens(refreshToken) {
@@ -63,14 +75,6 @@ class SessionService {
             }
         });
     }
-    // async logout(refreshToken: string) {
-    //   await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET)
-    //
-    //   const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken)
-    //   if (!result.acknowledged) {
-    //     throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST)
-    //   }
-    // }
     checkIfRefreshTokenIsNotBlacklisted(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             const isInvalid = yield session_repository_1.sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);

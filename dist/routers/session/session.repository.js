@@ -12,41 +12,34 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sessionRepository = void 0;
 const db_1 = require("../../app/db");
 exports.sessionRepository = {
-    findSession() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // const posts = await postsCollection
-            //   .find(blogId ? { blogId: blogId.toString() } : {}, { projection: { _id: 0 } })
-            //   .skip((pageNumber - 1) * pageSize)
-            //   .limit(pageSize)
-            //   .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
-            //   .toArray()
-            // return session
-        });
-    },
-    // async addRefreshTokenToBlackList (refreshToken: string) {
-    //
-    //   const newSession: PostType = {
-    //     id: String(Math.floor(Math.random() * 223)),
-    //     ...input,
-    //     blogName: blog.name,
-    //     blogId: input.blogId || String(blogIdAsParam),
-    //     createdAt: new Date().toISOString()
-    //   }
-    //
-    //   const posts = await sessionCollection.insertOne(refreshToken)
-    // },
     addRefreshTokenToBlackList(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            const refreshTokenObj = {
-                refreshToken
-            };
-            return yield db_1.refreshTokenBlacklistCollection.insertOne(refreshTokenObj);
+            const refreshTokenObj = { refreshToken };
+            return yield db_1.refreshTokenBlacklistCollection.insertOne({ refreshToken });
         });
     },
     checkIfRefreshTokenInBlackList(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            const found = yield db_1.refreshTokenBlacklistCollection.findOne({ refreshToken });
+            const found = yield db_1.refreshTokenBlacklistCollection.findOne({
+                refreshToken,
+            });
             return !!found;
         });
     },
+    createUserSession() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    },
+    create(session) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    },
+    findByDeviceId(deviceId) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    },
+    updateIat(deviceId, newIat) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    },
+    deleteByDeviceId(deviceId) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    },
+    // async findAllByUser(userId: string): Promise<any[]> {},
 };
