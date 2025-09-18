@@ -1,9 +1,10 @@
-import { CustomError } from "../../helpers/CustomError";
-import jwtService from "../../authorization/services/jwt-service";
-import { sessionRepository } from "./session.repository";
-import usersService from "../users/users.service";
-import { UsersErrors } from "../users/meta/Errors";
 import { SETTINGS } from "../../app/settings";
+import jwtService from "../../authorization/services/jwt-service";
+import { CustomError } from "../../helpers/CustomError";
+import { UsersErrors } from "../users/meta/Errors";
+import usersService from "../users/users.service";
+import { sessionRepository } from "./session.repository";
+import { SessionMeta } from "./session.types";
 
 export const SessionErrors = {
   NO_REFRESH_TOKEN: {
@@ -90,10 +91,15 @@ class SessionService {
     const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(
       refreshToken
     );
-    debugger;
     if (isInvalid)
       throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     return true;
+  }
+
+  async createSession(sessionMeta: SessionMeta) {
+    const result = await sessionRepository.create(sessionMeta);
+
+    return { id: result.insertedId.toString(), ...sessionMeta };
   }
 }
 

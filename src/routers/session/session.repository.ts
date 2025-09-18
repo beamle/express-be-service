@@ -1,8 +1,14 @@
-import { refreshTokenBlacklistCollection } from "../../app/db";
+import { InsertOneResult, OptionalId } from "mongodb";
+import {
+  refreshTokenBlacklistCollection,
+  UserSession,
+  UserSessionDBType,
+  userSessionsCollection,
+} from "../../app/db";
+import { SessionMeta } from "./session.types";
 
 export const sessionRepository = {
   async addRefreshTokenToBlackList(refreshToken: string) {
-    const refreshTokenObj = { refreshToken };
     return await refreshTokenBlacklistCollection.insertOne({ refreshToken });
   },
 
@@ -13,9 +19,12 @@ export const sessionRepository = {
     return !!found;
   },
 
-  async createUserSession() {},
+  async create(
+    sessionMeta: SessionMeta
+  ): Promise<InsertOneResult<UserSessionDBType>> {
+    return await userSessionsCollection.insertOne(sessionMeta);
+  },
 
-  async create(session: any): Promise<void> {},
   async findByDeviceId(deviceId: string): Promise<any | null> {},
   async updateIat(deviceId: string, newIat: Date): Promise<void> {},
   async deleteByDeviceId(deviceId: string): Promise<void> {},

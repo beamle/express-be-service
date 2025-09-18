@@ -69,7 +69,7 @@ export type RefreshTokenDBType = {
 };
 
 export type UserSessionDBType = {
-  _id: string;
+  _id?: string;
   user_id: string;
   device_id: string;
   device_name: string;
@@ -150,7 +150,7 @@ export let commentsCollection: Collection<CommentDBType>;
 export let sessionCollection: Collection<SessionDBType>;
 export let requestCasesMetadataCollection: Collection<RequestCasesMetadataDBType>;
 export let refreshTokenBlacklistCollection: Collection<RefreshTokenDBType>;
-export let userSessionsCollection: Collection<RefreshTokenDBType>;
+export let userSessionsCollection: Collection<UserSessionDBType>;
 
 export async function runDb(url: string) {
   const client = new MongoClient(url, {
@@ -177,12 +177,11 @@ export async function runDb(url: string) {
     requestCasesMetadataCollection = db.collection<RequestCasesMetadataDBType>(
       SETTINGS.PATH.REQUEST_CASES
     );
-    // sessionCollection = db.collection<SessionDBType>(SETTINGS.PATH.SESSION)
     refreshTokenBlacklistCollection = db.collection<RefreshTokenDBType>(
       SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST
     );
-    refreshTokenBlacklistCollection = db.collection<RefreshTokenDBType>(
-      SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST
+    userSessionsCollection = db.collection<UserSessionDBType>(
+      SETTINGS.PATH.SESSION
     );
 
     console.log("Conntected to collections!");
