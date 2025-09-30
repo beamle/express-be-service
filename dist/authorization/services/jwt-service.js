@@ -18,18 +18,18 @@ const settings_1 = require("../../app/settings");
 const CustomError_1 = require("../../helpers/CustomError");
 const session_service_1 = require("../../routers/session/session.service");
 exports.JwtServiceErrors = {
-    NO_CORRECT_TOKEN_PROVIDED: { message: "Unauthorized. You have to pass correct jwt token", field: "", status: 401 },
-    NO_TOKEN_PROVIDED: { message: "Unauthorized. You didn't pass jwt token", field: "", status: 404 },
+    NO_CORRECT_TOKEN_PROVIDED: { message: 'Unauthorized. You have to pass correct jwt token', field: '', status: 401 },
+    NO_TOKEN_PROVIDED: { message: "Unauthorized. You didn't pass jwt token", field: '', status: 404 },
 };
 class jwtService {
     createAccessToken(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            return jsonwebtoken_1.default.sign({ userId: user.id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '10s' });
+            return jsonwebtoken_1.default.sign({ userId: user.id }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '5m' });
         });
     }
     createRefreshToken(user, deviceId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const refreshToken = jsonwebtoken_1.default.sign({ userId: user.id, deviceId }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '15s' });
+            const refreshToken = jsonwebtoken_1.default.sign({ userId: user.id, deviceId }, settings_1.SETTINGS.JWT_SECRET, { expiresIn: '5m' });
             const refreshTokenPayload = jsonwebtoken_1.default.decode(refreshToken);
             return Object.assign({ refreshToken }, refreshTokenPayload);
         });
@@ -64,7 +64,7 @@ class jwtService {
     }
     getUserIdByToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!token || token === "undefined") {
+            if (!token || token === 'undefined') {
                 throw new CustomError_1.CustomError(exports.JwtServiceErrors.NO_TOKEN_PROVIDED);
             }
             try {

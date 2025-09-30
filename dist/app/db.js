@@ -34,9 +34,8 @@ function runDb(url) {
             exports.usersCollection = db.collection(settings_1.SETTINGS.PATH.USERS);
             exports.commentsCollection = db.collection(settings_1.SETTINGS.PATH.COMMENTS);
             exports.requestCasesMetadataCollection = db.collection(settings_1.SETTINGS.PATH.REQUEST_CASES);
-            // sessionCollection = db.collection<SessionDBType>(SETTINGS.PATH.SESSION)
             exports.refreshTokenBlacklistCollection = db.collection(settings_1.SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST);
-            exports.refreshTokenBlacklistCollection = db.collection(settings_1.SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST);
+            exports.userSessionsCollection = db.collection(settings_1.SETTINGS.PATH.SESSION);
             console.log("Conntected to collections!");
         }
         catch (e) {

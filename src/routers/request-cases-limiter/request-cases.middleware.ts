@@ -10,6 +10,7 @@ const requestLimiterMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    debugger;
     const IP = req.ip;
     const baseURL = req.baseUrl;
     const originalUrl = req.originalUrl;
@@ -20,7 +21,7 @@ const requestLimiterMiddleware = async (
       res.status(429).json({ message: "Critical data was not passed." });
       return;
     }
-
+    debugger;
     const recentRequestsCount =
       await requestCasesMetadataCollection.countDocuments({
         IP,

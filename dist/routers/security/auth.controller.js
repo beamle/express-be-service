@@ -19,47 +19,51 @@ const session_service_1 = __importDefault(require("../../session/session.service
 const auth_service_1 = __importDefault(require("../auth.service"));
 exports.AuthErrors = {
     EMAIL_CONFIRMATION_PROBLEM: {
-        message: 'Something wrong with email confirmation. Code is confirmed already or expirtationDate has expired',
-        field: 'code',
+        message: "Something wrong with email confirmation. Code is confirmed already or expirtationDate has expired",
+        field: "code",
         status: 400,
     },
     ACCOUNT_ALREADY_CONFIRMED: {
-        message: 'Your account is already confirmed',
-        field: 'code',
+        message: "Your account is already confirmed",
+        field: "code",
         status: 400,
     },
     EMAIL_ALREADY_CONFIRMED: {
-        message: 'Your email is already confirmed',
-        field: 'email',
+        message: "Your email is already confirmed",
+        field: "email",
         status: 400,
     },
     ACCOUNT_WAS_NOT_CREATED: {
-        message: 'Email sending failed. Registration rolled back.',
-        field: 'email',
+        message: "Email sending failed. Registration rolled back.",
+        field: "email",
         status: 400,
     },
 };
 function getDeviceInfo(userAgent) {
-    let deviceType = 'Unknown';
+    let deviceType = "Unknown";
     let deviceName = null;
     if (/android/i.test(userAgent)) {
-        deviceType = 'Mobile';
+        deviceType = "Mobile";
         const match = userAgent.match(/\((?:Linux; )?Android.*?; ([^)]+)\)/i);
         if (match && match[1])
             deviceName = match[1].trim();
     }
     else if (/iPhone|iPad|iPod/i.test(userAgent)) {
-        deviceType = 'Mobile';
-        deviceName = /iPhone/i.test(userAgent) ? 'iPhone' : /iPad/i.test(userAgent) ? 'iPad' : 'iOS Device';
+        deviceType = "Mobile";
+        deviceName = /iPhone/i.test(userAgent)
+            ? "iPhone"
+            : /iPad/i.test(userAgent)
+                ? "iPad"
+                : "iOS Device";
     }
     else if (/Macintosh|Mac OS X/i.test(userAgent)) {
-        deviceType = 'Mac';
+        deviceType = "Mac";
     }
     else if (/Windows NT/i.test(userAgent)) {
-        deviceType = 'PC';
+        deviceType = "PC";
     }
     else if (/Linux/i.test(userAgent)) {
-        deviceType = 'PC';
+        deviceType = "PC";
     }
     return { deviceType, deviceName };
 }
@@ -68,23 +72,23 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { accessToken, refreshToken, refreshPayload, user } = yield auth_service_1.default.login(req.body.loginOrEmail, req.body.password);
-                const userAgent = req.headers['user-agent'] || 'Unknown';
-                const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+                const userAgent = req.headers["user-agent"] || "Unknown";
+                const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
                 const { deviceType, deviceName } = getDeviceInfo(userAgent);
                 yield session_service_1.default.createSession({
                     user_id: user.id,
                     device_id: refreshPayload.deviceId,
-                    device_name: `${deviceType}${deviceName ? ` - ${deviceName}` : ''}`,
+                    device_name: `${deviceType}${deviceName ? ` - ${deviceName}` : ""}`,
                     ip: String(ip),
                     iat: new Date(refreshPayload.iat * 1000),
                     exp: new Date(refreshPayload.exp * 1000),
                 });
                 res
                     .status(200)
-                    .cookie('refreshToken', refreshToken, {
+                    .cookie("refreshToken", refreshToken, {
                     httpOnly: true,
-                    sameSite: 'strict',
-                    secure: process.env.NODE_ENV === 'development',
+                    sameSite: "strict",
+                    secure: process.env.NODE_ENV === "development",
                 })
                     .json({ accessToken });
                 return;
@@ -120,10 +124,10 @@ class AuthController {
                 debugger;
                 res
                     .status(200)
-                    .cookie('refreshToken', newRefreshToken, {
+                    .cookie("refreshToken", newRefreshToken, {
                     httpOnly: true,
-                    sameSite: 'strict',
-                    secure: process.env.NODE_ENV === 'development',
+                    sameSite: "strict",
+                    secure: process.env.NODE_ENV === "development",
                 })
                     .json({ accessToken });
                 return;

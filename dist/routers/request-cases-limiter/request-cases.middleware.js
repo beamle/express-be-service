@@ -17,6 +17,7 @@ const request_cases_limiter_manager_1 = __importDefault(require("./request-cases
 const REQUEST_LIMIT = 10;
 const requestLimiterMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        debugger;
         const IP = req.ip;
         const baseURL = req.baseUrl;
         const originalUrl = req.originalUrl;
@@ -27,6 +28,7 @@ const requestLimiterMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
             res.status(429).json({ message: "Critical data was not passed." });
             return;
         }
+        debugger;
         const recentRequestsCount = yield db_1.requestCasesMetadataCollection.countDocuments({
             IP,
             baseURL,

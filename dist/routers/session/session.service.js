@@ -13,32 +13,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionErrors = void 0;
-const CustomError_1 = require("../../helpers/CustomError");
-const jwt_service_1 = __importDefault(require("../../authorization/services/jwt-service"));
-const session_repository_1 = require("./session.repository");
-const users_service_1 = __importDefault(require("../users/users.service"));
-const Errors_1 = require("../users/meta/Errors");
 const settings_1 = require("../../app/settings");
+const jwt_service_1 = __importDefault(require("../../authorization/services/jwt-service"));
+const CustomError_1 = require("../../helpers/CustomError");
+const Errors_1 = require("../users/meta/Errors");
+const users_service_1 = __importDefault(require("../users/users.service"));
+const session_repository_1 = require("./session.repository");
 exports.SessionErrors = {
     NO_REFRESH_TOKEN: {
-        message: "No refresh token",
-        field: "refreshToken",
+        message: 'No refresh token',
+        field: 'refreshToken',
         status: 401,
     },
     INVALID_REFRESH_TOKEN: {
-        message: "Invalid refresh token",
-        field: "refreshToken",
+        message: 'Invalid refresh token',
+        field: 'refreshToken',
         status: 401,
     },
     REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST: {
         message: "Refresh token wasn't added to blacklist",
-        field: "refreshToken",
+        field: 'refreshToken',
         status: 401,
     },
     INVALID_OR_EXPIRED_REFRESH_TOKEN: {
-        message: "Invalid or expired refresh token",
-        field: "refreshToken",
+        message: 'Invalid or expired refresh token',
+        field: 'refreshToken',
         status: 401,
+    },
+    NO_SESSIONS_FOR_USER_ID: {
+        message: 'No sessions for such userId was found!',
+        field: 'id',
+        status: 404,
     },
 };
 class SessionService {
@@ -78,10 +83,24 @@ class SessionService {
     checkIfRefreshTokenIsNotBlacklisted(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             const isInvalid = yield session_repository_1.sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
-            debugger;
             if (isInvalid)
                 throw new CustomError_1.CustomError(exports.SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
             return true;
+        });
+    }
+    createSession(sessionMeta) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield session_repository_1.sessionRepository.create(sessionMeta);
+            return Object.assign({ id: result.insertedId.toString() }, sessionMeta);
+        });
+    }
+    getAllSessionsBy(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield session_repository_1.sessionRepository.findAllSessionsByUser(userId);
+            if (!result) {
+                throw new CustomError_1.CustomError(exports.SessionErrors.NO_SESSIONS_FOR_USER_ID);
+            }
+            return result;
         });
     }
 }

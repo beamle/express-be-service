@@ -8,16 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommentsErrors = void 0;
+exports.SecurityService = exports.SessionsErrors = void 0;
 const CustomError_1 = require("../../helpers/CustomError");
-const comments_repository_1 = __importDefault(require("./comments.repository"));
-exports.CommentsErrors = {
-    NO_COMMENTS_FOUND: {
-        message: "Comment with such Id was not found!",
+exports.SessionsErrors = {
+    NO_SESSIONS_FOR_USER_ID: {
+        message: "No sessions for such userId was found!",
         field: "id",
         status: 404,
     },
@@ -27,24 +23,16 @@ exports.CommentsErrors = {
         status: 403,
     },
 };
-class CommentsService {
-    updateComment(contentObj, commentId) {
+class SecurityService {
+    updateComment(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield comments_repository_1.default.updateCommentById(contentObj.content, commentId);
+            const result = yield securityRepository.getAllSessions(userId);
             if (!result) {
-                throw new CustomError_1.CustomError(exports.CommentsErrors.NO_COMMENTS_FOUND);
-            }
-            return result;
-        });
-    }
-    deleteComment(commentId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield comments_repository_1.default.deleteCommentById(commentId);
-            if (!result) {
-                throw new CustomError_1.CustomError(exports.CommentsErrors.NO_COMMENTS_FOUND);
+                throw new CustomError_1.CustomError(exports.SessionsErrors.NO_SESSIONS_FOR_USER_ID);
             }
             return result;
         });
     }
 }
-exports.default = new CommentsService();
+exports.SecurityService = SecurityService;
+exports.default = new SecurityService();

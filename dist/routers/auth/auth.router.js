@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRouter = void 0;
-const auth_controller_1 = __importDefault(require("./controller/auth.controller"));
 const express_1 = require("express");
 const bearerAuthorizationValidator_1 = require("../../authorization/middlewares/bearerAuthorizationValidator");
-const auth_middlewares_1 = require("./auth.middlewares");
 const validationHelpers_1 = require("../../helpers/validationHelpers");
 const request_cases_middleware_1 = __importDefault(require("../request-cases-limiter/request-cases.middleware"));
+const auth_middlewares_1 = require("./auth.middlewares");
+const auth_controller_1 = __importDefault(require("./controller/auth.controller"));
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.post("/login", request_cases_middleware_1.default, auth_controller_1.default.login);
 exports.authRouter.post("/registration", request_cases_middleware_1.default, ...auth_middlewares_1.authValidators, validationHelpers_1.inputCheckErrorsFormatter, auth_controller_1.default.registration);

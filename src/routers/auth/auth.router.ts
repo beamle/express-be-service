@@ -1,9 +1,9 @@
-import authController from "./controller/auth.controller";
 import { Router } from "express";
 import { bearerAuthorizationValidator } from "../../authorization/middlewares/bearerAuthorizationValidator";
-import { authValidators } from "./auth.middlewares";
 import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
 import requestLimiterMiddleware from "../request-cases-limiter/request-cases.middleware";
+import { authValidators } from "./auth.middlewares";
+import authController from "./controller/auth.controller";
 
 export const authRouter = Router({});
 

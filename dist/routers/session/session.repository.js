@@ -14,7 +14,6 @@ const db_1 = require("../../app/db");
 exports.sessionRepository = {
     addRefreshTokenToBlackList(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            const refreshTokenObj = { refreshToken };
             return yield db_1.refreshTokenBlacklistCollection.insertOne({ refreshToken });
         });
     },
@@ -26,11 +25,10 @@ exports.sessionRepository = {
             return !!found;
         });
     },
-    createUserSession() {
-        return __awaiter(this, void 0, void 0, function* () { });
-    },
-    create(session) {
-        return __awaiter(this, void 0, void 0, function* () { });
+    create(sessionMeta) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield db_1.userSessionsCollection.insertOne(sessionMeta);
+        });
     },
     findByDeviceId(deviceId) {
         return __awaiter(this, void 0, void 0, function* () { });
@@ -41,5 +39,9 @@ exports.sessionRepository = {
     deleteByDeviceId(deviceId) {
         return __awaiter(this, void 0, void 0, function* () { });
     },
-    // async findAllByUser(userId: string): Promise<any[]> {},
+    findAllSessionsByUser(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield db_1.userSessionsCollection.find({}, { projection: { _id: 0 } });
+        });
+    },
 };
