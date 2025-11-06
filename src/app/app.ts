@@ -10,6 +10,7 @@ import { authRouter } from "../routers/auth/auth.router";
 import { Request, Response, NextFunction } from "express";
 import { commentsRouter } from "../routers/comments/comments.router";
 import cookieParser from "cookie-parser";
+import { securityRouter } from "../routers/security/security.router";
 
 export function addContext(req: Request, res: Response, next: NextFunction) {
   req.context = { user: null };
@@ -32,4 +33,5 @@ app.use(SETTINGS.PATH.BLOGS, blogsRouter);
 app.use(SETTINGS.PATH.POSTS, postsRouter);
 app.use(SETTINGS.PATH.USERS, usersRouter);
 app.use(SETTINGS.PATH.COMMENTS, commentsRouter);
+app.use(SETTINGS.PATH.SECURITY, securityRouter);
 app.use(SETTINGS.PATH.TESTING, testingRouter);

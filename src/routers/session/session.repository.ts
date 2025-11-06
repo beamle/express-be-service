@@ -18,10 +18,25 @@ export const sessionRepository = {
     return await userSessionsCollection.insertOne(sessionMeta);
   },
 
-  async findByDeviceId(deviceId: string): Promise<any | null> {},
-  async updateIat(deviceId: string, newIat: Date): Promise<void> {},
-  async deleteByDeviceId(deviceId: string): Promise<void> {},
-  async findAllSessionsByUser(userId: string): Promise<any> {
-    return await userSessionsCollection.find({}, { projection: { _id: 0 } });
+  // async findByDeviceId(deviceId: string): Promise<any | null> {},
+  // async updateIat(deviceId: string, newIat: Date): Promise<void> {},
+  // async deleteByDeviceId(deviceId: string): Promise<void> {},
+  async findAllSessionsByUser(userId: string): Promise<SessionMeta[]> {
+    return await userSessionsCollection
+      .find({ user_id: userId }, { projection: { _id: 0 } })
+      .toArray();
   },
+  async deleteAllSessionsExceptDevice(userId: string, deviceId: string) {
+    return await userSessionsCollection.deleteMany({
+      user_id: userId,
+      device_id: { $ne: deviceId },
+    });
+  },
+  async findByUserAndDeviceMeta(userId: string, deviceName: string, ip: string) {
+    return await userSessionsCollection.findOne({
+      user_id: userId,
+      device_name: deviceName,
+      ip,
+    });
+  }
 };

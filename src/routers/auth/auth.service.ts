@@ -10,7 +10,9 @@ import emailManager, {
 import { UsersErrors } from "../users/meta/Errors";
 import usersRepository from "../users/users.repository";
 import usersService from "../users/users.service";
-import { AuthErrors } from "./controller/auth.controller";
+import { AuthErrors, getDeviceInfo } from "./controller/auth.controller";
+import { sessionRepository } from "../session/session.repository";
+import { SessionErrors } from "../session/session.service";
 
 type LoginResponseType = {
   accessToken: string;
@@ -26,12 +28,30 @@ type LoginResponseType = {
 export class AuthService {
   async login(
     loginOrEmail: string,
-    password: string
+    password: string,
+    userAgent?: string,
+    ip?: string
   ): Promise<LoginResponseType> {
     const user = await usersService.checkCredentials(loginOrEmail, password);
     if (!user) throw new CustomError(UsersErrors.NO_USERS);
 
-    const deviceId = uuid();
+    if(!userAgent || !ip) throw new CustomError(SessionErrors.NO_USERAGENT_OR_IP_PROVIDED)
+    const { deviceType, deviceName } = getDeviceInfo(userAgent);
+    const normalizedDeviceName = `${deviceType}${deviceName ? ` - ${deviceName}` : ''}`;
+    const existingSession = await sessionRepository.findByUserAndDeviceMeta(
+      user.id,
+      normalizedDeviceName,
+      ip
+    );
+
+    let deviceId: string;
+    if (existingSession) {
+      deviceId = existingSession.device_id;
+    } else {
+      deviceId = uuid();
+    }
+
+    // const deviceId = uuid();
     const accessToken = await jwtService.createAccessToken(user);
     const { refreshToken, iat, exp } = await jwtService.createRefreshToken(
       user,

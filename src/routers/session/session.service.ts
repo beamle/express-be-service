@@ -33,6 +33,18 @@ export const SessionErrors = {
     field: 'id',
     status: 404,
   },
+
+  NO_USER_ID_PROVIDED_: {
+    message: 'UserId was not provided!',
+    field: 'id',
+    status: 404,
+  },
+
+  NO_USERAGENT_OR_IP_PROVIDED: {
+    message: 'No user agent or ip provided!',
+    field: 'ip',
+    status: 404,
+  },
 };
 
 class SessionService {
@@ -86,7 +98,8 @@ class SessionService {
     return { id: result.insertedId.toString(), ...sessionMeta };
   }
 
-  async getAllSessionsBy(userId: string) {
+  async getAllSessionsBy(userId: string | undefined) {
+    if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
     const result = await sessionRepository.findAllSessionsByUser(userId);
 
     if (!result) {
@@ -94,6 +107,26 @@ class SessionService {
     }
 
     return result;
+  }
+
+  async deleteAllSessionsExceptCurrent(refreshToken: string) {
+    if (!refreshToken) {
+      throw new CustomError(SessionErrors.NO_REFRESH_TOKEN);
+    }
+
+    await this.checkIfRefreshTokenIsNotBlacklisted(refreshToken);
+
+    const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+
+    if (!userId) {
+      throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
+    }
+
+    const deleteResult = await sessionRepository.deleteAllSessionsExceptDevice(userId, deviceId);
+
+    // await sessionRepository.addMultipleTokensToBlackList(removedTokens)
+
+    return deleteResult;
   }
 }
 

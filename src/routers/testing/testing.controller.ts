@@ -7,7 +7,6 @@ class TestingController {
     res.sendStatus(204)
   }
   async getAllBlackListedRefreshTokens(req: Request, res: Response) {
-    debugger
     const result = await testingRepository.getAllBlackListedRefreshTokens();
     res.json(result);
   }

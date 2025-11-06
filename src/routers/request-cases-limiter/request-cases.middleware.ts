@@ -10,26 +10,23 @@ const requestLimiterMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    debugger;
     const IP = req.ip;
     const baseURL = req.baseUrl;
     const originalUrl = req.originalUrl;
     const now = new Date();
     const tenSecondsAgo = new Date(now.getTime() - 10_000);
-    debugger;
+
     if (!IP || !baseURL) {
       res.status(429).json({ message: "Critical data was not passed." });
       return;
     }
-    debugger;
+
     const recentRequestsCount =
       await requestCasesMetadataCollection.countDocuments({
         IP,
         baseURL,
         date: { $gte: tenSecondsAgo },
       });
-
-    debugger;
 
     if (recentRequestsCount >= REQUEST_LIMIT) {
       res.status(429).json({ message: "Too many requests. Please wait." });
