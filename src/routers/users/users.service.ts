@@ -10,7 +10,8 @@ import usersQueryRepository from "./users.queryRepository";
 
 const EXPIRATION_TIME_EXTRA = {
   ONE_MINUTE: { minutes: 1 },
-  FIVE_MINUTES: { minutes: 5 }
+  FIVE_MINUTES: { minutes: 5 },
+  ONE_HOUR: { minutes: 60 }
 }
 
 class UsersService {
@@ -76,7 +77,7 @@ class UsersService {
       emailConfirmation: {
         isConfirmed: createByAdmin,
         confirmationCode: uuid(),
-        expirationDate: add(new Date(), EXPIRATION_TIME_EXTRA.FIVE_MINUTES)
+        expirationDate: add(new Date(), EXPIRATION_TIME_EXTRA.ONE_HOUR)
       }
     }
 

@@ -8,11 +8,8 @@ export const securityRouter = Router({ mergeParams: true });
 securityRouter.get("/devices", requestLimiterMiddleware,
   bearerAuthorizationValidator,securityController.getAllSessions);
 
-// blogsRouter.get(
-//   "/:blogId/posts",
-//   // authMiddleware,
-//   requestLimiterMiddleware,
-//   blogIdAsParamValidator,
-//   inputCheckErrorsFormatter,
-//   postsController.getPosts
-// );
+securityRouter.delete("/devices/:deviceId", requestLimiterMiddleware,
+  bearerAuthorizationValidator,securityController.deleteDeviceSessionByDeviceId);
+
+securityRouter.delete("/devices", requestLimiterMiddleware,
+  bearerAuthorizationValidator,securityController.deleteAllSessionsExceptCurrent);

@@ -35,8 +35,17 @@ class SecurityController {
     }
   }
 
+  async deleteDeviceSessionByDeviceId(req: Request, res: Response) {
+    try {
+      const userId = req.context.user?.userId;
+      const { deviceId } = req.params;
 
-  async deleteDeviceSession(req: Request, res: Response) {}
+      await sessionService.deleteDeviceSessionByDeviceId(userId, deviceId);
+      res.sendStatus(204);
+    } catch (e) {
+      handleError(res, e);
+    }
+  }
 }
 
 export default new SecurityController();

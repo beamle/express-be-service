@@ -38,18 +38,28 @@ export class AuthService {
     if(!userAgent || !ip) throw new CustomError(SessionErrors.NO_USERAGENT_OR_IP_PROVIDED)
     const { deviceType, deviceName } = getDeviceInfo(userAgent);
     const normalizedDeviceName = `${deviceType}${deviceName ? ` - ${deviceName}` : ''}`;
-    const existingSession = await sessionRepository.findByUserAndDeviceMeta(
-      user.id,
-      normalizedDeviceName,
-      ip
-    );
 
-    let deviceId: string;
-    if (existingSession) {
-      deviceId = existingSession.device_id;
-    } else {
-      deviceId = uuid();
-    }
+    const deviceId = uuid(); // Always generate a new unique ID for every login
+
+// ... The rest of the function continues to use the new unique deviceId
+//     const accessToken = await jwtService.createAccessToken(user);
+//     const { refreshToken, iat, exp } = await jwtService.createRefreshToken(
+//       user,
+//       deviceId
+//     );
+// // .
+    // const existingSession = await sessionRepository.findByUserAndDeviceMeta(
+    //   user.id,
+    //   normalizedDeviceName,
+    //   ip
+    // );
+    //
+    // let deviceId: string;
+    // if (existingSession) {
+    //   deviceId = existingSession.device_id;
+    // } else {
+    //   deviceId = uuid();
+    // }
 
     // const deviceId = uuid();
     const accessToken = await jwtService.createAccessToken(user);

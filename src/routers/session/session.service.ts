@@ -36,12 +36,18 @@ export const SessionErrors = {
 
   NO_USER_ID_PROVIDED_: {
     message: 'UserId was not provided!',
-    field: 'id',
+    field: 'userId',
     status: 404,
   },
 
   NO_USERAGENT_OR_IP_PROVIDED: {
     message: 'No user agent or ip provided!',
+    field: 'device_id',
+    status: 404,
+  },
+
+  TRYING_TO_DELETE_OTHER_USER_DATA: {
+    message: 'Trying to delete other user data. UserId is incorrect!',
     field: 'ip',
     status: 404,
   },
@@ -122,11 +128,22 @@ class SessionService {
       throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
     }
 
-    const deleteResult = await sessionRepository.deleteAllSessionsExceptDevice(userId, deviceId);
+    return await sessionRepository.deleteAllSessionsExceptDevice(userId, deviceId);
+  }
 
-    // await sessionRepository.addMultipleTokensToBlackList(removedTokens)
+  async deleteDeviceSessionByDeviceId(userId: string | undefined, deviceId: string | undefined): Promise<boolean> {
+    if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
+    if (!deviceId) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_USER_ID)
 
-    return deleteResult;
+    const session = await sessionRepository.findSessionByDeviceId(deviceId);
+    if (!session) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_USER_ID);
+
+    if (session.user_id !== userId) {
+      throw new CustomError(SessionErrors.TRYING_TO_DELETE_OTHER_USER_DATA)
+    }
+
+    const result = await sessionRepository.deleteSessionByDeviceId(deviceId);
+    return result.deletedCount > 0;
   }
 }
 

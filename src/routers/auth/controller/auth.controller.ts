@@ -112,8 +112,6 @@ class AuthController {
       const refreshToken = req.cookies?.refreshToken;
 
       const { accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens(refreshToken);
-      const secondCall = sessionService.updateTokens(refreshToken); // old token
-      await secondCall.catch((err) => console.log(err.message));
 
       res
         .status(200)
@@ -128,6 +126,27 @@ class AuthController {
       handleErrorAsArrayOfErrors(res, e);
     }
   }
+  // async updateTokens(req: Request, res: Response) {
+  //   try {
+  //     const refreshToken = req.cookies?.refreshToken;
+  //
+  //     const { accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens(refreshToken);
+  //     const secondCall = sessionService.updateTokens(refreshToken); // old token
+  //     await secondCall.catch((err) => console.log(err.message));
+  //
+  //     res
+  //       .status(200)
+  //       .cookie('refreshToken', newRefreshToken, {
+  //         httpOnly: true,
+  //         sameSite: 'strict',
+  //         secure: process.env.NODE_ENV === 'development',
+  //       })
+  //       .json({ accessToken });
+  //     return;
+  //   } catch (e) {
+  //     handleErrorAsArrayOfErrors(res, e);
+  //   }
+  // }
 
   async registration(req: Request, res: Response): Promise<void> {
     const { email, password, login } = req.body;

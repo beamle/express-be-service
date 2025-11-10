@@ -38,5 +38,11 @@ export const sessionRepository = {
       device_name: deviceName,
       ip,
     });
+  },
+  async findSessionByDeviceId(deviceId: string) {
+    return await userSessionsCollection.findOne({ device_id: deviceId });
+  },
+  async deleteSessionByDeviceId(deviceId: string) {
+    return await userSessionsCollection.deleteOne({ device_id: deviceId });
   }
 };
