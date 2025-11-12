@@ -49,7 +49,12 @@ class jwtService {
   }
 
   async decodeToken(token: string) {
-    return jwt.decode(token) as RefreshTokenPayloadType;
+    const decoded = jwt.decode(token) as RefreshTokenPayloadType;
+    if (!decoded?.userId || !decoded?.deviceId || !decoded?.iat) {
+      throw new CustomError(SessionErrors.INVALID_REFRESH_TOKEN);
+    }
+
+    return decoded
   }
 
   async getUserIdByToken(token: string): Promise<string | null> {

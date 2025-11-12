@@ -7,7 +7,7 @@ import authController from "./controller/auth.controller";
 
 export const authRouter = Router({});
 
-authRouter.post("/login", requestLimiterMiddleware, authController.login);
+authRouter.post("/login", requestLimiterMiddleware, inputCheckErrorsFormatter, authController.login);
 authRouter.post(
   "/registration",
   requestLimiterMiddleware,
@@ -18,22 +18,27 @@ authRouter.post(
 authRouter.post(
   "/registration-confirmation",
   requestLimiterMiddleware,
+  inputCheckErrorsFormatter,
   authController.confirmEmail
 );
 authRouter.post(
   "/registration-email-resending",
   requestLimiterMiddleware,
+  inputCheckErrorsFormatter,
   authController.resendEmail
 );
 authRouter.post(
   "/refresh-token",
   requestLimiterMiddleware,
+  bearerAuthorizationValidator,
+  inputCheckErrorsFormatter,
   authController.updateTokens
 );
-authRouter.post("/logout", requestLimiterMiddleware, authController.logout);
+authRouter.post("/logout", requestLimiterMiddleware, bearerAuthorizationValidator,   inputCheckErrorsFormatter,authController.logout);
 authRouter.get(
   "/me",
   requestLimiterMiddleware,
   bearerAuthorizationValidator,
+  inputCheckErrorsFormatter,
   authController.me
 );

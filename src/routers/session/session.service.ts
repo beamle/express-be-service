@@ -55,8 +55,13 @@ export const SessionErrors = {
 
 class SessionService {
   async updateTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
-    await this.checkIfRefreshTokenIsNotBlacklisted(refreshToken);
-    const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+    if (isInvalid) {
+      throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+    }
+
+    // const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+    const { userId, deviceId } = await jwtService.decodeToken(refreshToken);
 
     const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken);
     if (!result.acknowledged) {

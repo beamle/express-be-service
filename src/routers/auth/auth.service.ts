@@ -39,15 +39,8 @@ export class AuthService {
     const { deviceType, deviceName } = getDeviceInfo(userAgent);
     const normalizedDeviceName = `${deviceType}${deviceName ? ` - ${deviceName}` : ''}`;
 
-    const deviceId = uuid(); // Always generate a new unique ID for every login
+    const deviceId = uuid();
 
-// ... The rest of the function continues to use the new unique deviceId
-//     const accessToken = await jwtService.createAccessToken(user);
-//     const { refreshToken, iat, exp } = await jwtService.createRefreshToken(
-//       user,
-//       deviceId
-//     );
-// // .
     // const existingSession = await sessionRepository.findByUserAndDeviceMeta(
     //   user.id,
     //   normalizedDeviceName,
@@ -60,8 +53,8 @@ export class AuthService {
     // } else {
     //   deviceId = uuid();
     // }
-
     // const deviceId = uuid();
+
     const accessToken = await jwtService.createAccessToken(user);
     const { refreshToken, iat, exp } = await jwtService.createRefreshToken(
       user,

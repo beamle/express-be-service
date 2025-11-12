@@ -110,7 +110,6 @@ class AuthController {
   async updateTokens(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
-
       const { accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens(refreshToken);
 
       res

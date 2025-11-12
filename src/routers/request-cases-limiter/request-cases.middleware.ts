@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from "express";
-import { requestCasesMetadataCollection } from "../../app/db";
 import requestCasesLimiterManager from "./request-cases-limiter.manager";
+import { requestCasesMetadataCollection } from "../../app/db";
+import { NextFunction, Response, Request } from "express";
 
-const REQUEST_LIMIT = 10;
+
+const REQUEST_LIMIT = 5;
 
 const requestLimiterMiddleware = async (
   req: Request,
@@ -11,20 +12,19 @@ const requestLimiterMiddleware = async (
 ): Promise<void> => {
   try {
     const IP = req.ip;
-    const baseURL = req.baseUrl;
-    const originalUrl = req.originalUrl;
+    const endpointUrl = req.originalUrl;
     const now = new Date();
     const tenSecondsAgo = new Date(now.getTime() - 10_000);
 
-    if (!IP || !baseURL) {
-      res.status(429).json({ message: "Critical data was not passed." });
+    if (!IP || !endpointUrl) {
+      res.status(401).json({ message: "Critical data was not passed." });
       return;
     }
 
     const recentRequestsCount =
       await requestCasesMetadataCollection.countDocuments({
         IP,
-        baseURL,
+        baseURL: endpointUrl,
         date: { $gte: tenSecondsAgo },
       });
 
@@ -34,10 +34,10 @@ const requestLimiterMiddleware = async (
     }
 
     console.log(
-      `[RateLimit] ${IP} -> ${originalUrl} | ${recentRequestsCount} | "requests in last 10s`
+      `[RateLimit] ${IP} -> ${endpointUrl} | ${recentRequestsCount} | requests in last 10s`
     );
 
-    await requestCasesLimiterManager.create({ IP, baseURL, date: now });
+    await requestCasesLimiterManager.create({ IP, baseURL: endpointUrl, date: now });
 
     next();
   } catch (error) {

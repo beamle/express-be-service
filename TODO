@@ -1,4 +1,1 @@
-1. Add middleware limiter for all apis
-2. FOR security CONTROLLER add middlewar to check if its autorized user. If not return 401 (cherks swagger) 
-3. Add security controller to the router 
-4. fix all ts errors
+// Ja ishu v security/device token is headers["authorization"] a nado bratj iz cookie. Tam on prihodit v vide "refreshToken=ldjoijsojdsoi"
