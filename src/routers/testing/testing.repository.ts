@@ -3,7 +3,7 @@ import {
   commentsCollection,
   postsCollection,
   refreshTokenBlacklistCollection,
-  sessionCollection,
+  sessionsCollection,
   usersCollection
 } from "../../app/db";
 
@@ -13,7 +13,7 @@ class TestingRepository {
     await blogsCollection.deleteMany({})
     await usersCollection.deleteMany({})
     await commentsCollection.deleteMany({})
-    // await sessionCollection.deleteMany({})
+    await sessionsCollection.deleteMany({})
     await refreshTokenBlacklistCollection.deleteMany({})
   }
 

@@ -12,7 +12,6 @@ export async function bearerAuthorizationValidator(
 
   if (!auth) {
     res.status(401).json({ message: "No authorization header" });
-    debugger
     return;
   }
 

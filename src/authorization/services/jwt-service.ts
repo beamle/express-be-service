@@ -41,6 +41,7 @@ class jwtService {
     if (!isValid) throw new CustomError(SessionErrors.INVALID_REFRESH_TOKEN);
 
     const decoded = await this.decodeToken(token);
+    debugger
     if (!decoded?.userId || !decoded?.deviceId || !decoded?.iat) {
       throw new CustomError(SessionErrors.INVALID_REFRESH_TOKEN);
     }

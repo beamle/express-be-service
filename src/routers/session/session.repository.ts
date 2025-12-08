@@ -1,5 +1,9 @@
 import { InsertOneResult } from 'mongodb';
-import { refreshTokenBlacklistCollection, UserSessionDBType, userSessionsCollection } from '../../app/db';
+import {
+  refreshTokenBlacklistCollection,
+  UserSessionDBType,
+  sessionsCollection
+} from '../../app/db';
 import { SessionMeta } from './session.types';
 
 export const sessionRepository = {
@@ -15,34 +19,38 @@ export const sessionRepository = {
   },
 
   async create(sessionMeta: SessionMeta): Promise<InsertOneResult<UserSessionDBType>> {
-    return await userSessionsCollection.insertOne(sessionMeta);
+    return await sessionsCollection.insertOne(sessionMeta);
   },
 
   // async findByDeviceId(deviceId: string): Promise<any | null> {},
   // async updateIat(deviceId: string, newIat: Date): Promise<void> {},
   // async deleteByDeviceId(deviceId: string): Promise<void> {},
   async findAllSessionsByUser(userId: string): Promise<SessionMeta[]> {
-    return await userSessionsCollection
-      .find({ user_id: userId }, { projection: { _id: 0 } })
+    return await sessionsCollection
+      .find({ userId: userId }, { projection: { _id: 0 } })
+      .toArray();
+  },
+  async findAllSessionsByDeviceId(deviceId: string): Promise<SessionMeta[]> {
+    return await sessionsCollection
+      .find({ deviceId }, { projection: { _id: 0 } })
       .toArray();
   },
   async deleteAllSessionsExceptDevice(userId: string, deviceId: string) {
-    return await userSessionsCollection.deleteMany({
-      user_id: userId,
-      device_id: { $ne: deviceId },
+    return await sessionsCollection.deleteMany({
+      userId: userId,
+      deviceId: { $ne: deviceId },
     });
   },
-  async findByUserAndDeviceMeta(userId: string, deviceName: string, ip: string) {
-    return await userSessionsCollection.findOne({
-      user_id: userId,
-      device_name: deviceName,
-      ip,
+  async findByUserAndDeviceMeta(userId: string, deviceName: string, deviceId?: string) {
+    return await sessionsCollection.findOne({
+      userId: userId,
+      deviceName: deviceName,
     });
   },
   async findSessionByDeviceId(deviceId: string) {
-    return await userSessionsCollection.findOne({ device_id: deviceId });
+    return await sessionsCollection.findOne({ deviceId: deviceId });
   },
   async deleteSessionByDeviceId(deviceId: string) {
-    return await userSessionsCollection.deleteOne({ device_id: deviceId });
+    return await sessionsCollection.deleteOne({ deviceId: deviceId });
   }
 };

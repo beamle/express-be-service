@@ -28,9 +28,9 @@ export const SessionErrors = {
     status: 401,
   },
 
-  NO_SESSIONS_FOR_USER_ID: {
-    message: 'No sessions for such userId was found!',
-    field: 'id',
+  NO_SESSIONS_FOR_DEVICE_ID: {
+    message: 'No sessions for such deviceId was found!',
+    field: 'deviceId',
     status: 404,
   },
 
@@ -105,16 +105,16 @@ class SessionService {
 
   async createSession(sessionMeta: SessionMeta) {
     const result = await sessionRepository.create(sessionMeta);
-
     return { id: result.insertedId.toString(), ...sessionMeta };
   }
 
-  async getAllSessionsBy(userId: string | undefined) {
-    if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
-    const result = await sessionRepository.findAllSessionsByUser(userId);
+  async getAllSessionsBy(deviceId: string, iat: number) {
+    // if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
+    // const result = await sessionRepository.findAllSessionsByUser(userId);
+    const result = await sessionRepository.findAllSessionsByDeviceId(deviceId);
 
     if (!result) {
-      throw new CustomError(SessionErrors.NO_SESSIONS_FOR_USER_ID);
+      throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID);
     }
 
     return result;
@@ -138,12 +138,12 @@ class SessionService {
 
   async deleteDeviceSessionByDeviceId(userId: string | undefined, deviceId: string | undefined): Promise<boolean> {
     if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
-    if (!deviceId) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_USER_ID)
+    if (!deviceId) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID)
 
     const session = await sessionRepository.findSessionByDeviceId(deviceId);
-    if (!session) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_USER_ID);
+    if (!session) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID);
 
-    if (session.user_id !== userId) {
+    if (session.deviceId !== deviceId) {
       throw new CustomError(SessionErrors.TRYING_TO_DELETE_OTHER_USER_DATA)
     }
 

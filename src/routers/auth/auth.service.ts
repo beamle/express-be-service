@@ -13,6 +13,7 @@ import usersService from "../users/users.service";
 import { AuthErrors, getDeviceInfo } from "./controller/auth.controller";
 import { sessionRepository } from "../session/session.repository";
 import { SessionErrors } from "../session/session.service";
+import { sessionMetaRepository } from "../sessionMeta/sessionMeta.repository";
 
 type LoginResponseType = {
   accessToken: string;
@@ -29,31 +30,30 @@ export class AuthService {
   async login(
     loginOrEmail: string,
     password: string,
+    normalizedDeviceName: string,
     userAgent?: string,
-    ip?: string
+    ip?: string,
   ): Promise<LoginResponseType> {
     const user = await usersService.checkCredentials(loginOrEmail, password);
+    debugger
     if (!user) throw new CustomError(UsersErrors.NO_USERS);
-
     if(!userAgent || !ip) throw new CustomError(SessionErrors.NO_USERAGENT_OR_IP_PROVIDED)
-    const { deviceType, deviceName } = getDeviceInfo(userAgent);
-    const normalizedDeviceName = `${deviceType}${deviceName ? ` - ${deviceName}` : ''}`;
 
-    const deviceId = uuid();
+    let deviceId;
 
-    // const existingSession = await sessionRepository.findByUserAndDeviceMeta(
-    //   user.id,
-    //   normalizedDeviceName,
-    //   ip
-    // );
-    //
-    // let deviceId: string;
-    // if (existingSession) {
-    //   deviceId = existingSession.device_id;
-    // } else {
-    //   deviceId = uuid();
-    // }
-    // const deviceId = uuid();
+    const existingSessionUser = await sessionRepository.findAllSessionsByUser(
+      user.id
+    );
+    const existingSession = await sessionRepository.findByUserAndDeviceMeta(
+      user.id,
+      normalizedDeviceName,
+    );
+
+    if (existingSession) {
+      deviceId = existingSession.deviceId;
+    } else {
+      deviceId = uuid();
+    }
 
     const accessToken = await jwtService.createAccessToken(user);
     const { refreshToken, iat, exp } = await jwtService.createRefreshToken(

@@ -12,6 +12,7 @@ export const SETTINGS = {
     COMMENTS: "/comments",
     EMAIL: "/email",
     SESSION: "/session",
+    SESSION_META: "/session_meta",
     REFRESH_TOKEN_BLACKLIST: "/refresh-token-blacklist",
     REQUEST_CASES: "/request-cases-list",
     SECURITY: "/security",

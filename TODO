@@ -1,1 +1,1 @@
-// Ja ishu v security/device token is headers["authorization"] a nado bratj iz cookie. Tam on prihodit v vide "refreshToken=ldjoijsojdsoi"
+// Nado iskatj session y device Id and or iat.

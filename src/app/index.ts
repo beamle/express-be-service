@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== 'production') {
       app.listen(SETTINGS.PORT, () => {
         console.log(`Server started on port ${SETTINGS.PORT}`);
       });
+      app.set('trust proxy', true)
     } catch (e) {
       console.log("Something went wrong, shutting down the backend app service", e);
       process.exit(1);

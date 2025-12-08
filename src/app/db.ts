@@ -1,5 +1,6 @@
 import { Collection, MongoClient, ObjectId } from "mongodb";
 import { SETTINGS } from "./settings";
+import { app } from "./app";
 
 const { CollectionMongoClient, ServerApiVersion } = require("mongodb");
 
@@ -68,30 +69,30 @@ export type RefreshTokenDBType = {
   refreshToken: string;
 };
 
-export type UserSessionDBType = {
-  _id?: string;
-  user_id: string;
-  device_id: string;
-  device_name: string;
-  ip: string;
-  iat: Date;
-  exp: Date;
-};
+// export type UserSessionDBType = {
+//   _id?: string;
+//   deviceId: string;
+//   ip: string;
+//   lastActiveDate: Date;
+//   title: string;
+// };
+
 
 type WithId<T> = Omit<T, "_id"> & { id: string };
 
 export type UserSession = WithId<UserSessionDBType>;
 
-// export type UserSessionDBType = {
-//   _id?: ObjectId;
-//   id?: any;
-//   user_id: string;
-//   device_id: string;
-//   device_name: string;
-//   ip: string;
-//   iat: Date;
-//   exp: Date;
-// };
+export type UserSessionDBType = {
+  _id?: string
+  userId: string;
+  deviceName: string;
+  deviceId: string;
+  ip: string;
+  lastActiveDate: Date;
+  title: string;
+  // iat: Date;
+  // exp: Date;
+};
 
 export type RequestCasesMetadataDBType = {
   IP: string;
@@ -147,10 +148,11 @@ export let blogsCollection: Collection<BlogType>;
 export let postsCollection: Collection<PostType>;
 export let usersCollection: Collection<UserType>;
 export let commentsCollection: Collection<CommentDBType>;
-export let sessionCollection: Collection<SessionDBType>;
+export let sessionsCollection: Collection<UserSessionDBType>;
+// export let sessionsMetadataCollection: Collection<UserSessionMetadataDBType>;
 export let requestCasesMetadataCollection: Collection<RequestCasesMetadataDBType>;
 export let refreshTokenBlacklistCollection: Collection<RefreshTokenDBType>;
-export let userSessionsCollection: Collection<UserSessionDBType>;
+// export let sessionsCollection: Collection<UserSessionDBType>;
 
 export async function runDb(url: string) {
   const client = new MongoClient(url, {
@@ -180,11 +182,16 @@ export async function runDb(url: string) {
     refreshTokenBlacklistCollection = db.collection<RefreshTokenDBType>(
       SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST
     );
-    userSessionsCollection = db.collection<UserSessionDBType>(
+    sessionsCollection = db.collection<UserSessionDBType>(
       SETTINGS.PATH.SESSION
     );
+    // sessionsMetadataCollection = db.collection<UserSessionMetadataDBType>(
+    //   SETTINGS.PATH.SESSION_META
+    // );
 
-    console.log("Conntected to collections!");
+    console.log("Connected to collections!");
+
+    app.set('trust proxy', true)
   } catch (e) {
     // Ensures that the client will close when you finish/error
     await client.close();

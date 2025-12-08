@@ -25,6 +25,7 @@ export const AuthErrors = {
     status: 400,
   },
 };
+
 export function getDeviceInfo(userAgent: string = ''): {
   deviceType: string;
   deviceName: string | null;
@@ -61,25 +62,27 @@ export function getDeviceInfo(userAgent: string = ''): {
 class AuthController {
   async login(req: Request, res: Response) {
     try {
-      const userAgent = req.headers['user-agent'] || 'Unknown';
-      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      const userAgent = req.headers['user-agent'] || 'Default';
+      const ip = req.ip;
+      const { deviceType, deviceName } = getDeviceInfo(userAgent);
+      const normalizedDeviceName = `${deviceType}${deviceName ? ` - ${deviceName}` : ''}`;
 
       const { accessToken, refreshToken, refreshPayload, user } = await authService.login(
         req.body.loginOrEmail,
         req.body.password,
+        normalizedDeviceName,
         userAgent,
         String(ip),
       );
 
-      const { deviceType, deviceName } = getDeviceInfo(userAgent);
       // TODO: move this to createSession service method
       await sessionService.createSession({
-        user_id: user.id,
-        device_id: refreshPayload.deviceId,
-        device_name: `${deviceType}${deviceName ? ` - ${deviceName}` : ''}`,
+        deviceId: refreshPayload.deviceId,
         ip: String(ip),
-        iat: new Date(refreshPayload.iat * 1000),
-        exp: new Date(refreshPayload.exp * 1000),
+        lastActiveDate: new Date(refreshPayload.iat * 1000),
+        title: String(new Date().getMilliseconds() * 0.0035 + 1 + ` user-agent: ${userAgent}`),
+        userId: user.id,
+        deviceName: normalizedDeviceName
       });
 
       res
@@ -125,6 +128,7 @@ class AuthController {
       handleErrorAsArrayOfErrors(res, e);
     }
   }
+
   // async updateTokens(req: Request, res: Response) {
   //   try {
   //     const refreshToken = req.cookies?.refreshToken;

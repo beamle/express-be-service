@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
 import { handleError } from '../../helpers/validationHelpers';
 import sessionService from '../session/session.service';
+import jwtService from "../../authorization/services/jwt-service";
+import { SETTINGS } from "../../app/settings";
 
 class SecurityController {
   async getAllSessions(req: Request, res: Response) {
+    const sessionData = await jwtService.parseAndValidateRefreshToken((req.cookies?.refreshToken), SETTINGS.JWT_SECRET)
+
     try {
-      // const me = await authService;
-      const sessions = await sessionService.getAllSessionsBy(req.context.user?.userId);
+      const sessions = await sessionService.getAllSessionsBy(sessionData.deviceId, sessionData.iat);
       res.status(200).json(sessions);
       return;
     } catch (error) {
