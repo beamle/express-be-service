@@ -9,7 +9,7 @@ export async function bearerAuthorizationValidator(
   next: NextFunction
 ) {
   const auth = req.headers["authorization"];
-
+debugger
   if (!auth) {
     res.status(401).json({ message: "No authorization header" });
     return;

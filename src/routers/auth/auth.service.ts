@@ -13,7 +13,6 @@ import usersService from "../users/users.service";
 import { AuthErrors, getDeviceInfo } from "./controller/auth.controller";
 import { sessionRepository } from "../session/session.repository";
 import { SessionErrors } from "../session/session.service";
-import { sessionMetaRepository } from "../sessionMeta/sessionMeta.repository";
 
 type LoginResponseType = {
   accessToken: string;
@@ -39,21 +38,19 @@ export class AuthService {
     if (!user) throw new CustomError(UsersErrors.NO_USERS);
     if(!userAgent || !ip) throw new CustomError(SessionErrors.NO_USERAGENT_OR_IP_PROVIDED)
 
-    let deviceId;
-
-    const existingSessionUser = await sessionRepository.findAllSessionsByUser(
-      user.id
-    );
-    const existingSession = await sessionRepository.findByUserAndDeviceMeta(
-      user.id,
-      normalizedDeviceName,
-    );
-
-    if (existingSession) {
-      deviceId = existingSession.deviceId;
-    } else {
-      deviceId = uuid();
-    }
+    let deviceId = uuid();
+    // TODO: Currently i dont create new deviceId if user and devince name already exist. But ishould ?
+    // I should somehow check is used deviceName is the same ? And if it is then keep old deviceId. But currently it return "other" always.
+    // const existingSession = await sessionRepository.findByUserAndDeviceMeta(
+    //   user.id,
+    //   normalizedDeviceName,
+    // );
+    //
+    // if (existingSession) {
+    //   deviceId = existingSession.deviceId;
+    // } else {
+    //   deviceId = uuid();
+    // }
 
     const accessToken = await jwtService.createAccessToken(user);
     const { refreshToken, iat, exp } = await jwtService.createRefreshToken(

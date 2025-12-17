@@ -54,27 +54,57 @@ export const SessionErrors = {
 };
 
 class SessionService {
+  // async updateTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+  //   const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+  //   if (isInvalid) {
+  //     throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+  //   }
+  //
+  //   // const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+  //   const { userId, deviceId } = await jwtService.decodeToken(refreshToken);
+  //
+  //   const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken);
+  //   if (!result.acknowledged) {
+  //     throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST);
+  //   }
+  //
+  //   const user = await usersService.getUserBy({ id: userId });
+  //   if (!user) {
+  //     throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
+  //   }
+  //
+  //   const newAccessToken = await jwtService.createAccessToken(user);
+  //   const { refreshToken: newRefreshToken } = await jwtService.createRefreshToken(user, deviceId);
+  //
+  //   return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+  // }
   async updateTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+    // 1. Blacklist check (Keep this)
     const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
     if (isInvalid) {
       throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
 
-    // const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+    // 2. Decode to get the existing deviceId
     const { userId, deviceId } = await jwtService.decodeToken(refreshToken);
 
-    const result = await sessionRepository.addRefreshTokenToBlackList(refreshToken);
-    if (!result.acknowledged) {
-      throw new CustomError(SessionErrors.REFRESH_TOKEN_WAS_NOT_ADDED_TO_BLACKLIST);
-    }
+    // 3. Blacklist the old token (Keep this)
+    await sessionRepository.addRefreshTokenToBlackList(refreshToken);
 
     const user = await usersService.getUserBy({ id: userId });
     if (!user) {
       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
     }
 
+    // 4. Create new tokens REUSING the deviceId
     const newAccessToken = await jwtService.createAccessToken(user);
-    const { refreshToken: newRefreshToken } = await jwtService.createRefreshToken(user, deviceId);
+
+    // Make sure your createRefreshToken returns the 'iat' (issued at)
+    const { refreshToken: newRefreshToken, iat } = await jwtService.createRefreshToken(user, deviceId);
+
+    // 5. UPDATE THE DATABASE (The missing piece)
+    // This ensures LastActiveDate changes but the record count stays the same
+    await sessionRepository.updateSessionRefreshData(deviceId, iat);
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
@@ -108,14 +138,15 @@ class SessionService {
     return { id: result.insertedId.toString(), ...sessionMeta };
   }
 
-  async getAllSessionsBy(deviceId: string, iat: number) {
-    // if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
-    // const result = await sessionRepository.findAllSessionsByUser(userId);
-    const result = await sessionRepository.findAllSessionsByDeviceId(deviceId);
+  async getAllSessionsBy(userId: string, iat: number) {
+    if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
+    const result = await sessionRepository.findAllSessionsByUser(userId);
+    // const result = await sessionRepository.findAllSessionsByDeviceId(deviceId);
 
     if (!result) {
       throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID);
     }
+    debugger
 
     return result;
   }
@@ -127,13 +158,13 @@ class SessionService {
 
     await this.checkIfRefreshTokenIsNotBlacklisted(refreshToken);
 
-    const { userId, deviceId } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+    const { userId, deviceId, iat } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
 
     if (!userId) {
       throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
     }
 
-    return await sessionRepository.deleteAllSessionsExceptDevice(userId, deviceId);
+    return await sessionRepository.deleteAllSessionsExceptDevice(userId, deviceId, iat);
   }
 
   async deleteDeviceSessionByDeviceId(userId: string | undefined, deviceId: string | undefined): Promise<boolean> {
@@ -153,3 +184,6 @@ class SessionService {
 }
 
 export default new SessionService();
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTQzMGJlNmI5MjI5NWYyMDQ3NDkyZDYiLCJpYXQiOjE3NjYwMDE2NDQsImV4cCI6MTc2NjAwMTk0NH0.-KR2aogGGiEf0ewhKECjt-DBCKYUCBhsM5Vt3vkxzIE
+// "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTE2NDFkMjU0Nzc4M2VhMjg3OWExMjIiLCJkZXZpY2VJZCI6IjU0NDk4NjdhLWU5NTEtNDdiNi04OGE2LWViMGZiNDYyNDAwYiIsImlhdCI6MTc2NjAwMTUxNSwiZXhwIjoxNzY2MDAxODE1fQ.K17mjyW8Oj2HuIURRS7zOLJCM_NbBFzB4bJv5ngXfiI; Path=/; Secure; HttpOnly;"

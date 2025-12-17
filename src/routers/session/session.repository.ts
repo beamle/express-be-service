@@ -18,6 +18,17 @@ export const sessionRepository = {
     return !!found;
   },
 
+  async updateSessionRefreshData(deviceId: string, iat: number) {
+    return await sessionsCollection.updateOne(
+      { deviceId: deviceId },
+      {
+        $set: {
+          lastActiveDate: new Date(iat * 1000) // Sync DB with the token's issued-at time
+        }
+      }
+    );
+  },
+
   async create(sessionMeta: SessionMeta): Promise<InsertOneResult<UserSessionDBType>> {
     return await sessionsCollection.insertOne(sessionMeta);
   },
@@ -35,10 +46,13 @@ export const sessionRepository = {
       .find({ deviceId }, { projection: { _id: 0 } })
       .toArray();
   },
-  async deleteAllSessionsExceptDevice(userId: string, deviceId: string) {
+  async deleteAllSessionsExceptDevice(userId: string, deviceId: string, iat: number) {
     return await sessionsCollection.deleteMany({
       userId: userId,
-      deviceId: { $ne: deviceId },
+      $or: [
+        { deviceId: { $ne: deviceId } }, // Different devices
+        { lastActiveDate: { $ne: new Date(iat * 1000) } } // Same device, but older session
+      ]
     });
   },
   async findByUserAndDeviceMeta(userId: string, deviceName: string, deviceId?: string) {
@@ -53,4 +67,5 @@ export const sessionRepository = {
   async deleteSessionByDeviceId(deviceId: string) {
     return await sessionsCollection.deleteOne({ deviceId: deviceId });
   }
+
 };

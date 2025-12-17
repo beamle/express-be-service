@@ -9,7 +9,7 @@ class SecurityController {
     const sessionData = await jwtService.parseAndValidateRefreshToken((req.cookies?.refreshToken), SETTINGS.JWT_SECRET)
 
     try {
-      const sessions = await sessionService.getAllSessionsBy(sessionData.deviceId, sessionData.iat);
+      const sessions = await sessionService.getAllSessionsBy(sessionData.userId, sessionData.iat);
       res.status(200).json(sessions);
       return;
     } catch (error) {
