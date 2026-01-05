@@ -49,7 +49,7 @@ export const SessionErrors = {
   TRYING_TO_DELETE_OTHER_USER_DATA: {
     message: 'Trying to delete other user data. UserId is incorrect!',
     field: 'ip',
-    status: 404,
+    status: 403,
   },
 };
 
@@ -139,14 +139,14 @@ class SessionService {
   }
 
   async getAllSessionsBy(userId: string, iat: number) {
-    if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
+    if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
     const result = await sessionRepository.findAllSessionsByUser(userId);
     // const result = await sessionRepository.findAllSessionsByDeviceId(deviceId);
 
     if (!result) {
       throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID);
     }
-    debugger
+    debugger;
 
     return result;
   }
@@ -168,14 +168,14 @@ class SessionService {
   }
 
   async deleteDeviceSessionByDeviceId(userId: string | undefined, deviceId: string | undefined): Promise<boolean> {
-    if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_)
-    if (!deviceId) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID)
+    if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
+    if (!deviceId) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID);
 
     const session = await sessionRepository.findSessionByDeviceId(deviceId);
     if (!session) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID);
 
-    if (session.deviceId !== deviceId) {
-      throw new CustomError(SessionErrors.TRYING_TO_DELETE_OTHER_USER_DATA)
+    if (session.userId !== userId) {
+      throw new CustomError(SessionErrors.TRYING_TO_DELETE_OTHER_USER_DATA);
     }
 
     const result = await sessionRepository.deleteSessionByDeviceId(deviceId);
@@ -184,6 +184,3 @@ class SessionService {
 }
 
 export default new SessionService();
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTQzMGJlNmI5MjI5NWYyMDQ3NDkyZDYiLCJpYXQiOjE3NjYwMDE2NDQsImV4cCI6MTc2NjAwMTk0NH0.-KR2aogGGiEf0ewhKECjt-DBCKYUCBhsM5Vt3vkxzIE
-// "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTE2NDFkMjU0Nzc4M2VhMjg3OWExMjIiLCJkZXZpY2VJZCI6IjU0NDk4NjdhLWU5NTEtNDdiNi04OGE2LWViMGZiNDYyNDAwYiIsImlhdCI6MTc2NjAwMTUxNSwiZXhwIjoxNzY2MDAxODE1fQ.K17mjyW8Oj2HuIURRS7zOLJCM_NbBFzB4bJv5ngXfiI; Path=/; Secure; HttpOnly;"
