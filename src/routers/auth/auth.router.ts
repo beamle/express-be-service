@@ -1,44 +1,44 @@
-import { Router } from "express";
-import { bearerAuthorizationValidator } from "../../authorization/middlewares/bearerAuthorizationValidator";
-import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
-import requestLimiterMiddleware from "../request-cases-limiter/request-cases.middleware";
-import { authValidators } from "./auth.middlewares";
-import authController from "./controller/auth.controller";
+import { Router } from 'express';
+import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
+import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
+import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
+import { authValidators } from './auth.middlewares';
+import authController from './controller/auth.controller';
 
 export const authRouter = Router({});
 
-authRouter.post("/login", requestLimiterMiddleware, inputCheckErrorsFormatter, authController.login);
+authRouter.post('/login', requestLimiterMiddleware, inputCheckErrorsFormatter, authController.login);
 authRouter.post(
-  "/registration",
+  '/registration',
   requestLimiterMiddleware,
   ...authValidators,
   inputCheckErrorsFormatter,
-  authController.registration
+  authController.registration,
 );
 authRouter.post(
-  "/registration-confirmation",
+  '/registration-confirmation',
   requestLimiterMiddleware,
   inputCheckErrorsFormatter,
-  authController.confirmEmail
+  authController.confirmEmail,
 );
 authRouter.post(
-  "/registration-email-resending",
+  '/registration-email-resending',
   requestLimiterMiddleware,
   inputCheckErrorsFormatter,
-  authController.resendEmail
+  authController.resendEmail,
 );
+authRouter.post('/refresh-token', requestLimiterMiddleware, inputCheckErrorsFormatter, authController.updateTokens);
 authRouter.post(
-  "/refresh-token",
+  '/logout',
   requestLimiterMiddleware,
   bearerAuthorizationValidator,
   inputCheckErrorsFormatter,
-  authController.updateTokens
+  authController.logout,
 );
-authRouter.post("/logout", requestLimiterMiddleware, bearerAuthorizationValidator,   inputCheckErrorsFormatter,authController.logout);
 authRouter.get(
-  "/me",
+  '/me',
   requestLimiterMiddleware,
   bearerAuthorizationValidator,
   inputCheckErrorsFormatter,
-  authController.me
+  authController.me,
 );
