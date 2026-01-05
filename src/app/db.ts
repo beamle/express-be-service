@@ -1,8 +1,8 @@
-import { Collection, MongoClient, ObjectId } from "mongodb";
-import { SETTINGS } from "./settings";
-import { app } from "./app";
+import { Collection, MongoClient, ObjectId } from 'mongodb';
+import { app } from './app';
+import { SETTINGS } from './settings';
 
-const { CollectionMongoClient, ServerApiVersion } = require("mongodb");
+const { CollectionMongoClient, ServerApiVersion } = require('mongodb');
 
 export type BlogType = {
   _id?: ObjectId;
@@ -77,15 +77,14 @@ export type RefreshTokenDBType = {
 //   title: string;
 // };
 
-
-type WithId<T> = Omit<T, "_id"> & { id: string };
+type WithId<T> = Omit<T, '_id'> & { id: string };
 
 export type UserSession = WithId<UserSessionDBType>;
 
 export type UserSessionDBType = {
-  _id?: string
+  _id?: string;
   userId: string;
-  deviceName: string;
+  // deviceName: string;
   deviceId: string;
   ip: string;
   lastActiveDate: Date;
@@ -122,13 +121,12 @@ export type UserTypeViewModel = {
 export type SortingBase = {
   pageNumber: number;
   pageSize: number;
-  sortBy: "createdAt" | string;
-  sortDirection: "asc" | "desc";
+  sortBy: 'createdAt' | string;
+  sortDirection: 'asc' | 'desc';
 };
 
 export type PostsSortingData = SortingBase;
-export type BlogsSortingData = SortingBase &
-  Partial<{ searchNameTerm: string }>;
+export type BlogsSortingData = SortingBase & Partial<{ searchNameTerm: string }>;
 export type UsersSortingData = SortingBase &
   Partial<{ searchLoginTerm: string }> &
   Partial<{
@@ -168,30 +166,22 @@ export async function runDb(url: string) {
     // Send a ping to confirm a successful connection
     const db = client.db(SETTINGS.DB_NAME as string);
     await db.command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    console.log('Pinged your deployment. You successfully connected to MongoDB!');
 
     postsCollection = db.collection<PostType>(SETTINGS.PATH.POSTS);
     blogsCollection = db.collection<BlogType>(SETTINGS.PATH.BLOGS);
     usersCollection = db.collection<UserType>(SETTINGS.PATH.USERS);
     commentsCollection = db.collection<CommentDBType>(SETTINGS.PATH.COMMENTS);
-    requestCasesMetadataCollection = db.collection<RequestCasesMetadataDBType>(
-      SETTINGS.PATH.REQUEST_CASES
-    );
-    refreshTokenBlacklistCollection = db.collection<RefreshTokenDBType>(
-      SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST
-    );
-    sessionsCollection = db.collection<UserSessionDBType>(
-      SETTINGS.PATH.SESSION
-    );
+    requestCasesMetadataCollection = db.collection<RequestCasesMetadataDBType>(SETTINGS.PATH.REQUEST_CASES);
+    refreshTokenBlacklistCollection = db.collection<RefreshTokenDBType>(SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST);
+    sessionsCollection = db.collection<UserSessionDBType>(SETTINGS.PATH.SESSION);
     // sessionsMetadataCollection = db.collection<UserSessionMetadataDBType>(
     //   SETTINGS.PATH.SESSION_META
     // );
 
-    console.log("Connected to collections!");
+    console.log('Connected to collections!');
 
-    app.set('trust proxy', true)
+    app.set('trust proxy', true);
   } catch (e) {
     // Ensures that the client will close when you finish/error
     await client.close();

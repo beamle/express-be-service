@@ -39,11 +39,7 @@ export function getDeviceInfo(userAgent: string = ''): {
     if (match && match[1]) deviceName = match[1].trim();
   } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
     deviceType = 'Mobile';
-    deviceName = /iPhone/i.test(userAgent)
-      ? 'iPhone'
-      : /iPad/i.test(userAgent)
-        ? 'iPad'
-        : 'iOS Device';
+    deviceName = /iPhone/i.test(userAgent) ? 'iPhone' : /iPad/i.test(userAgent) ? 'iPad' : 'iOS Device';
   } else if (/Macintosh|Mac OS X/i.test(userAgent)) {
     deviceType = 'Mac';
     deviceName = 'Mac OS';
@@ -57,7 +53,6 @@ export function getDeviceInfo(userAgent: string = ''): {
 
   return { deviceType, deviceName };
 }
-
 
 class AuthController {
   async login(req: Request, res: Response) {
@@ -82,7 +77,7 @@ class AuthController {
         lastActiveDate: new Date(refreshPayload.iat * 1000),
         title: String(new Date().getMilliseconds() * 0.0035 + 1 + ` user-agent: ${userAgent}`),
         userId: user.id,
-        deviceName: normalizedDeviceName
+        // deviceName: normalizedDeviceName
       });
 
       res
