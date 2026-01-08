@@ -28,13 +28,7 @@ authRouter.post(
   authController.resendEmail,
 );
 authRouter.post('/refresh-token', requestLimiterMiddleware, inputCheckErrorsFormatter, authController.updateTokens);
-authRouter.post(
-  '/logout',
-  requestLimiterMiddleware,
-  bearerAuthorizationValidator,
-  inputCheckErrorsFormatter,
-  authController.logout,
-);
+authRouter.post('/logout', requestLimiterMiddleware, inputCheckErrorsFormatter, authController.logout);
 authRouter.get(
   '/me',
   requestLimiterMiddleware,

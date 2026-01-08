@@ -98,13 +98,14 @@ class AuthController {
     try {
       const refreshToken = req.cookies?.refreshToken;
       await sessionService.logout(refreshToken);
+      res.clearCookie('refreshToken');
+
       res.sendStatus(204);
       return;
     } catch (e) {
       handleError(res, e);
     }
   }
-
   async updateTokens(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
