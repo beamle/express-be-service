@@ -57,6 +57,7 @@ export function getDeviceInfo(userAgent: string = ''): {
 class AuthController {
   async login(req: Request, res: Response) {
     try {
+      debugger;
       const userAgent = req.headers['user-agent'] || 'Default';
       const ip = req.ip;
       const { deviceType, deviceName } = getDeviceInfo(userAgent);

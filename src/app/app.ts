@@ -1,31 +1,31 @@
-import express from "express";
-import cors from "cors";
-import { SETTINGS } from "./settings";
-import { blogsRouter } from "../routers/blogs/blogs.router";
-import { postsRouter } from "../routers/posts/posts.router";
-import { testingRouter } from "../routers/testing/testing.router";
-import { usersRouter } from "../routers/users/users.router";
-import { authRouter } from "../routers/auth/auth.router";
+import cors from 'cors';
+import express from 'express';
+import { authRouter } from '../routers/auth/auth.router';
+import { blogsRouter } from '../routers/blogs/blogs.router';
+import { postsRouter } from '../routers/posts/posts.router';
+import { testingRouter } from '../routers/testing/testing.router';
+import { usersRouter } from '../routers/users/users.router';
+import { SETTINGS } from './settings';
 
-import { Request, Response, NextFunction } from "express";
-import { commentsRouter } from "../routers/comments/comments.router";
-import cookieParser from "cookie-parser";
-import { securityRouter } from "../routers/security/security.router";
+import cookieParser from 'cookie-parser';
+import { NextFunction, Request, Response } from 'express';
+import { commentsRouter } from '../routers/comments/comments.router';
+import { securityRouter } from '../routers/security/security.router';
 
 export function addContext(req: Request, res: Response, next: NextFunction) {
   req.context = { user: null };
   next();
 }
-
+debugger;
 export const app = express();
-app.options("*", cors()); // Enable preflight for all rou
+app.options('*', cors()); // Enable preflight for all rou
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json()); // The request body will be available as a raw stream of data in req.body, but req.body will be undefined unless you manually parse it.
 app.use(addContext);
 
-app.get("/", (req, res) => {
-  res.status(200).json({ version: "1.0" });
+app.get('/', (req, res) => {
+  res.status(200).json({ version: '1.0' });
 });
 
 app.use(SETTINGS.PATH.AUTH, authRouter);

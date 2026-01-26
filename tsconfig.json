@@ -3,6 +3,8 @@
     "target": "es2016",
     "module": "commonjs",
     "outDir": "./dist",
+    "sourceMap": true,
+    "inlineSources": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

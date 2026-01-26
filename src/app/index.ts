@@ -1,18 +1,19 @@
-import {SETTINGS} from './settings'
-import { runDb } from "./db";
-import { app } from "./app";
+import { app } from './app';
+import { runDb } from './db';
+import { SETTINGS } from './settings';
 
 // Only run the server locally (not on Vercel)
 if (process.env.NODE_ENV !== 'production') {
+  debugger;
   const startApp = async () => {
     try {
       await runDb(SETTINGS.MONGO_URI);
       app.listen(SETTINGS.PORT, () => {
         console.log(`Server started on port ${SETTINGS.PORT}`);
       });
-      app.set('trust proxy', true)
+      app.set('trust proxy', true);
     } catch (e) {
-      console.log("Something went wrong, shutting down the backend app service", e);
+      console.log('Something went wrong, shutting down the backend app service', e);
       process.exit(1);
     }
   };
