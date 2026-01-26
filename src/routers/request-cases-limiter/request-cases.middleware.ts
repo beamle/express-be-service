@@ -6,7 +6,9 @@ const REQUEST_LIMIT = 5;
 
 const requestLimiterMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const IP = req.ip || req.headers['x-forwarded-for'] || 'unknown-ip';
+    const rawIp = req.headers['x-forwarded-for'];
+
+    const IP = typeof rawIp === 'string' ? rawIp : Array.isArray(rawIp) ? rawIp[0] : req.ip ?? 'unknown-ip';
     const endpointUrl = req.originalUrl;
     const now = new Date();
     const tenSecondsAgo = new Date(now.getTime() - 10_000);

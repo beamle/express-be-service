@@ -1,18 +1,17 @@
-import { ObjectId } from "mongodb";
-import { uuid } from "uuidv4";
-import { UserTypeViewModel } from "../../app/db";
-import jwtService from "../../authorization/services/jwt-service";
-import { CustomError } from "../../helpers/CustomError";
+import { ObjectId } from 'mongodb';
+import { uuid } from 'uuidv4';
+import { UserTypeViewModel } from '../../app/db';
+import { JwtService } from '../../authorization/services/jwt-service';
+import { CustomError } from '../../helpers/CustomError';
 import emailManager, {
   generateEmailConfirmationMessage,
   generateEmailConfirmationResendMessage,
-} from "../../managers/email.manager";
-import { UsersErrors } from "../users/meta/Errors";
-import usersRepository from "../users/users.repository";
-import usersService from "../users/users.service";
-import { AuthErrors, getDeviceInfo } from "./controller/auth.controller";
-import { sessionRepository } from "../session/session.repository";
-import { SessionErrors } from "../session/session.service";
+} from '../../managers/email.manager';
+import { SessionErrors } from '../session/session.service';
+import { UsersErrors } from '../users/meta/Errors';
+import usersRepository from '../users/users.repository';
+import usersService from '../users/users.service';
+import { AuthErrors } from './controller/auth.controller';
 
 type LoginResponseType = {
   accessToken: string;
@@ -26,6 +25,10 @@ type LoginResponseType = {
 };
 
 export class AuthService {
+  private JwtService: JwtService;
+  constructor() {
+    this.JwtService = new JwtService();
+  }
   async login(
     loginOrEmail: string,
     password: string,
@@ -34,9 +37,9 @@ export class AuthService {
     ip?: string,
   ): Promise<LoginResponseType> {
     const user = await usersService.checkCredentials(loginOrEmail, password);
-    debugger
+
     if (!user) throw new CustomError(UsersErrors.NO_USERS);
-    if(!userAgent || !ip) throw new CustomError(SessionErrors.NO_USERAGENT_OR_IP_PROVIDED)
+    if (!userAgent || !ip) throw new CustomError(SessionErrors.NO_USERAGENT_OR_IP_PROVIDED);
 
     let deviceId = uuid();
     // TODO: Currently i dont create new deviceId if user and devince name already exist. But ishould ?
@@ -52,11 +55,8 @@ export class AuthService {
     //   deviceId = uuid();
     // }
 
-    const accessToken = await jwtService.createAccessToken(user);
-    const { refreshToken, iat, exp } = await jwtService.createRefreshToken(
-      user,
-      deviceId
-    );
+    const accessToken = await this.JwtService.createAccessToken(user);
+    const { refreshToken, iat, exp } = await this.JwtService.createRefreshToken(user, deviceId);
 
     return {
       accessToken,
@@ -66,29 +66,20 @@ export class AuthService {
     };
   }
 
-  async registration(dto: {
-    email: string;
-    password: string;
-    login: string;
-  }): Promise<UserTypeViewModel> {
+  async registration(dto: { email: string; password: string; login: string }): Promise<UserTypeViewModel> {
     const { email, password, login } = dto;
 
     await usersService.getUserBy({ email }); // rename to checkIf exist
     await usersService.getUserBy({ login });
 
-    const userId = await usersService.createUser(
-      { email, password, login },
-      false
-    );
+    const userId = await usersService.createUser({ email, password, login }, false);
     const user = await usersService.findUserBy({ email });
 
     try {
       await emailManager.sendEmailConfirmationMessage(
         user,
-        generateEmailConfirmationMessage(
-          user.emailConfirmation.confirmationCode
-        ),
-        "Registration confirmation"
+        generateEmailConfirmationMessage(user.emailConfirmation.confirmationCode),
+        'Registration confirmation',
       );
     } catch (e) {
       await usersRepository.deleteUser(userId);
@@ -100,7 +91,7 @@ export class AuthService {
 
   async confirmEmail(code: string, email: string) {
     let user = await usersRepository.findUserBy({
-      "emailConfirmation.confirmationCode": code,
+      'emailConfirmation.confirmationCode': code,
     });
     if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST);
 
@@ -117,33 +108,18 @@ export class AuthService {
 
   async resendEmail(email: string) {
     const user = await usersService.findUserBy({ email });
-    if (user.emailConfirmation.isConfirmed)
-      throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
+    if (user.emailConfirmation.isConfirmed) throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
 
     const newConfirmationCode = uuid();
 
-    await usersRepository.updateUserConfirmationCode(
-      new ObjectId(user.id),
-      newConfirmationCode
-    );
+    await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode);
     const updatedUser = await usersService.findUserBy({ email });
     await emailManager.sendEmailConfirmationMessage(
       updatedUser,
-      generateEmailConfirmationResendMessage(
-        updatedUser.emailConfirmation.confirmationCode
-      ),
-      "Registration confirmation"
+      generateEmailConfirmationResendMessage(updatedUser.emailConfirmation.confirmationCode),
+      'Registration confirmation',
     );
   }
-
-  // async confirmEmail(code: string, email: string) {
-  //   const result = await this.confirmEmail(code, email)
-  //   if (result) {
-  //     return
-  //   } else {
-  //     throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED)
-  //   }
-  // }
 }
 
 export default new AuthService();

@@ -9,7 +9,7 @@ export const JwtServiceErrors = {
   NO_TOKEN_PROVIDED: { message: "Unauthorized. You didn't pass jwt token", field: '', status: 404 },
 };
 
-class jwtService {
+export class JwtService {
   async createAccessToken(user: UserTypeViewModel): Promise<string> {
     return jwt.sign({ userId: user.id }, SETTINGS.JWT_SECRET, { expiresIn: '5m' });
   }
@@ -72,4 +72,4 @@ class jwtService {
   }
 }
 
-export default new jwtService();
+export default new JwtService();

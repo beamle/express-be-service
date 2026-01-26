@@ -1,5 +1,5 @@
 import { SETTINGS } from '../../app/settings';
-import jwtService from '../../authorization/services/jwt-service';
+import JwtService from '../../authorization/services/jwt-service';
 import { CustomError } from '../../helpers/CustomError';
 import { UsersErrors } from '../users/meta/Errors';
 import usersService from '../users/users.service';
@@ -60,7 +60,7 @@ class SessionService {
       throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
 
-    const { userId, deviceId, iat } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+    const { userId, deviceId, iat } = await JwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
 
     const session = await sessionRepository.findSessionByDeviceId(deviceId);
 
@@ -73,8 +73,8 @@ class SessionService {
     const user = await usersService.getUserBy({ id: userId });
     if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
 
-    const newAccessToken = await jwtService.createAccessToken(user);
-    const { refreshToken: newRefreshToken, iat: newIat } = await jwtService.createRefreshToken(user, deviceId);
+    const newAccessToken = await JwtService.createAccessToken(user);
+    const { refreshToken: newRefreshToken, iat: newIat } = await JwtService.createRefreshToken(user, deviceId);
 
     await sessionRepository.updateSessionRefreshData(deviceId, newIat);
 
@@ -87,7 +87,7 @@ class SessionService {
     const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
     if (isInvalid) throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
 
-    const { deviceId, iat } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+    const { deviceId, iat } = await JwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
 
     const session = await sessionRepository.findSessionByDeviceId(deviceId);
 
@@ -130,7 +130,7 @@ class SessionService {
 
     await this.checkIfRefreshTokenIsNotBlacklisted(refreshToken);
 
-    const { userId, deviceId, iat } = await jwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
+    const { userId, deviceId, iat } = await JwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
 
     if (!userId) {
       throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
