@@ -1,19 +1,24 @@
-import { ObjectId } from "mongodb";
-import { BlogErrors } from "./blogs.service";
-import { blogsCollection, BlogsModelView, BlogsSortingData, BlogType } from "../../app/db";
-import { blogsRepository } from "../blogs/blogs.repository";
-import { PostErrors } from "../posts/posts.service";
-import { createFilter } from "../../helpers/objectGenerators";
-import { CustomError } from "../../helpers/CustomError";
+import { ObjectId } from 'mongodb';
+import { blogsCollection, BlogsModelView, BlogsSortingData, BlogType } from '../../app/db';
+import { CustomError } from '../../helpers/CustomError';
+import { createFilter } from '../../helpers/objectGenerators';
+import { BlogsRepository } from '../blogs/blogs.repository';
+import { PostErrors } from '../posts/posts.service';
+import { BlogErrors } from './blogs.service';
 
-class BlogsQueryRepository {
+export class BlogsQueryRepository {
+  private blogsRepository: BlogsRepository;
+
+  constructor() {
+    this.blogsRepository = new BlogsRepository();
+  }
   async getBlogs(sortingData: BlogsSortingData, blogId?: string): Promise<BlogsModelView> {
-    const filter: any = createFilter(sortingData)
-    const blogsLength = await blogsCollection.countDocuments(filter) // make aggregation?
-    const blogs = await blogsRepository.getBlogs(sortingData, filter)
+    const filter: any = createFilter(sortingData);
+    const blogsLength = await blogsCollection.countDocuments(filter); // make aggregation?
+    const blogs = await this.blogsRepository.getBlogs(sortingData, filter);
 
     if (!blogs) {
-      throw new CustomError(BlogErrors.NO_BLOGS)
+      throw new CustomError(BlogErrors.NO_BLOGS);
     }
 
     return {
@@ -21,19 +26,17 @@ class BlogsQueryRepository {
       page: sortingData.pageNumber,
       pageSize: sortingData.pageSize,
       totalCount: blogsLength,
-      items: blogs
-    }
+      items: blogs,
+    };
   }
 
   async getBlogById(searchablePostId: string): Promise<BlogType> {
-    const post = await blogsRepository.findBy(new ObjectId(searchablePostId))
+    const post = await this.blogsRepository.findBy(new ObjectId(searchablePostId));
 
     if (!post) {
-      throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID)
+      throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID);
     }
 
-    return post
+    return post;
   }
 }
-
-export default new BlogsQueryRepository()
