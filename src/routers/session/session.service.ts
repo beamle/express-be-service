@@ -2,7 +2,7 @@ import { SETTINGS } from '../../app/settings';
 import JwtService from '../../authorization/services/jwt-service';
 import { CustomError } from '../../helpers/CustomError';
 import { UsersErrors } from '../users/meta/Errors';
-import usersService from '../users/users.service';
+import { UsersService } from '../users/users.service';
 import { sessionRepository } from './session.repository';
 import { SessionMeta } from './session.types';
 
@@ -54,6 +54,10 @@ export const SessionErrors = {
 };
 
 class SessionService {
+  private UsersService: UsersService;
+  constructor() {
+    this.UsersService = new UsersService();
+  }
   async updateTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
     if (isInvalid) {
@@ -70,7 +74,7 @@ class SessionService {
 
     await sessionRepository.addRefreshTokenToBlackList(refreshToken);
 
-    const user = await usersService.getUserBy({ id: userId });
+    const user = await this.UsersService.getUserBy({ id: userId });
     if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
 
     const newAccessToken = await JwtService.createAccessToken(user);

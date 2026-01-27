@@ -10,7 +10,7 @@ import emailManager, {
 import { SessionErrors } from '../session/session.service';
 import { UsersErrors } from '../users/meta/Errors';
 import usersRepository from '../users/users.repository';
-import usersService from '../users/users.service';
+import { UsersService } from '../users/users.service';
 import { AuthErrors } from './controller/auth.controller';
 
 type LoginResponseType = {
@@ -25,9 +25,12 @@ type LoginResponseType = {
 };
 
 export class AuthService {
-  private JwtService: JwtService;
+  private jwtService: JwtService;
+  private usersService: UsersService;
+
   constructor() {
-    this.JwtService = new JwtService();
+    this.jwtService = new JwtService();
+    this.usersService = new UsersService();
   }
   async login(
     loginOrEmail: string,
@@ -36,7 +39,7 @@ export class AuthService {
     userAgent?: string,
     ip?: string,
   ): Promise<LoginResponseType> {
-    const user = await usersService.checkCredentials(loginOrEmail, password);
+    const user = await this.usersService.checkCredentials(loginOrEmail, password);
 
     if (!user) throw new CustomError(UsersErrors.NO_USERS);
     if (!userAgent || !ip) throw new CustomError(SessionErrors.NO_USERAGENT_OR_IP_PROVIDED);
@@ -55,8 +58,8 @@ export class AuthService {
     //   deviceId = uuid();
     // }
 
-    const accessToken = await this.JwtService.createAccessToken(user);
-    const { refreshToken, iat, exp } = await this.JwtService.createRefreshToken(user, deviceId);
+    const accessToken = await this.jwtService.createAccessToken(user);
+    const { refreshToken, iat, exp } = await this.jwtService.createRefreshToken(user, deviceId);
 
     return {
       accessToken,
@@ -69,11 +72,11 @@ export class AuthService {
   async registration(dto: { email: string; password: string; login: string }): Promise<UserTypeViewModel> {
     const { email, password, login } = dto;
 
-    await usersService.getUserBy({ email }); // rename to checkIf exist
-    await usersService.getUserBy({ login });
+    await this.usersService.getUserBy({ email }); // rename to checkIf exist
+    await this.usersService.getUserBy({ login });
 
-    const userId = await usersService.createUser({ email, password, login }, false);
-    const user = await usersService.findUserBy({ email });
+    const userId = await this.usersService.createUser({ email, password, login }, false);
+    const user = await this.usersService.findUserBy({ email });
 
     try {
       await emailManager.sendEmailConfirmationMessage(
@@ -107,13 +110,13 @@ export class AuthService {
   }
 
   async resendEmail(email: string) {
-    const user = await usersService.findUserBy({ email });
+    const user = await this.usersService.findUserBy({ email });
     if (user.emailConfirmation.isConfirmed) throw new CustomError(AuthErrors.EMAIL_ALREADY_CONFIRMED);
 
     const newConfirmationCode = uuid();
 
     await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode);
-    const updatedUser = await usersService.findUserBy({ email });
+    const updatedUser = await this.usersService.findUserBy({ email });
     await emailManager.sendEmailConfirmationMessage(
       updatedUser,
       generateEmailConfirmationResendMessage(updatedUser.emailConfirmation.confirmationCode),
@@ -121,5 +124,3 @@ export class AuthService {
     );
   }
 }
-
-export default new AuthService();

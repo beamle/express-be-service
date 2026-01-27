@@ -1,57 +1,58 @@
-import { usersCollection, UsersSortingData, UserType, UserTypeViewModel } from "../../app/db";
-import { Filter, ObjectId } from "mongodb";
-import usersQueryRepository from "./users.queryRepository";
+import { Filter, ObjectId } from 'mongodb';
+import { usersCollection, UsersSortingData, UserType } from '../../app/db';
 
 type UserFilter = Partial<{
-  _id?: ObjectId
-  email?: string
-  login?: string
-}>
+  _id?: ObjectId;
+  email?: string;
+  login?: string;
+}>;
 
 type UserFilterType = Filter<UserFilter>;
 
 class UsersRepository {
   async getUsers(sortingData: UsersSortingData, filter: UsersSortingData) {
-
     const users = await usersCollection
       // .find(filter ? filter : {})
       .find(filter)
       .skip((sortingData.pageNumber - 1) * sortingData.pageSize)
       .limit(sortingData.pageSize)
       .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })
-      .toArray()
+      .toArray();
 
-    return users
+    return users;
   }
 
   async findUserBy(filter: UserFilterType): Promise<UserType | null> {
-    const user = await usersCollection.findOne(filter as Filter<any>) // to allow passing mongodb Query strings
+    const user = await usersCollection.findOne(filter as Filter<any>); // to allow passing mongodb Query strings
 
-    return user
+    return user;
   }
 
   async createUser(userData: UserType): Promise<ObjectId> {
-    const result = await usersCollection.insertOne(userData)
+    const result = await usersCollection.insertOne(userData);
 
-    return result.insertedId
+    return result.insertedId;
   }
 
   async deleteUser(id: ObjectId): Promise<boolean> {
-    const result = await usersCollection.deleteOne({ _id: id })
+    const result = await usersCollection.deleteOne({ _id: id });
 
-    return result.acknowledged
+    return result.acknowledged;
   }
 
   async updateUserConfirmationCode(id: ObjectId, code: string): Promise<boolean> {
-    const result = await usersCollection.updateOne({_id: id}, {$set: {'emailConfirmation.confirmationCode': code}});
+    const result = await usersCollection.updateOne(
+      { _id: id },
+      { $set: { 'emailConfirmation.confirmationCode': code } },
+    );
 
-    return result.modifiedCount === 1
+    return result.modifiedCount === 1;
   }
 
   async updateConfirmation(id: ObjectId): Promise<boolean> {
-    let result = await usersCollection.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } })
-    return result.modifiedCount === 1
+    let result = await usersCollection.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } });
+    return result.modifiedCount === 1;
   }
 }
 
-export default new UsersRepository()
+export default new UsersRepository();

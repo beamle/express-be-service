@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import { refreshTokenValidator } from '../../authorization/middlewares/refreshTokenValidator';
-import securityController from './security.controller';
+import { SecurityController } from './security.controller';
 
 export const securityRouter = Router({ mergeParams: true });
 export const sessionMetaRouter = Router({ mergeParams: true });
+
+const securityController = new SecurityController();
 
 securityRouter.get('/devices', refreshTokenValidator, securityController.getAllSessions);
 

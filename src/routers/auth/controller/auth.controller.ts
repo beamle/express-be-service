@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { handleError, handleErrorAsArrayOfErrors } from '../../../helpers/validationHelpers';
 import sessionService from '../../session/session.service';
-import authService from '../auth.service';
+import { AuthService } from '../auth.service';
 
 export const AuthErrors = {
   EMAIL_CONFIRMATION_PROBLEM: {
@@ -55,6 +55,10 @@ export function getDeviceInfo(userAgent: string = ''): {
 }
 
 class AuthController {
+  private authService: AuthService;
+  constructor() {
+    this.authService = new AuthService();
+  }
   async login(req: Request, res: Response) {
     try {
       const userAgent = req.headers['user-agent'] || 'Default';
@@ -62,7 +66,7 @@ class AuthController {
       const { deviceType, deviceName } = getDeviceInfo(userAgent);
       const normalizedDeviceName = `${deviceType}${deviceName ? ` - ${deviceName}` : ''}`;
 
-      const { accessToken, refreshToken, refreshPayload, user } = await authService.login(
+      const { accessToken, refreshToken, refreshPayload, user } = await this.authService.login(
         req.body.loginOrEmail,
         req.body.password,
         normalizedDeviceName,
@@ -128,7 +132,7 @@ class AuthController {
   async registration(req: Request, res: Response): Promise<void> {
     const { email, password, login } = req.body;
     try {
-      const user = await authService.registration({ email, password, login });
+      const user = await this.authService.registration({ email, password, login });
       res.status(204).json(user);
     } catch (e) {
       handleErrorAsArrayOfErrors(res, e);
@@ -137,7 +141,7 @@ class AuthController {
 
   async resendEmail(req: Request, res: Response) {
     try {
-      await authService.resendEmail(req.body.email);
+      await this.authService.resendEmail(req.body.email);
       res.sendStatus(204);
       return;
     } catch (e) {
@@ -147,7 +151,7 @@ class AuthController {
 
   async confirmEmail(req: Request, res: Response) {
     try {
-      await authService.confirmEmail(req.body.code, req.body.email);
+      await this.authService.confirmEmail(req.body.code, req.body.email);
       res.status(204).send();
       return;
     } catch (e) {
