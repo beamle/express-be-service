@@ -12,9 +12,8 @@ import {
 import { BlogsQueryRepository } from '../blogs.queryRepository';
 import { BlogsService } from '../blogs.service';
 import { BlogError, CreateBlogInput, CreateBlogOutput } from '../blogs.types';
-import blogsController from './blogs.controller';
 
-class BlogsController {
+export class BlogsController {
   private blogsQueryRepository: BlogsQueryRepository;
   private blogsService: BlogsService;
 
@@ -50,7 +49,7 @@ class BlogsController {
   ) {
     const { id: searchableBlogId } = req.params;
     if (!searchableBlogId) {
-      return await blogsController.getBlogs(req, res);
+      return await this.getBlogs(req, res);
     }
 
     try {
@@ -81,5 +80,3 @@ class BlogsController {
     }
   }
 }
-
-export default new BlogsController();
