@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
-import { authController } from './auth.compositionRepository';
+import { authController } from './auth.composition-root';
 import { authValidators } from './auth.middlewares';
 
 export const authRouter = Router({});

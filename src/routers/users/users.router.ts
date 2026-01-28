@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import { usersController } from './users.compositionRepository';
+import { usersController } from './users.composition-root';
 import { usersValidators } from './users.middlewares';
 
 export const usersRouter = Router({ mergeParams: true });
