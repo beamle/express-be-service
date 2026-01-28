@@ -8,7 +8,7 @@ import { CommentsController } from './comments.controller';
 export const commentsRouter = Router({ mergeParams: true });
 const commentsController = new CommentsController();
 
-commentsRouter.get('/:id', requestLimiterMiddleware, commentsController.getCommentById);
+commentsRouter.get('/:id', requestLimiterMiddleware, commentsController.getCommentById.bind(commentsController));
 
 commentsRouter.put(
   '/:id',
@@ -16,7 +16,7 @@ commentsRouter.put(
   bearerAuthorizationValidator,
   postCommentContentValidator,
   inputCheckErrorsFormatter,
-  commentsController.updateCommentForPost,
+  commentsController.updateCommentForPost.bind(commentsController),
 );
 
 commentsRouter.delete(
@@ -24,5 +24,5 @@ commentsRouter.delete(
   requestLimiterMiddleware,
   bearerAuthorizationValidator,
   inputCheckErrorsFormatter,
-  commentsController.deleteCommentById,
+  commentsController.deleteCommentById.bind(commentsController),
 );

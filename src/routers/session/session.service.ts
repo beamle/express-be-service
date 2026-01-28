@@ -3,7 +3,7 @@ import JwtService from '../../authorization/services/jwt-service';
 import { CustomError } from '../../helpers/CustomError';
 import { UsersErrors } from '../users/meta/Errors';
 import { UsersService } from '../users/users.service';
-import { sessionRepository } from './session.repository';
+import { SessionRepository } from './session.repository';
 import { SessionMeta } from './session.types';
 
 export const SessionErrors = {
@@ -53,34 +53,37 @@ export const SessionErrors = {
   },
 };
 
-class SessionService {
-  private UsersService: UsersService;
-  constructor() {
-    this.UsersService = new UsersService();
+export class SessionService {
+  constructor(
+    private usersService: UsersService,
+    private sessionRepository: SessionRepository,
+  ) {
+    this.usersService = usersService;
+    this.sessionRepository = sessionRepository;
   }
   async updateTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
-    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+    const isInvalid = await this.sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
     if (isInvalid) {
       throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
 
     const { userId, deviceId, iat } = await JwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
 
-    const session = await sessionRepository.findSessionByDeviceId(deviceId);
+    const session = await this.sessionRepository.findSessionByDeviceId(deviceId);
 
     if (!session || new Date(iat * 1000).getTime() !== new Date(session.lastActiveDate).getTime()) {
       throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
 
-    await sessionRepository.addRefreshTokenToBlackList(refreshToken);
+    await this.sessionRepository.addRefreshTokenToBlackList(refreshToken);
 
-    const user = await this.UsersService.getUserBy({ id: userId });
+    const user = await this.usersService.getUserBy({ id: userId });
     if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
 
     const newAccessToken = await JwtService.createAccessToken(user);
     const { refreshToken: newRefreshToken, iat: newIat } = await JwtService.createRefreshToken(user, deviceId);
 
-    await sessionRepository.updateSessionRefreshData(deviceId, newIat);
+    await this.sessionRepository.updateSessionRefreshData(deviceId, newIat);
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
@@ -88,35 +91,35 @@ class SessionService {
   async logout(refreshToken: string) {
     if (!refreshToken) throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
 
-    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+    const isInvalid = await this.sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
     if (isInvalid) throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
 
     const { deviceId, iat } = await JwtService.parseAndValidateRefreshToken(refreshToken, SETTINGS.JWT_SECRET);
 
-    const session = await sessionRepository.findSessionByDeviceId(deviceId);
+    const session = await this.sessionRepository.findSessionByDeviceId(deviceId);
 
     if (!session || new Date(iat * 1000).getTime() !== new Date(session.lastActiveDate).getTime()) {
       throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
 
-    await sessionRepository.addRefreshTokenToBlackList(refreshToken);
-    await sessionRepository.deleteSessionByDeviceId(deviceId);
+    await this.sessionRepository.addRefreshTokenToBlackList(refreshToken);
+    await this.sessionRepository.deleteSessionByDeviceId(deviceId);
   }
 
   async checkIfRefreshTokenIsNotBlacklisted(refreshToken: string) {
-    const isInvalid = await sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
+    const isInvalid = await this.sessionRepository.checkIfRefreshTokenInBlackList(refreshToken);
     if (isInvalid) throw new CustomError(SessionErrors.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     return true;
   }
 
   async createSession(sessionMeta: SessionMeta) {
-    const result = await sessionRepository.create(sessionMeta);
+    const result = await this.sessionRepository.create(sessionMeta);
     return { id: result.insertedId.toString(), ...sessionMeta };
   }
 
   async getAllSessionsBy(userId: string, iat: number) {
     if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
-    const result = await sessionRepository.findAllSessionsByUser(userId);
+    const result = await this.sessionRepository.findAllSessionsByUser(userId);
     // const result = await sessionRepository.findAllSessionsByDeviceId(deviceId);
 
     if (!result) {
@@ -140,23 +143,21 @@ class SessionService {
       throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
     }
 
-    return await sessionRepository.deleteAllSessionsExceptDevice(userId, deviceId, iat);
+    return await this.sessionRepository.deleteAllSessionsExceptDevice(userId, deviceId, iat);
   }
 
   async deleteDeviceSessionByDeviceId(userId: string | undefined, deviceId: string | undefined): Promise<boolean> {
     if (!userId) throw new CustomError(SessionErrors.NO_USER_ID_PROVIDED_);
     if (!deviceId) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID);
 
-    const session = await sessionRepository.findSessionByDeviceId(deviceId);
+    const session = await this.sessionRepository.findSessionByDeviceId(deviceId);
     if (!session) throw new CustomError(SessionErrors.NO_SESSIONS_FOR_DEVICE_ID);
 
     if (session.userId !== userId) {
       throw new CustomError(SessionErrors.TRYING_TO_DELETE_OTHER_USER_DATA);
     }
 
-    const result = await sessionRepository.deleteSessionByDeviceId(deviceId);
+    const result = await this.sessionRepository.deleteSessionByDeviceId(deviceId);
     return result.deletedCount > 0;
   }
 }
-
-export default new SessionService();

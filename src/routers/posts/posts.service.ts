@@ -13,7 +13,7 @@ export const PostErrors = {
   DID_NOT_CREATE_COMMENT: { message: "Didn't create comment", field: '', status: 400 },
 };
 
-class PostsService {
+export class PostsService {
   private postsRepository: PostsRepository;
 
   constructor() {
@@ -102,5 +102,3 @@ class PostsService {
     return createdCommentId;
   }
 }
-
-export default new PostsService();

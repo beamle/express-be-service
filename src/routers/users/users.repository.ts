@@ -9,7 +9,7 @@ type UserFilter = Partial<{
 
 type UserFilterType = Filter<UserFilter>;
 
-class UsersRepository {
+export class UsersRepository {
   async getUsers(sortingData: UsersSortingData, filter: UsersSortingData) {
     const users = await usersCollection
       // .find(filter ? filter : {})
@@ -54,5 +54,3 @@ class UsersRepository {
     return result.modifiedCount === 1;
   }
 }
-
-export default new UsersRepository();

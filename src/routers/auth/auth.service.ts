@@ -9,7 +9,7 @@ import emailManager, {
 } from '../../managers/email.manager';
 import { SessionErrors } from '../session/session.service';
 import { UsersErrors } from '../users/meta/Errors';
-import usersRepository from '../users/users.repository';
+import { UsersRepository } from '../users/users.repository';
 import { UsersService } from '../users/users.service';
 import { AuthErrors } from './controller/auth.controller';
 
@@ -25,12 +25,14 @@ type LoginResponseType = {
 };
 
 export class AuthService {
-  private jwtService: JwtService;
-  private usersService: UsersService;
-
-  constructor() {
-    this.jwtService = new JwtService();
-    this.usersService = new UsersService();
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+    private usersRepository: UsersRepository,
+  ) {
+    this.usersService = usersService;
+    this.jwtService = jwtService;
+    this.usersRepository = usersRepository;
   }
   async login(
     loginOrEmail: string,
@@ -85,7 +87,7 @@ export class AuthService {
         'Registration confirmation',
       );
     } catch (e) {
-      await usersRepository.deleteUser(userId);
+      await this.usersRepository.deleteUser(userId);
       throw new CustomError(AuthErrors.ACCOUNT_WAS_NOT_CREATED);
     }
 
@@ -93,7 +95,7 @@ export class AuthService {
   }
 
   async confirmEmail(code: string, email: string) {
-    let user = await usersRepository.findUserBy({
+    let user = await this.usersRepository.findUserBy({
       'emailConfirmation.confirmationCode': code,
     });
     if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_CODE_EXIST);
@@ -103,7 +105,7 @@ export class AuthService {
     }
 
     if (user.emailConfirmation.confirmationCode === code) {
-      return await usersRepository.updateConfirmation(new ObjectId(user._id!));
+      return await this.usersRepository.updateConfirmation(new ObjectId(user._id!));
     } else {
       throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED);
     }
@@ -115,7 +117,7 @@ export class AuthService {
 
     const newConfirmationCode = uuid();
 
-    await usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode);
+    await this.usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode);
     const updatedUser = await this.usersService.findUserBy({ email });
     await emailManager.sendEmailConfirmationMessage(
       updatedUser,

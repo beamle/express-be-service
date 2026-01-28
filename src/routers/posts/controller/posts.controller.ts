@@ -7,7 +7,7 @@ import { BlogsRepository } from '../../blogs/blogs.repository';
 import commentsQueryRepository from '../../comments/comments.queryRepository';
 import { RequestWithRouteParams, RequestWithRouteParamsAndBody, RoutePathWithIdParam } from '../../RequestTypes';
 import postsQueryRepository from '../posts.queryRepository';
-import postsService, { PostErrors } from '../posts.service';
+import { PostErrors, PostsService } from '../posts.service';
 import { PostError, UpdatePostInput } from '../posts.types';
 
 //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
@@ -15,11 +15,13 @@ import { PostError, UpdatePostInput } from '../posts.types';
 
 // TODO: na vse testy chto padajut, dobavitj middleware, kotoryj budet bratj accessToken
 
-class PostsController {
+export class PostsController {
   private blogsRepository: BlogsRepository;
+  private postsService: PostsService;
 
   constructor() {
     this.blogsRepository = new BlogsRepository();
+    this.postsService = new PostsService();
   }
   async getPosts(req: Request, res: Response) {
     const { blogId } = req.params;
@@ -56,9 +58,9 @@ class PostsController {
     try {
       let createdPost;
       if (blogId) {
-        createdPost = await postsService.createPostForBlog(req.body, blogId);
+        createdPost = await this.postsService.createPostForBlog(req.body, blogId);
       } else {
-        createdPost = await postsService.createPost(req.body);
+        createdPost = await this.postsService.createPost(req.body);
       }
       res.status(201).json(createdPost);
       return;
@@ -103,7 +105,7 @@ class PostsController {
 
   async updatePost(req: RequestWithRouteParamsAndBody<RoutePathWithIdParam, UpdatePostInput>, res: Response) {
     try {
-      const postIdUpdated = await postsService.updatePost({ ...req.body }, new ObjectId(req.params.id));
+      const postIdUpdated = await this.postsService.updatePost({ ...req.body }, new ObjectId(req.params.id));
       res.sendStatus(204);
       return;
     } catch (e) {
@@ -113,7 +115,7 @@ class PostsController {
 
   async deletePost(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     try {
-      const postIsDeleted = await postsService.deletePost(new ObjectId(req.params.id));
+      const postIsDeleted = await this.postsService.deletePost(new ObjectId(req.params.id));
       res.sendStatus(204);
       return;
     } catch (e) {
@@ -137,7 +139,7 @@ class PostsController {
 
     try {
       const post = await postsQueryRepository.getPostById(new ObjectId(postId));
-      const createdCommentId = await postsService.createCommentForPost(
+      const createdCommentId = await this.postsService.createCommentForPost(
         new ObjectId(post.id!),
         {
           userId,
@@ -187,5 +189,3 @@ class PostsController {
     }
   }
 }
-
-export default new PostsController();

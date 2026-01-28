@@ -4,13 +4,13 @@ import { handleError } from '../../../helpers/validationHelpers';
 import { UsersQueryRepository } from '../users.queryRepository';
 import { UsersService } from '../users.service';
 
-class UsersController {
-  private usersService: UsersService;
-  private usersQueryRepository: UsersQueryRepository;
-
-  constructor() {
-    this.usersService = new UsersService();
-    this.usersQueryRepository = new UsersQueryRepository();
+export class UsersController {
+  constructor(
+    private usersService: UsersService,
+    private usersQueryRepository: UsersQueryRepository,
+  ) {
+    this.usersService = usersService;
+    this.usersQueryRepository = usersQueryRepository;
   }
 
   async getUsers(req: Request, res: Response) {
@@ -51,5 +51,3 @@ class UsersController {
     }
   }
 }
-
-export default new UsersController();

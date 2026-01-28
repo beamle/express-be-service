@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { handleError, handleErrorAsArrayOfErrors } from '../../../helpers/validationHelpers';
-import sessionService from '../../session/session.service';
+import { SessionService } from '../../session/session.service';
 import { AuthService } from '../auth.service';
 
 export const AuthErrors = {
@@ -54,10 +54,13 @@ export function getDeviceInfo(userAgent: string = ''): {
   return { deviceType, deviceName };
 }
 
-class AuthController {
-  private authService: AuthService;
-  constructor() {
-    this.authService = new AuthService();
+export class AuthController {
+  constructor(
+    private sessionService: SessionService,
+    private authService: AuthService,
+  ) {
+    this.authService = authService;
+    this.sessionService = sessionService;
   }
   async login(req: Request, res: Response) {
     try {
@@ -75,7 +78,7 @@ class AuthController {
       );
 
       // TODO: move this to createSession service method
-      await sessionService.createSession({
+      await this.sessionService.createSession({
         deviceId: refreshPayload.deviceId,
         ip: String(ip),
         lastActiveDate: new Date(refreshPayload.iat * 1000),
@@ -101,7 +104,7 @@ class AuthController {
   async logout(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
-      await sessionService.logout(refreshToken);
+      await this.sessionService.logout(refreshToken);
       res.clearCookie('refreshToken');
 
       res.sendStatus(204);
@@ -113,7 +116,7 @@ class AuthController {
   async updateTokens(req: Request, res: Response) {
     try {
       const refreshToken = req.cookies?.refreshToken;
-      const { accessToken, refreshToken: newRefreshToken } = await sessionService.updateTokens(refreshToken);
+      const { accessToken, refreshToken: newRefreshToken } = await this.sessionService.updateTokens(refreshToken);
 
       res
         .status(200)
@@ -168,5 +171,3 @@ class AuthController {
     }
   }
 }
-
-export default new AuthController();

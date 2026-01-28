@@ -4,12 +4,15 @@ import { CustomError } from '../../helpers/CustomError';
 import { createFilter } from '../../helpers/objectGenerators';
 import { UsersErrors } from './meta/Errors';
 import { UsersViewModel } from './meta/UsersTypes';
-import usersRepository from './users.repository';
+import { UsersRepository } from './users.repository';
 
 export class UsersQueryRepository {
+  constructor(private usersRepository: UsersRepository) {
+    this.usersRepository = new UsersRepository();
+  }
   async getUsers(sortingData: UsersSortingData): Promise<UsersViewModel> {
     const filter: any = createFilter(sortingData);
-    const users = await usersRepository.getUsers(sortingData, filter);
+    const users = await this.usersRepository.getUsers(sortingData, filter);
     const usersLength = await usersCollection.countDocuments(filter);
 
     if (!users) {
@@ -27,7 +30,7 @@ export class UsersQueryRepository {
 
   async getUserByEmail({ email }: Partial<UserType>): Promise<UserTypeViewModel | null> {
     if (email) {
-      const existingUserByEmail = await usersRepository.findUserBy({ email: email });
+      const existingUserByEmail = await this.usersRepository.findUserBy({ email: email });
       if (!existingUserByEmail) {
         throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL);
       }
@@ -39,17 +42,17 @@ export class UsersQueryRepository {
 
   async findUserBy({ email, login, id }: Partial<UserType>): Promise<UserType | null> {
     if (id) {
-      const user = await usersRepository.findUserBy({ _id: new ObjectId(id) });
+      const user = await this.usersRepository.findUserBy({ _id: new ObjectId(id) });
       if (user) return user;
 
       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID);
     }
 
     if (email || login) {
-      const userByEmail = email ? await usersRepository.findUserBy({ email }) : null;
+      const userByEmail = email ? await this.usersRepository.findUserBy({ email }) : null;
       if (userByEmail) return userByEmail;
 
-      const userByLogin = login ? await usersRepository.findUserBy({ login }) : null;
+      const userByLogin = login ? await this.usersRepository.findUserBy({ login }) : null;
       if (userByLogin) return userByLogin;
 
       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN);
@@ -64,16 +67,16 @@ export class UsersQueryRepository {
     id,
   }: Partial<UserType>): Promise<Omit<UserTypeViewModel, 'emailConfirmation'> | null> {
     if (id) {
-      const user = await usersRepository.findUserBy({ _id: new ObjectId(id) });
+      const user = await this.usersRepository.findUserBy({ _id: new ObjectId(id) });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID);
 
       return this.mapUserWithoutEmailConfirmation(user);
     } else if (email) {
-      const existingUserByEmail = await usersRepository.findUserBy({ email: email });
+      const existingUserByEmail = await this.usersRepository.findUserBy({ email: email });
       if (existingUserByEmail) throw new CustomError(UsersErrors.USER_WITH_SUCH_EMAIL_ALREADY_EXIST);
       return null;
     } else if (login) {
-      const existingUserByLogin = await usersRepository.findUserBy({ login: login });
+      const existingUserByLogin = await this.usersRepository.findUserBy({ login: login });
       if (existingUserByLogin) throw new CustomError(UsersErrors.USER_WITH_SUCH_LOGIN_ALREADY_EXIST);
       return null;
     }

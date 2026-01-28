@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import postsController from '../posts/controller/posts.controller';
+import { PostsController } from '../posts/controller/posts.controller';
 import {
   postContentInputValidator,
   postShortDescriptionInputValidator,
@@ -14,8 +14,9 @@ import { BlogsController } from './controller/blogs.controller';
 export const blogsRouter = Router({ mergeParams: true });
 
 const blogsController = new BlogsController();
+const postsController = new PostsController();
 
-blogsRouter.get('/', requestLimiterMiddleware, blogsController.getBlogs);
+blogsRouter.get('/', requestLimiterMiddleware, blogsController.getBlogs.bind(blogsController));
 
 blogsRouter.get('/test-cord', (req, res) => {
   res.json({ message: 'CORS is working!' });
@@ -27,7 +28,7 @@ blogsRouter.get(
   requestLimiterMiddleware,
   blogIdAsParamValidator,
   inputCheckErrorsFormatter,
-  postsController.getPosts,
+  postsController.getPosts.bind(postsController),
 );
 
 blogsRouter.get(
@@ -35,7 +36,7 @@ blogsRouter.get(
   // blogIdInputValidator,
   requestLimiterMiddleware,
   inputCheckErrorsFormatter,
-  blogsController.getBlogById,
+  blogsController.getBlogById.bind(blogsController),
 );
 
 blogsRouter.post(
@@ -47,7 +48,7 @@ blogsRouter.post(
   postShortDescriptionInputValidator,
   postTitleInputValidator,
   inputCheckErrorsFormatter,
-  postsController.createPost,
+  postsController.createPost.bind(postsController),
 );
 
 blogsRouter.post(
@@ -56,7 +57,7 @@ blogsRouter.post(
   requestLimiterMiddleware,
   ...blogInputValidators,
   inputCheckErrorsFormatter,
-  blogsController.createBlog,
+  blogsController.createBlog.bind(blogsController),
 );
 
 blogsRouter.put(
@@ -66,7 +67,7 @@ blogsRouter.put(
   ...blogInputValidators,
   // blogIdInputValidator,
   inputCheckErrorsFormatter,
-  blogsController.updateBlog,
+  blogsController.updateBlog.bind(blogsController),
 );
 // blogsRouter.put("/:id", (req, res) => blogsController.updateBlog(req, res)) // If you pass directly like that,
 // then THIS obj is lost, because This is because JavaScript’s default
@@ -84,6 +85,6 @@ blogsRouter.delete(
   // middlewareObjectIdChecker,
   // blogIdInputValidator,
   inputCheckErrorsFormatter,
-  blogsController.deleteBlog,
+  blogsController.deleteBlog.bind(blogsController),
 );
 // blogsRouter.delete("/:id", blogsController.deleteBlog.bind(blogsController))

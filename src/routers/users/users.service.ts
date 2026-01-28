@@ -6,7 +6,7 @@ import { UserCreationType, UserType, UserTypeViewModel } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { UsersErrors } from './meta/Errors';
 import { UsersQueryRepository } from './users.queryRepository';
-import usersRepository from './users.repository';
+import { UsersRepository } from './users.repository';
 
 const EXPIRATION_TIME_EXTRA = {
   ONE_MINUTE: { minutes: 1 },
@@ -15,23 +15,26 @@ const EXPIRATION_TIME_EXTRA = {
 };
 
 export class UsersService {
-  private usersQueryRepository: UsersQueryRepository;
-  constructor() {
-    this.usersQueryRepository = new UsersQueryRepository();
+  constructor(
+    private usersQueryRepository: UsersQueryRepository,
+    private usersRepository: UsersRepository,
+  ) {
+    this.usersQueryRepository = usersQueryRepository;
+    this.usersRepository = usersRepository;
   }
   // TODO: change method. Currently by id it reutnr user but email and login checks for eixstence
   async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | null> {
     if (id) {
-      const user = await usersRepository.findUserBy({ _id: new ObjectId(id) });
+      const user = await this.usersRepository.findUserBy({ _id: new ObjectId(id) });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID);
 
       return this.mapUserWithId(user);
     } else if (email) {
-      const existingUserByEmail = await usersRepository.findUserBy({ email: email });
+      const existingUserByEmail = await this.usersRepository.findUserBy({ email: email });
       if (existingUserByEmail) throw new CustomError(UsersErrors.USER_WITH_SUCH_EMAIL_ALREADY_EXIST);
       return null;
     } else if (login) {
-      const existingUserByLogin = await usersRepository.findUserBy({ login: login });
+      const existingUserByLogin = await this.usersRepository.findUserBy({ login: login });
       if (existingUserByLogin) throw new CustomError(UsersErrors.USER_WITH_SUCH_LOGIN_ALREADY_EXIST);
       return null;
     }
@@ -42,16 +45,16 @@ export class UsersService {
   async findUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel> {
     let user;
     if (id) {
-      user = await usersRepository.findUserBy({ _id: new ObjectId(id) });
+      user = await this.usersRepository.findUserBy({ _id: new ObjectId(id) });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID);
 
       return this.mapUserWithId(user);
     } else if (email) {
-      user = await usersRepository.findUserBy({ email });
+      user = await this.usersRepository.findUserBy({ email });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL);
       return this.mapUserWithId(user);
     } else if (login) {
-      user = await usersRepository.findUserBy({ login });
+      user = await this.usersRepository.findUserBy({ login });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_LOGIN);
       return this.mapUserWithId(user);
     }
@@ -75,7 +78,7 @@ export class UsersService {
       },
     };
 
-    const newUserId = await usersRepository.createUser(newUser);
+    const newUserId = await this.usersRepository.createUser(newUser);
 
     if (!newUserId) {
       throw new CustomError(UsersErrors.USER_NOT_CREATED);
@@ -85,7 +88,7 @@ export class UsersService {
   }
 
   async deleteUser(id: string): Promise<boolean> {
-    const result = await usersRepository.deleteUser(new ObjectId(id));
+    const result = await this.usersRepository.deleteUser(new ObjectId(id));
 
     return result;
   }

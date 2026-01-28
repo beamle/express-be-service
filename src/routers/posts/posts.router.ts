@@ -1,56 +1,59 @@
-import { Router } from "express";
-import postsController from "./controller/posts.controller";
-import {
-  middlewareObjectIdChecker,
-  postBlogIdAsForeignKeyIdInputValidator, postCommentContentValidator,
-  postInputValidators
-} from "./posts.middlewares";
-import { authMiddleware } from "../../authorization/middlewares/authorization.middleware";
-import { inputCheckErrorsFormatter } from "../../helpers/validationHelpers";
-import { bearerAuthorizationValidator } from "../../authorization/middlewares/bearerAuthorizationValidator";
+import { Router } from 'express';
+import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
+import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
+import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
+import { PostsController } from './controller/posts.controller';
+import { middlewareObjectIdChecker, postCommentContentValidator, postInputValidators } from './posts.middlewares';
 
 export const postsRouter = Router({ mergeParams: true });
+export const postsController = new PostsController();
 
-postsRouter.get("/", postsController.getPosts)
+postsRouter.get('/', postsController.getPosts.bind(postsController));
 
-postsRouter.get("/:id", postsController.getPostById)
+postsRouter.get('/:id', postsController.getPostById.bind(postsController));
 
-postsRouter.post("/",
+postsRouter.post(
+  '/',
   authMiddleware,
   ...postInputValidators,
   inputCheckErrorsFormatter,
-  postsController.createPost
-)
+  postsController.createPost.bind(postsController),
+);
 
-postsRouter.post("/:blogId",
+postsRouter.post(
+  '/:blogId',
   authMiddleware,
   ...postInputValidators,
   inputCheckErrorsFormatter,
-  postsController.createPost
-)
+  postsController.createPost.bind(postsController),
+);
 
-postsRouter.put("/:id",
+postsRouter.put(
+  '/:id',
   authMiddleware,
   ...postInputValidators,
   inputCheckErrorsFormatter,
-  postsController.updatePost
-)
+  postsController.updatePost.bind(postsController),
+);
 
-postsRouter.delete("/:id",
+postsRouter.delete(
+  '/:id',
   authMiddleware,
   middlewareObjectIdChecker,
   inputCheckErrorsFormatter,
-  postsController.deletePost
-)
+  postsController.deletePost.bind(postsController),
+);
 
-postsRouter.post("/:postId/comments",
+postsRouter.post(
+  '/:postId/comments',
   bearerAuthorizationValidator,
   postCommentContentValidator,
   inputCheckErrorsFormatter,
-  postsController.createCommentForPost
-)
+  postsController.createCommentForPost.bind(postsController),
+);
 
-postsRouter.get("/:postId/comments",
+postsRouter.get(
+  '/:postId/comments',
   inputCheckErrorsFormatter,
-  postsController.getCommentsByPostId
-)
+  postsController.getCommentsByPostId.bind(postsController),
+);
