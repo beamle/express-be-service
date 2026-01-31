@@ -53,4 +53,12 @@ export class UsersRepository {
     let result = await usersCollection.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } });
     return result.modifiedCount === 1;
   }
+
+  async updateUserPassword(userId: string, newPasswordHash: string): Promise<boolean> {
+    const result = await usersCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { passwordHash: newPasswordHash } },
+    );
+    return result.modifiedCount === 1;
+  }
 }

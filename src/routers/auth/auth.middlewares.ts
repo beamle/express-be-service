@@ -15,4 +15,11 @@ export const authEmailInputValidator = body('email').isString().trim()
   .matches(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)
   .withMessage("Email should have a valid pattern: ^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
 
-export const authValidators = [authPasswordInputValidator, authLoginInputValidator, authEmailInputValidator]
+export const authValidators = [authPasswordInputValidator, authLoginInputValidator, authEmailInputValidator];
+
+export const recoveryPasswordValidators = [authEmailInputValidator];
+export const newPasswordValidators = [
+  authPasswordInputValidator,
+  body('recoveryCode').isString().isLength({ min: 1 }),
+];
+export const authLoginOrEmailInputValidator = body('loginOrEmail').isString().trim().isLength({ min: 1 });

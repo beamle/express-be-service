@@ -1,4 +1,4 @@
-import { Collection, MongoClient, ObjectId } from 'mongodb';
+import { Collection, Db, MongoClient, ObjectId } from 'mongodb';
 import { app } from './app';
 import { SETTINGS } from './settings';
 
@@ -150,7 +150,7 @@ export let sessionsCollection: Collection<UserSessionDBType>;
 // export let sessionsMetadataCollection: Collection<UserSessionMetadataDBType>;
 export let requestCasesMetadataCollection: Collection<RequestCasesMetadataDBType>;
 export let refreshTokenBlacklistCollection: Collection<RefreshTokenDBType>;
-// export let sessionsCollection: Collection<UserSessionDBType>;
+export let db: Db;
 
 export async function runDb(url: string) {
   const client = new MongoClient(url, {
@@ -164,7 +164,7 @@ export async function runDb(url: string) {
   try {
     await client.connect();
     // Send a ping to confirm a successful connection
-    const db = client.db(SETTINGS.DB_NAME as string);
+    db = client.db(SETTINGS.DB_NAME as string);
     await db.command({ ping: 1 });
     console.log('Pinged your deployment. You successfully connected to MongoDB!');
 

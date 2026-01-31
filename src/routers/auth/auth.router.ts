@@ -3,7 +3,7 @@ import { bearerAuthorizationValidator } from '../../authorization/middlewares/be
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
 import { authController } from './auth.composition-root';
-import { authValidators } from './auth.middlewares';
+import { authValidators, newPasswordValidators, recoveryPasswordValidators } from './auth.middlewares';
 
 export const authRouter = Router({});
 
@@ -50,4 +50,20 @@ authRouter.get(
   bearerAuthorizationValidator,
   inputCheckErrorsFormatter,
   authController.me.bind(authController),
+);
+
+authRouter.post(
+  '/password-recovery',
+  requestLimiterMiddleware,
+  ...recoveryPasswordValidators,
+  inputCheckErrorsFormatter,
+  authController.passwordRecovery.bind(authController),
+);
+
+authRouter.post(
+  '/new-password',
+  requestLimiterMiddleware,
+  ...newPasswordValidators,
+  inputCheckErrorsFormatter,
+  authController.newPassword.bind(authController),
 );

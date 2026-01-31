@@ -170,4 +170,24 @@ export class AuthController {
       handleError(res, e);
     }
   }
+
+  async passwordRecovery(req: Request, res: Response) {
+    try {
+      await this.authService.passwordRecovery(req.body.email);
+      res.sendStatus(204);
+      return;
+    } catch (e) {
+      handleErrorAsArrayOfErrors(res, e);
+    }
+  }
+
+  async newPassword(req: Request, res: Response) {
+    try {
+      await this.authService.newPassword(req.body.newPassword, req.body.recoveryCode);
+      res.sendStatus(204);
+      return;
+    } catch (e) {
+      handleErrorAsArrayOfErrors(res, e);
+    }
+  }
 }

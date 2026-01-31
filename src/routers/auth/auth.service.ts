@@ -6,12 +6,16 @@ import { CustomError } from '../../helpers/CustomError';
 import emailManager, {
   generateEmailConfirmationMessage,
   generateEmailConfirmationResendMessage,
+  generatePasswordRecoveryMessage,
 } from '../../managers/email.manager';
 import { SessionErrors } from '../session/session.service';
 import { UsersErrors } from '../users/meta/Errors';
 import { UsersRepository } from '../users/users.repository';
 import { UsersService } from '../users/users.service';
 import { AuthErrors } from './controller/auth.controller';
+import { passwordRecoveryRepository } from './password-recovery.repository';
+import * as bcrypt from 'bcrypt';
+
 
 type LoginResponseType = {
   accessToken: string;
@@ -124,5 +128,36 @@ export class AuthService {
       generateEmailConfirmationResendMessage(updatedUser.emailConfirmation.confirmationCode),
       'Registration confirmation',
     );
+  }
+
+  async passwordRecovery(email: string) {
+    const user = await this.usersService.findUserBy({ email });
+    if (!user) return;
+
+    const recoveryCode = uuid();
+
+    await passwordRecoveryRepository.createOrUpdatePasswordRecovery({
+      email,
+      recoveryCode,
+      expirationDate: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+    });
+
+    await emailManager.sendEmailConfirmationMessage(
+      user,
+      generatePasswordRecoveryMessage(recoveryCode),
+      'Password recovery',
+    );
+  }
+
+  async newPassword(newPassword: string, recoveryCode: string) {
+    const passwordRecovery = await passwordRecoveryRepository.findPasswordRecoveryByCode(recoveryCode);
+
+    if (!passwordRecovery) throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
+    if (passwordRecovery.expirationDate < new Date()) throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
+
+    const user = await this.usersService.findUserBy({ email: passwordRecovery.email });
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await this.usersRepository.updateUserPassword(user.id, passwordHash);
   }
 }

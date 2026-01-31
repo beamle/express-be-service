@@ -22,3 +22,10 @@ export const generateEmailConfirmationResendMessage = (code: string) => {
     `     <a href=https://somesite.resend.com/confirm-registration?code=${code}>resending registration code</a>\n` +
     " </p>\n"
 }
+
+export const generatePasswordRecoveryMessage = (recoveryCode: string) => {
+  return "<h1>Password recovery</h1>\n" +
+    " <p>To finish password recovery please follow the link below:\n" +
+    `     <a href=https://somesite.com/password-recovery?recoveryCode=${recoveryCode}>recovery password</a>\n` +
+    " </p>\n"
+}
