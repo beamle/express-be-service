@@ -4,10 +4,8 @@ import { BlogsRepository } from '../blogs/blogs.repository';
 import { CommentatorInfo, CreatePostInput } from './posts.types';
 
 export class PostsRepository {
-  private blogsRepository: BlogsRepository;
-
-  constructor() {
-    this.blogsRepository = new BlogsRepository();
+  constructor(private blogsRepository: BlogsRepository) {
+    this.blogsRepository = blogsRepository;
   }
   async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;

@@ -14,10 +14,8 @@ export const PostErrors = {
 };
 
 export class PostsService {
-  private postsRepository: PostsRepository;
-
-  constructor() {
-    this.postsRepository = new PostsRepository();
+  constructor(private postsRepository: PostsRepository) {
+    this.postsRepository = postsRepository;
   }
   async createPost(postCreatingInput: CreatePostInput): Promise<PostType> {
     const createdPostId = await this.postsRepository.create(postCreatingInput);

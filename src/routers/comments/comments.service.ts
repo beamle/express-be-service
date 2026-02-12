@@ -16,9 +16,8 @@ export const CommentsErrors = {
 };
 
 export class CommentsService {
-  private commentsRepository: CommentsRepository;
-  constructor() {
-    this.commentsRepository = new CommentsRepository();
+  constructor(private commentsRepository: CommentsRepository) {
+    this.commentsRepository = commentsRepository;
   }
   async updateComment(contentObj: { content: string }, commentId: ObjectId) {
     const result = await this.commentsRepository.updateCommentById(contentObj.content, commentId);

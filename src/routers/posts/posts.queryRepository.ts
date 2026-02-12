@@ -5,11 +5,9 @@ import commentsQueryRepository from '../comments/comments.queryRepository';
 import { PostsRepository } from './posts.repository';
 import { PostErrors } from './posts.service';
 
-class PostsQueryRepository {
-  private postsRepository: PostsRepository;
-
-  constructor() {
-    this.postsRepository = new PostsRepository();
+export class PostsQueryRepository {
+  constructor(private postsRepository: PostsRepository) {
+    this.postsRepository = postsRepository;
   }
   async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
     const posts = blogId
@@ -62,5 +60,3 @@ class PostsQueryRepository {
     };
   }
 }
-
-export default new PostsQueryRepository();

@@ -12,10 +12,8 @@ export const BlogErrors = {
 };
 
 export class BlogsService {
-  private blogsRepository: BlogsRepository;
-
-  constructor() {
-    this.blogsRepository = new BlogsRepository();
+  constructor(private blogsRepository: BlogsRepository) {
+    this.blogsRepository = blogsRepository;
   }
   async createBlog(blogCreatingInput: CreateBlogInput): Promise<BlogType> {
     const createdBlogId = await this.blogsRepository.create(blogCreatingInput); // TODO: vsju logiku po sozdaniju vynesti sjuda

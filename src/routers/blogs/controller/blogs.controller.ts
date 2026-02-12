@@ -14,12 +14,12 @@ import { BlogsService } from '../blogs.service';
 import { BlogError, CreateBlogInput, CreateBlogOutput } from '../blogs.types';
 
 export class BlogsController {
-  private blogsQueryRepository: BlogsQueryRepository;
-  private blogsService: BlogsService;
-
-  constructor() {
-    this.blogsQueryRepository = new BlogsQueryRepository();
-    this.blogsService = new BlogsService();
+  constructor(
+    private blogsService: BlogsService,
+    private blogsQueryRepository: BlogsQueryRepository,
+  ) {
+    this.blogsService = blogsService;
+    this.blogsQueryRepository = blogsQueryRepository;
   }
 
   async getBlogs(req: Request, res: Response) {

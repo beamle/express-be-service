@@ -7,9 +7,8 @@ import commentsQueryRepository from './comments.queryRepository';
 import { CommentsErrors, CommentsService } from './comments.service';
 
 export class CommentsController {
-  private commentsService: CommentsService;
-  constructor() {
-    this.commentsService = new CommentsService();
+  constructor(private commentsService: CommentsService) {
+    this.commentsService = commentsService;
   }
   async getCommentById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     const { id: searchableCommentId } = req.params;

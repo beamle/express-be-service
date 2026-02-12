@@ -4,9 +4,9 @@ import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import { postCommentContentValidator } from '../posts/posts.middlewares';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
 import { CommentsController } from './comments.controller';
+import { commentsController } from '../composition-root';
 
 export const commentsRouter = Router({ mergeParams: true });
-const commentsController = new CommentsController();
 
 commentsRouter.get('/:id', requestLimiterMiddleware, commentsController.getCommentById.bind(commentsController));
 
