@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import { blogsController, postsController } from '../composition-root';
 import {
   postContentInputValidator,
   postShortDescriptionInputValidator,

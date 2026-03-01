@@ -1,11 +1,14 @@
 import { Router } from 'express';
 import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import { authController } from '../composition-root';
+import container from '../composition-root';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
 import { authValidators, newPasswordValidators, recoveryPasswordValidators } from './auth.middlewares';
+import { AuthController } from './controller/auth.controller';
 
 export const authRouter = Router({});
+
+const authController = container.get(AuthController);
 
 authRouter.post(
   '/login',

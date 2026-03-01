@@ -1,8 +1,10 @@
+import { inject, injectable } from 'inversify';
 import { MeViewModel, UserTypeViewModel } from '../../app/db';
 import { UsersQueryRepository } from '../users/users.queryRepository';
 
+@injectable()
 export class AuthQueryRepository {
-  constructor(private usersQueryRepository: UsersQueryRepository) {
+  constructor(@inject(UsersQueryRepository) private usersQueryRepository: UsersQueryRepository) {
     this.usersQueryRepository = usersQueryRepository;
   }
   async getMeBy(userId: string): Promise<MeViewModel> {

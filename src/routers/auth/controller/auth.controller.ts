@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { inject, injectable } from 'inversify';
 import { handleError, handleErrorAsArrayOfErrors } from '../../../helpers/validationHelpers';
 import { SessionService } from '../../session/session.service';
 import { AuthService } from '../auth.service';
@@ -53,11 +54,11 @@ export function getDeviceInfo(userAgent: string = ''): {
 
   return { deviceType, deviceName };
 }
-
+@injectable()
 export class AuthController {
   constructor(
-    private sessionService: SessionService,
-    private authService: AuthService,
+    @inject(AuthService) private authService: AuthService,
+    @inject(SessionService) private sessionService: SessionService,
   ) {
     this.authService = authService;
     this.sessionService = sessionService;

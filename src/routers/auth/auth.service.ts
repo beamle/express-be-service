@@ -1,3 +1,5 @@
+import * as bcrypt from 'bcrypt';
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { uuid } from 'uuidv4';
 import { UserTypeViewModel } from '../../app/db';
@@ -14,8 +16,6 @@ import { UsersRepository } from '../users/users.repository';
 import { UsersService } from '../users/users.service';
 import { AuthErrors } from './controller/auth.controller';
 import { passwordRecoveryRepository } from './password-recovery.repository';
-import * as bcrypt from 'bcrypt';
-
 
 type LoginResponseType = {
   accessToken: string;
@@ -27,12 +27,12 @@ type LoginResponseType = {
   };
   user: UserTypeViewModel;
 };
-
+@injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-    private usersRepository: UsersRepository,
+    @inject(UsersService) private usersService: UsersService,
+    @inject(JwtService) private jwtService: JwtService,
+    @inject(UsersRepository) private usersRepository: UsersRepository,
   ) {
     this.usersService = usersService;
     this.jwtService = jwtService;

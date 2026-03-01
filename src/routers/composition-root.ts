@@ -1,3 +1,4 @@
+import { Container } from 'inversify';
 import { JwtService } from '../authorization/services/jwt-service';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/controller/auth.controller';
@@ -20,31 +21,61 @@ import { UsersQueryRepository } from './users/users.queryRepository';
 import { UsersRepository } from './users/users.repository';
 import { UsersService } from './users/users.service';
 
-const jwtService = new JwtService();
+import 'reflect-metadata';
+import { AuthQueryRepository } from './auth/auth.queryRepository';
 
-const usersRepository = new UsersRepository();
-const usersQueryRepository = new UsersQueryRepository(usersRepository);
-const usersService = new UsersService(usersQueryRepository, usersRepository);
+// const jwtService = new JwtService();
 
-const authService = new AuthService(usersService, jwtService, usersRepository);
+// const usersRepository = new UsersRepository();
+// const usersQueryRepository = new UsersQueryRepository(usersRepository);
+// const usersService = new UsersService(usersQueryRepository, usersRepository);
 
-const sessionRepository = new SessionRepository();
-const sessionService = new SessionService(usersService, sessionRepository);
+// const authService = new AuthService(usersService, jwtService, usersRepository);
 
-const blogsRepository = new BlogsRepository();
-const blogsQueryRepository = new BlogsQueryRepository();
-const blogsService = new BlogsService(blogsRepository);
+// const sessionRepository = new SessionRepository();
+// const sessionService = new SessionService(usersService, sessionRepository);
 
-const postsRepository = new PostsRepository(blogsRepository);
-const postsQueryRepository = new PostsQueryRepository(postsRepository);
-const postsService = new PostsService(postsRepository);
+// const blogsRepository = new BlogsRepository();
+// const blogsQueryRepository = new BlogsQueryRepository();
+// const blogsService = new BlogsService(blogsRepository);
 
-const commentsRepository = new CommentsRepository();
-const commentsService = new CommentsService(commentsRepository);
+// const postsRepository = new PostsRepository(blogsRepository);
+// const postsQueryRepository = new PostsQueryRepository(postsRepository);
+// const postsService = new PostsService(postsRepository);
 
-export const authController = new AuthController(sessionService, authService);
-export const usersController = new UsersController(usersService, usersQueryRepository);
-export const blogsController = new BlogsController(blogsService, blogsQueryRepository);
-export const postsController = new PostsController(blogsRepository, postsService, postsQueryRepository);
-export const commentsController = new CommentsController(commentsService);
-export const securityController = new SecurityController(sessionService);
+// const commentsRepository = new CommentsRepository();
+// const commentsService = new CommentsService(commentsRepository);
+
+// export const authController = new AuthController(sessionService, authService);
+// export const usersController = new UsersController(usersService, usersQueryRepository);
+// export const blogsController = new BlogsController(blogsService, blogsQueryRepository);
+// export const postsController = new PostsController(blogsRepository, postsService, postsQueryRepository);
+// export const commentsController = new CommentsController(commentsService);
+// export const securityController = new SecurityController(sessionService);
+
+export const container = new Container();
+
+container.bind<AuthController>(AuthController).to(AuthController);
+container.bind<AuthService>(AuthService).to(AuthService);
+container.bind<AuthQueryRepository>(AuthQueryRepository).to(AuthQueryRepository);
+container.bind<JwtService>(JwtService).to(JwtService);
+container.bind<UsersController>(UsersController).to(UsersController);
+container.bind<UsersService>(UsersService).to(UsersService);
+container.bind<UsersQueryRepository>(UsersQueryRepository).to(UsersQueryRepository);
+container.bind<UsersRepository>(UsersRepository).to(UsersRepository);
+container.bind<BlogsController>(BlogsController).to(BlogsController);
+container.bind<BlogsService>(BlogsService).to(BlogsService);
+container.bind<BlogsQueryRepository>(BlogsQueryRepository).to(BlogsQueryRepository);
+container.bind<BlogsRepository>(BlogsRepository).to(BlogsRepository);
+container.bind<PostsController>(PostsController).to(PostsController);
+container.bind<PostsService>(PostsService).to(PostsService);
+container.bind<PostsQueryRepository>(PostsQueryRepository).to(PostsQueryRepository);
+container.bind<PostsRepository>(PostsRepository).to(PostsRepository);
+container.bind<CommentsController>(CommentsController).to(CommentsController);
+container.bind<CommentsService>(CommentsService).to(CommentsService);
+container.bind<CommentsRepository>(CommentsRepository).to(CommentsRepository);
+container.bind<SessionService>(SessionService).to(SessionService);
+container.bind<SessionRepository>(SessionRepository).to(SessionRepository);
+container.bind<SecurityController>(SecurityController).to(SecurityController);
+
+export default container;
