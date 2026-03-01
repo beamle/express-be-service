@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Container } from 'inversify';
 import { JwtService } from '../authorization/services/jwt-service';
 import { AuthService } from './auth/auth.service';
@@ -21,7 +22,6 @@ import { UsersQueryRepository } from './users/users.queryRepository';
 import { UsersRepository } from './users/users.repository';
 import { UsersService } from './users/users.service';
 
-import 'reflect-metadata';
 import { AuthQueryRepository } from './auth/auth.queryRepository';
 
 // const jwtService = new JwtService();

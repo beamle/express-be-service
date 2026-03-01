@@ -1,4 +1,5 @@
 import { Collection, Db, MongoClient, ObjectId } from 'mongodb';
+import { PasswordRecoveryType } from '../routers/auth/password-recovery.types';
 import { app } from './app';
 import { SETTINGS } from './settings';
 
@@ -150,6 +151,8 @@ export let sessionsCollection: Collection<UserSessionDBType>;
 // export let sessionsMetadataCollection: Collection<UserSessionMetadataDBType>;
 export let requestCasesMetadataCollection: Collection<RequestCasesMetadataDBType>;
 export let refreshTokenBlacklistCollection: Collection<RefreshTokenDBType>;
+export let passwordRecoveryCollection: Collection<PasswordRecoveryType>;
+
 export let db: Db;
 
 export async function runDb(url: string) {
@@ -175,6 +178,7 @@ export async function runDb(url: string) {
     requestCasesMetadataCollection = db.collection<RequestCasesMetadataDBType>(SETTINGS.PATH.REQUEST_CASES);
     refreshTokenBlacklistCollection = db.collection<RefreshTokenDBType>(SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST);
     sessionsCollection = db.collection<UserSessionDBType>(SETTINGS.PATH.SESSION);
+    passwordRecoveryCollection = db.collection<PasswordRecoveryType>(SETTINGS.PATH.AUTH);
     // sessionsMetadataCollection = db.collection<UserSessionMetadataDBType>(
     //   SETTINGS.PATH.SESSION_META
     // );

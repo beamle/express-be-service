@@ -1,4 +1,5 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { RefreshTokenPayloadType } from './jwt-types';
 import { UserTypeViewModel } from '../../app/db';
 import { SETTINGS } from '../../app/settings';
 import { CustomError } from '../../helpers/CustomError';

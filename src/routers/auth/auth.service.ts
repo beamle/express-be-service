@@ -152,8 +152,9 @@ export class AuthService {
   async newPassword(newPassword: string, recoveryCode: string) {
     const passwordRecovery = await passwordRecoveryRepository.findPasswordRecoveryByCode(recoveryCode);
 
-    if (!passwordRecovery) throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
-    if (passwordRecovery.expirationDate < new Date()) throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
+    if (!passwordRecovery || passwordRecovery.expirationDate < new Date()) {
+      throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
+    }
 
     const user = await this.usersService.findUserBy({ email: passwordRecovery.email });
     const passwordHash = await bcrypt.hash(newPassword, 10);

@@ -1,14 +1,15 @@
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { commentsCollection, postsCollection, PostsSortingData, PostType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
+import { CommentsQueryRepository } from '../comments/comments.queryRepository';
 import { PostsRepository } from './posts.repository';
 import { PostErrors } from './posts.service';
-import { inject, injectable } from 'inversify';
 @injectable()
 export class PostsQueryRepository {
   constructor(
     @inject(PostsRepository) private postsRepository: PostsRepository,
-    @inject(commentsQueryRepository) private commentsQueryRepository: commentsQueryRepository,
+    @inject(CommentsQueryRepository) private commentsQueryRepository: CommentsQueryRepository,
   ) {
     this.postsRepository = postsRepository;
     this.commentsQueryRepository = commentsQueryRepository;

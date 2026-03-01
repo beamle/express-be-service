@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
+import { inject, injectable } from 'inversify';
 import { ObjectId, SortDirection } from 'mongodb';
 import { PostType } from '../../../app/db';
 import { CustomError } from '../../../helpers/CustomError';
 import { handleError } from '../../../helpers/validationHelpers';
 import { BlogsRepository } from '../../blogs/blogs.repository';
-import commentsQueryRepository from '../../comments/comments.queryRepository';
+import { CommentsQueryRepository } from '../../comments/comments.queryRepository';
 import { RequestWithRouteParams, RequestWithRouteParamsAndBody, RoutePathWithIdParam } from '../../RequestTypes';
 import { PostErrors, PostsService } from '../posts.service';
 import { PostError, UpdatePostInput } from '../posts.types';
@@ -15,15 +16,18 @@ import { PostsQueryRepository } from './../posts.queryRepository';
 
 // TODO: na vse testy chto padajut, dobavitj middleware, kotoryj budet bratj accessToken
 
+@injectable()
 export class PostsController {
   constructor(
-    private blogsRepository: BlogsRepository,
-    private postsService: PostsService,
-    private postsQueryRepository: PostsQueryRepository,
+    @inject(BlogsRepository) private blogsRepository: BlogsRepository,
+    @inject(PostsService) private postsService: PostsService,
+    @inject(PostsQueryRepository) private postsQueryRepository: PostsQueryRepository,
+    @inject(CommentsQueryRepository) private commentsQueryRepository: CommentsQueryRepository,
   ) {
     this.blogsRepository = blogsRepository;
     this.postsService = postsService;
     this.postsQueryRepository = postsQueryRepository;
+    this.commentsQueryRepository = commentsQueryRepository;
   }
   async getPosts(req: Request, res: Response) {
     const { blogId } = req.params;
@@ -149,7 +153,7 @@ export class PostsController {
         },
         content,
       );
-      const createdComment = await commentsQueryRepository.getLastCreatedCommentForPostBy(
+      const createdComment = await this.commentsQueryRepository.getLastCreatedCommentForPostBy(
         new ObjectId(createdCommentId),
       );
 

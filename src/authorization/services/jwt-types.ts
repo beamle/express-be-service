@@ -1,4 +1,4 @@
-type RefreshTokenPayloadType = {
+export type RefreshTokenPayloadType = {
   userId: string;
   deviceId: string;
   exp: number;
