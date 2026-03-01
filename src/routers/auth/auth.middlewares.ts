@@ -18,8 +18,12 @@ export const authEmailInputValidator = body('email').isString().trim()
 export const authValidators = [authPasswordInputValidator, authLoginInputValidator, authEmailInputValidator];
 
 export const recoveryPasswordValidators = [authEmailInputValidator];
+export const authNewPasswordInputValidator = body('newPassword').trim().isString()
+  .isLength({ min: 6, max: 20 })
+  .withMessage("Password should exist, should be less or equal to 20 symbols and at least 6")
+
 export const newPasswordValidators = [
-  authPasswordInputValidator,
+  authNewPasswordInputValidator,
   body('recoveryCode').isString().isLength({ min: 1 }),
 ];
 export const authLoginOrEmailInputValidator = body('loginOrEmail').isString().trim().isLength({ min: 1 });
