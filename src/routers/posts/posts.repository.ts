@@ -2,9 +2,11 @@ import { ObjectId } from 'mongodb';
 import { commentsCollection, CommentsSortingData, postsCollection, PostsSortingData, PostType } from '../../app/db';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { CommentatorInfo, CreatePostInput } from './posts.types';
+import { inject, injectable } from 'inversify';
 
+@injectable()
 export class PostsRepository {
-  constructor(private blogsRepository: BlogsRepository) {
+  constructor(@inject(BlogsRepository) private blogsRepository: BlogsRepository) {
     this.blogsRepository = blogsRepository;
   }
   async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {

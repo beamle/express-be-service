@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { refreshTokenValidator } from '../../authorization/middlewares/refreshTokenValidator';
-import { securityController } from '../composition-root';
+import container from '../composition-root';
+import { SecurityController } from './security.controller';
+
+const securityController = container.get(SecurityController);
 
 export const securityRouter = Router({ mergeParams: true });
 export const sessionMetaRouter = Router({ mergeParams: true });

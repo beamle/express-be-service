@@ -2,9 +2,11 @@ import { Router } from 'express';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import { postsController } from '../composition-root';
+import container from '../composition-root';
+import { PostsController } from './controller/posts.controller';
 import { middlewareObjectIdChecker, postCommentContentValidator, postInputValidators } from './posts.middlewares';
 
+const postsController = container.get(PostsController);
 export const postsRouter = Router({ mergeParams: true });
 
 postsRouter.get('/', postsController.getPosts.bind(postsController));

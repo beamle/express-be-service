@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
+import { inject, injectable } from 'inversify';
 import { SETTINGS } from '../../app/settings';
 import JwtService from '../../authorization/services/jwt-service';
 import { handleError } from '../../helpers/validationHelpers';
 import { SessionService } from '../session/session.service';
-
+@injectable()
 export class SecurityController {
-  constructor(private sessionService: SessionService) {
+  constructor(@inject(SessionService) private sessionService: SessionService) {
     this.sessionService = sessionService;
   }
   async getAllSessions(req: Request, res: Response) {

@@ -1,13 +1,17 @@
 import { ObjectId } from 'mongodb';
 import { commentsCollection, postsCollection, PostsSortingData, PostType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
-import commentsQueryRepository from '../comments/comments.queryRepository';
 import { PostsRepository } from './posts.repository';
 import { PostErrors } from './posts.service';
-
+import { inject, injectable } from 'inversify';
+@injectable()
 export class PostsQueryRepository {
-  constructor(private postsRepository: PostsRepository) {
+  constructor(
+    @inject(PostsRepository) private postsRepository: PostsRepository,
+    @inject(commentsQueryRepository) private commentsQueryRepository: commentsQueryRepository,
+  ) {
     this.postsRepository = postsRepository;
+    this.commentsQueryRepository = commentsQueryRepository;
   }
   async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
     const posts = blogId
@@ -39,9 +43,7 @@ export class PostsQueryRepository {
   }
 
   async getPostCommentsByPostId(sortingData: PostsSortingData, searchablePostId: ObjectId): Promise<any> {
-    // const post = await postsRepository.findBy(searchablePostId)
-
-    const posts = await commentsQueryRepository.getCommentsByPostId(sortingData, searchablePostId.toString());
+    const posts = await this.commentsQueryRepository.getCommentsByPostId(sortingData, searchablePostId.toString());
 
     if (!posts) {
       throw new CustomError({ message: 'no error description', field: '', status: 400 });

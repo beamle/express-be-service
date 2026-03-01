@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { PostsSortingData, PostType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
@@ -13,8 +14,9 @@ export const PostErrors = {
   DID_NOT_CREATE_COMMENT: { message: "Didn't create comment", field: '', status: 400 },
 };
 
+@injectable()
 export class PostsService {
-  constructor(private postsRepository: PostsRepository) {
+  constructor(@inject(PostsRepository) private postsRepository: PostsRepository) {
     this.postsRepository = postsRepository;
   }
   async createPost(postCreatingInput: CreatePostInput): Promise<PostType> {

@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { usersCollection, UsersSortingData, UserType, UserTypeViewModel } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
@@ -5,9 +6,9 @@ import { createFilter } from '../../helpers/objectGenerators';
 import { UsersErrors } from './meta/Errors';
 import { UsersViewModel } from './meta/UsersTypes';
 import { UsersRepository } from './users.repository';
-
+@injectable()
 export class UsersQueryRepository {
-  constructor(private usersRepository: UsersRepository) {
+  constructor(@inject(UsersRepository) private usersRepository: UsersRepository) {
     this.usersRepository = new UsersRepository();
   }
   async getUsers(sortingData: UsersSortingData): Promise<UsersViewModel> {

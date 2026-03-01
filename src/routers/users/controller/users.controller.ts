@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
+import { inject, injectable } from 'inversify';
 import { generateUsersSortingDataObject } from '../../../helpers/objectGenerators';
 import { handleError } from '../../../helpers/validationHelpers';
 import { UsersQueryRepository } from '../users.queryRepository';
 import { UsersService } from '../users.service';
 
+@injectable()
 export class UsersController {
   constructor(
-    private usersService: UsersService,
-    private usersQueryRepository: UsersQueryRepository,
+    @inject(UsersService) private usersService: UsersService,
+    @inject(UsersQueryRepository) private usersQueryRepository: UsersQueryRepository,
   ) {
     this.usersService = usersService;
     this.usersQueryRepository = usersQueryRepository;

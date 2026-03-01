@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { SETTINGS } from '../../app/settings';
 import JwtService from '../../authorization/services/jwt-service';
 import { CustomError } from '../../helpers/CustomError';
@@ -52,11 +53,11 @@ export const SessionErrors = {
     status: 403,
   },
 };
-
+@injectable()
 export class SessionService {
   constructor(
-    private usersService: UsersService,
-    private sessionRepository: SessionRepository,
+    @inject(UsersService) private usersService: UsersService,
+    @inject(SessionRepository) private sessionRepository: SessionRepository,
   ) {
     this.usersService = usersService;
     this.sessionRepository = sessionRepository;

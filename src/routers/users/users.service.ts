@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { add } from 'date-fns';
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { uuid } from 'uuidv4';
 import { UserCreationType, UserType, UserTypeViewModel } from '../../app/db';
@@ -13,11 +14,11 @@ const EXPIRATION_TIME_EXTRA = {
   FIVE_MINUTES: { minutes: 5 },
   ONE_HOUR: { minutes: 60 },
 };
-
+@injectable()
 export class UsersService {
   constructor(
-    private usersQueryRepository: UsersQueryRepository,
-    private usersRepository: UsersRepository,
+    @inject(UsersQueryRepository) private usersQueryRepository: UsersQueryRepository,
+    @inject(UsersRepository) private usersRepository: UsersRepository,
   ) {
     this.usersQueryRepository = usersQueryRepository;
     this.usersRepository = usersRepository;
