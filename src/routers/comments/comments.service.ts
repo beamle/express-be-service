@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsRepository } from './comments.repository';
@@ -15,8 +16,9 @@ export const CommentsErrors = {
   },
 };
 
+@injectable()
 export class CommentsService {
-  constructor(private commentsRepository: CommentsRepository) {
+  constructor(@inject(CommentsRepository) private commentsRepository: CommentsRepository) {
     this.commentsRepository = commentsRepository;
   }
   async updateComment(contentObj: { content: string }, commentId: ObjectId) {

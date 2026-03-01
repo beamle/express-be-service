@@ -1,19 +1,24 @@
 import { Response } from 'express';
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { CustomError } from '../../helpers/CustomError';
 import { handleError } from '../../helpers/validationHelpers';
 import { RequestWithRouteParams, RoutePathWithIdParam } from '../RequestTypes';
-import commentsQueryRepository from './comments.queryRepository';
+import { CommentsQueryRepository } from './comments.queryRepository';
 import { CommentsErrors, CommentsService } from './comments.service';
-
+@injectable()
 export class CommentsController {
-  constructor(private commentsService: CommentsService) {
+  constructor(
+    @inject(CommentsService) private commentsService: CommentsService,
+    @inject(CommentsQueryRepository) private commentsQueryRepository: CommentsQueryRepository,
+  ) {
     this.commentsService = commentsService;
+    this.commentsQueryRepository = commentsQueryRepository;
   }
   async getCommentById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     const { id: searchableCommentId } = req.params;
     try {
-      const comment = await commentsQueryRepository.getCommentBy(new ObjectId(searchableCommentId));
+      const comment = await this.commentsQueryRepository.getCommentBy(new ObjectId(searchableCommentId));
       res.status(200).json(comment);
       return;
     } catch (e) {
@@ -25,7 +30,7 @@ export class CommentsController {
     const { id: searchableCommentId } = req.params;
 
     try {
-      const comment = await commentsQueryRepository.getCommentBy(new ObjectId(searchableCommentId));
+      const comment = await this.commentsQueryRepository.getCommentBy(new ObjectId(searchableCommentId));
       if (comment.commentatorInfo.userId !== req.context.user?.userId) {
         throw new CustomError(CommentsErrors.NOT_OWNER_OF_COMMENT); // Fine to capture here since CQRS is used
         // return res.status(403).json({ message: "You are not owner of the comment" })
@@ -42,7 +47,7 @@ export class CommentsController {
     const { id: commentIdToDelete } = req.params;
 
     try {
-      const comment = await commentsQueryRepository.getCommentBy(new ObjectId(commentIdToDelete));
+      const comment = await this.commentsQueryRepository.getCommentBy(new ObjectId(commentIdToDelete));
       if (comment.commentatorInfo.userId !== req.context.user?.userId) {
         throw new CustomError(CommentsErrors.NOT_OWNER_OF_COMMENT);
       }

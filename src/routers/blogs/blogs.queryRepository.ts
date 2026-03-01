@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { blogsCollection, BlogsModelView, BlogsSortingData, BlogType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
@@ -5,9 +6,9 @@ import { createFilter } from '../../helpers/objectGenerators';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { PostErrors } from '../posts/posts.service';
 import { BlogErrors } from './blogs.service';
-
+@injectable()
 export class BlogsQueryRepository {
-  private blogsRepository: BlogsRepository;
+  @inject(BlogsRepository) private blogsRepository: BlogsRepository;
 
   constructor() {
     this.blogsRepository = new BlogsRepository();

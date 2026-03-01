@@ -1,15 +1,20 @@
 import { Router } from 'express';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
+import { PostsController } from '../posts/controller/posts.controller';
 import {
   postContentInputValidator,
   postShortDescriptionInputValidator,
   postTitleInputValidator,
 } from '../posts/posts.middlewares';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
+import container from './../composition-root';
 import { blogIdAsParamValidator, blogInputValidators } from './blogs.middlewares';
+import { BlogsController } from './controller/blogs.controller';
 
 export const blogsRouter = Router({ mergeParams: true });
+const blogsController = container.get(BlogsController);
+const postsController = container.get(PostsController);
 
 blogsRouter.get('/', requestLimiterMiddleware, blogsController.getBlogs.bind(blogsController));
 

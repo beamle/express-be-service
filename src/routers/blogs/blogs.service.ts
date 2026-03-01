@@ -1,3 +1,4 @@
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { BlogType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
@@ -10,9 +11,9 @@ export const BlogErrors = {
   BLOG_NOT_CREATED: { message: 'Blog was not created!', field: '', status: 400 },
   INTERNAL_SERVER_ERROR: { message: 'Internal server error', field: '', status: 500 },
 };
-
+@injectable()
 export class BlogsService {
-  constructor(private blogsRepository: BlogsRepository) {
+  constructor(@inject(BlogsRepository) private blogsRepository: BlogsRepository) {
     this.blogsRepository = blogsRepository;
   }
   async createBlog(blogCreatingInput: CreateBlogInput): Promise<BlogType> {

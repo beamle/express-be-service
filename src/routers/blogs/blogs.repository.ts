@@ -1,7 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { blogsCollection, BlogsSortingData, BlogType, postsCollection } from '../../app/db';
 import { CreateBlogInput } from './blogs.types';
+import { injectable } from 'inversify';
 
+@injectable()
 export class BlogsRepository {
   async getBlogs({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }: BlogsSortingData, filter: any) {
     const blogs = await blogsCollection

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
 import { BlogType } from '../../../app/db';
 import { generateSortingDataObject } from '../../../helpers/objectGenerators';
@@ -13,10 +14,11 @@ import { BlogsQueryRepository } from '../blogs.queryRepository';
 import { BlogsService } from '../blogs.service';
 import { BlogError, CreateBlogInput, CreateBlogOutput } from '../blogs.types';
 
+@injectable()
 export class BlogsController {
   constructor(
-    private blogsService: BlogsService,
-    private blogsQueryRepository: BlogsQueryRepository,
+    @inject(BlogsService) private blogsService: BlogsService,
+    @inject(BlogsQueryRepository) private blogsQueryRepository: BlogsQueryRepository,
   ) {
     this.blogsService = blogsService;
     this.blogsQueryRepository = blogsQueryRepository;

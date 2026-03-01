@@ -3,8 +3,10 @@ import { bearerAuthorizationValidator } from '../../authorization/middlewares/be
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import { postCommentContentValidator } from '../posts/posts.middlewares';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
+import container from './../composition-root';
 import { CommentsController } from './comments.controller';
-import { commentsController } from '../composition-root';
+
+const commentsController = container.get(CommentsController);
 
 export const commentsRouter = Router({ mergeParams: true });
 
