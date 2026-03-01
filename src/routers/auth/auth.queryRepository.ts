@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
 import { MeViewModel, UserTypeViewModel } from '../../app/db';
 import { UsersQueryRepository } from '../users/users.queryRepository';
 

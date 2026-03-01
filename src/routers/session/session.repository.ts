@@ -1,4 +1,4 @@
-import { InsertOneResult } from 'mongodb';
+import { InsertOneResult } from 'mongodb';import 'reflect-metadata';
 import { refreshTokenBlacklistCollection, sessionsCollection, UserSessionDBType } from '../../app/db';
 import { SessionMeta } from './session.types';
 

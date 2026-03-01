@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
 import { ObjectId } from 'mongodb';
 import { BlogType } from '../../../app/db';
 import { generateSortingDataObject } from '../../../helpers/objectGenerators';

@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
 import { ObjectId } from 'mongodb';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsRepository } from './comments.repository';

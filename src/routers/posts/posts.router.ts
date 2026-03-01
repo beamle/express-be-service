@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from 'express';import 'reflect-metadata';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';

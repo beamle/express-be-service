@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId } from 'mongodb'; import 'reflect-metadata';
 import { commentsCollection, CommentsSortingData, postsCollection, PostsSortingData, PostType } from '../../app/db';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { CommentatorInfo, CreatePostInput } from './posts.types';

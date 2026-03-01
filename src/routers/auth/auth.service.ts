@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
+import 'reflect-metadata';
 import { uuid } from 'uuidv4';
 import { UserTypeViewModel } from '../../app/db';
 import { JwtService } from '../../authorization/services/jwt-service';
@@ -14,8 +15,8 @@ import { SessionErrors } from '../session/session.service';
 import { UsersErrors } from '../users/meta/Errors';
 import { UsersRepository } from '../users/users.repository';
 import { UsersService } from '../users/users.service';
-import { AuthErrors } from './controller/auth.controller';
 import { passwordRecoveryRepository } from './password-recovery.repository';
+import { AuthErrors } from './helpers/auth.errors';
 
 type LoginResponseType = {
   accessToken: string;
@@ -33,11 +34,7 @@ export class AuthService {
     @inject(UsersService) private usersService: UsersService,
     @inject(JwtService) private jwtService: JwtService,
     @inject(UsersRepository) private usersRepository: UsersRepository,
-  ) {
-    this.usersService = usersService;
-    this.jwtService = jwtService;
-    this.usersRepository = usersRepository;
-  }
+  ) { }
   async login(
     loginOrEmail: string,
     password: string,

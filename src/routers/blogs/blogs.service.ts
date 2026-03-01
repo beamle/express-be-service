@@ -1,5 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
+import 'reflect-metadata';
 import { BlogType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { BlogsRepository } from './blogs.repository';

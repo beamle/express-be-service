@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
 import { ObjectId } from 'mongodb';
 import { CustomError } from '../../helpers/CustomError';
 import { handleError } from '../../helpers/validationHelpers';

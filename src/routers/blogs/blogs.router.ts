@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import 'reflect-metadata';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import { PostsController } from '../posts/controller/posts.controller';

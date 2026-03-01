@@ -23,6 +23,7 @@ import { UsersRepository } from './users/users.repository';
 import { UsersService } from './users/users.service';
 
 import { AuthQueryRepository } from './auth/auth.queryRepository';
+import { CommentsQueryRepository } from './comments/comments.queryRepository';
 
 // const jwtService = new JwtService();
 
@@ -77,5 +78,7 @@ container.bind<CommentsRepository>(CommentsRepository).to(CommentsRepository);
 container.bind<SessionService>(SessionService).to(SessionService);
 container.bind<SessionRepository>(SessionRepository).to(SessionRepository);
 container.bind<SecurityController>(SecurityController).to(SecurityController);
+
+container.bind<CommentsQueryRepository>(CommentsQueryRepository).to(CommentsQueryRepository);
 
 export default container;

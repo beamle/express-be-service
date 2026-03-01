@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import 'reflect-metadata';
 import { commentsCollection } from '../../app/db';
 
 export class CommentsRepository {

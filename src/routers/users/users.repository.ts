@@ -1,4 +1,4 @@
-import { Filter, ObjectId } from 'mongodb';
+import { Filter, ObjectId } from 'mongodb';import 'reflect-metadata';
 import { usersCollection, UsersSortingData, UserType } from '../../app/db';
 
 type UserFilter = Partial<{

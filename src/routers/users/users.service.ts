@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt'; import 'reflect-metadata';
 import { add } from 'date-fns';
 import { inject, injectable } from 'inversify';
 import { ObjectId } from 'mongodb';
@@ -115,7 +115,7 @@ export class UsersService {
     return this.usersQueryRepository.mapUserWithId(user);
   }
 
-  async getMe(token: string) {}
+  async getMe(token: string) { }
 
   private async generateSalt(rounds: number) {
     return await bcrypt.genSalt(rounds);

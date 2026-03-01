@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import 'reflect-metadata';
 import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import { postCommentContentValidator } from '../posts/posts.middlewares';

@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import 'reflect-metadata';
 import { blogsCollection, BlogsSortingData, BlogType, postsCollection } from '../../app/db';
 import { CreateBlogInput } from './blogs.types';
 import { injectable } from 'inversify';

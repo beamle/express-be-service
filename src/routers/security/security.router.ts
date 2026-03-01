@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from 'express';import 'reflect-metadata';
 import { refreshTokenValidator } from '../../authorization/middlewares/refreshTokenValidator';
 import container from '../composition-root';
 import { SecurityController } from './security.controller';

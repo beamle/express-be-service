@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response } from 'express'; import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import { generateUsersSortingDataObject } from '../../../helpers/objectGenerators';
 import { handleError } from '../../../helpers/validationHelpers';

@@ -1,4 +1,4 @@
-import { inject, injectable } from 'inversify';
+import { inject, injectable } from 'inversify';import 'reflect-metadata';
 import { SETTINGS } from '../../app/settings';
 import JwtService from '../../authorization/services/jwt-service';
 import { CustomError } from '../../helpers/CustomError';

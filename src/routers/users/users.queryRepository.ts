@@ -1,4 +1,4 @@
-import { inject, injectable } from 'inversify';
+import { inject, injectable } from 'inversify'; import 'reflect-metadata';
 import { ObjectId } from 'mongodb';
 import { usersCollection, UsersSortingData, UserType, UserTypeViewModel } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';

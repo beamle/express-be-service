@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import 'reflect-metadata';
 import { commentsCollection, PostsSortingData } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsErrors } from './comments.service';

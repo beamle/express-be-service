@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response } from 'express'; import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import { SETTINGS } from '../../app/settings';
 import JwtService from '../../authorization/services/jwt-service';
