@@ -28,6 +28,7 @@ const requestLimiterMiddleware = async (req: Request, res: Response, next: NextF
 
     next();
   } catch (error) {
+    console.error('Error in requestLimiterMiddleware:', error);
     res.status(500).send();
   }
 };

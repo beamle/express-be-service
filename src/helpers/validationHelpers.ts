@@ -36,7 +36,6 @@ export function handleErrorAsArrayOfErrors(res: Response, error: any) {
     return
   } else {
     res.status(500).json({ message: "Internal server error", field: "", status: 500 });
-    console.log(res, "RES")
     return
   }
 }

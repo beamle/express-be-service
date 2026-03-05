@@ -95,7 +95,6 @@ export class UsersService {
   }
 
   async checkCredentials(loginOrEmail: string, password: string): Promise<UserTypeViewModel> {
-    // const user = await usersRepository.findUserBy({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] })
     const user = await this.usersQueryRepository.findUserBy({ login: loginOrEmail, email: loginOrEmail });
 
     if (!user) {

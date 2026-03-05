@@ -84,7 +84,7 @@ type WithId<T> = Omit<T, '_id'> & { id: string };
 export type UserSession = WithId<UserSessionDBType>;
 
 export type UserSessionDBType = {
-  _id?: string;
+  _id?: ObjectId;
   userId: string;
   // deviceName: string;
   deviceId: string;

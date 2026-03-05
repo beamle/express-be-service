@@ -7,7 +7,6 @@ export const sessionSchema = new Schema<UserSessionDBType>({
     ip: { type: String, required: true },
     lastActiveDate: { type: Date, required: true },
     title: { type: String, required: true },
-    _id: { type: String } // optional string id
 }, {
     versionKey: false
 });
