@@ -2,16 +2,16 @@ import { Router } from 'express';
 import 'reflect-metadata';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import { PostsController } from '../posts/controller/posts.controller';
+import { PostsController } from '../posts/posts.controller';
 import {
   postContentInputValidator,
   postShortDescriptionInputValidator,
   postTitleInputValidator,
 } from '../posts/posts.middlewares';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
-import container from './../composition-root';
+import container from '../../config/container';
 import { blogIdAsParamValidator, blogInputValidators } from './blogs.middlewares';
-import { BlogsController } from './controller/blogs.controller';
+import { BlogsController } from './blogs.controller';
 
 export const blogsRouter = Router({ mergeParams: true });
 const blogsController = container.get(BlogsController);

@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'; import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
-import { generateUsersSortingDataObject } from '../../../helpers/objectGenerators';
-import { handleError } from '../../../helpers/validationHelpers';
-import { UsersQueryRepository } from '../users.queryRepository';
-import { UsersService } from '../users.service';
+import { generateUsersSortingDataObject } from '../../helpers/objectGenerators';
+import { handleError } from '../../helpers/validationHelpers';
+import { UsersQueryRepository } from './users.queryRepository';
+import { UsersService } from './users.service';
 
 @injectable()
 export class UsersController {

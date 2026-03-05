@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { SETTINGS } from '../../app/settings';
 import { handleError } from '../../helpers/validationHelpers';
-import { AuthQueryRepository } from '../../routers/auth/auth.queryRepository';
-import { UsersQueryRepository } from '../../routers/users/users.queryRepository';
-import { UsersRepository } from '../../routers/users/users.repository';
+import { AuthQueryRepository } from '../../features/auth/auth.queryRepository';
+import { UsersQueryRepository } from '../../features/users/users.queryRepository';
+import { UsersRepository } from '../../features/users/users.repository';
 import JwtService from '../services/jwt-service';
 
 const usersRepository = new UsersRepository();

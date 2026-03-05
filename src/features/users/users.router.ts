@@ -1,8 +1,8 @@
 import { Router } from 'express';import 'reflect-metadata';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import container from '../composition-root';
-import { UsersController } from './controller/users.controller';
+import container from '../../config/container';
+import { UsersController } from './users.controller';
 import { usersValidators } from './users.middlewares';
 
 const usersController = container.get(UsersController);

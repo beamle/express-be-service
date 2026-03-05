@@ -4,7 +4,7 @@ import 'reflect-metadata';
 import { Types } from 'mongoose';
 import { CustomError } from '../../helpers/CustomError';
 import { handleError } from '../../helpers/validationHelpers';
-import { RequestWithRouteParams, RoutePathWithIdParam } from '../RequestTypes';
+import { RequestWithRouteParams, RoutePathWithIdParam } from '../../common/types/RequestTypes';
 import { CommentsQueryRepository } from './comments.queryRepository';
 import { CommentsErrors, CommentsService } from './comments.service';
 @injectable()

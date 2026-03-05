@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
-import { handleError, handleErrorAsArrayOfErrors } from '../../../helpers/validationHelpers';
-import { SessionService } from '../../session/session.service';
-import { AuthService } from '../auth.service';
-import { getDeviceInfo } from '../helpers/auth.errors';
+import { handleError, handleErrorAsArrayOfErrors } from '../../helpers/validationHelpers';
+import { SessionService } from '../session/session.service';
+import { AuthService } from './auth.service';
+import { getDeviceInfo } from './helpers/auth.errors';
 
 @injectable()
 export class AuthController {

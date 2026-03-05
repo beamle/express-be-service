@@ -2,8 +2,8 @@ import { Router } from 'express'; import 'reflect-metadata';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import container from '../composition-root';
-import { PostsController } from './controller/posts.controller';
+import container from '../../config/container';
+import { PostsController } from './posts.controller';
 import { middlewareObjectIdChecker, postCommentContentValidator, postInputValidators } from './posts.middlewares';
 
 const postsController = container.get(PostsController);

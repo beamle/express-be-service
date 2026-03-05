@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient } from 'mongodb';
 import { Types } from 'mongoose';
-import { PasswordRecoveryType } from '../routers/auth/password-recovery.types';
+import { PasswordRecoveryType } from '../features/auth/password-recovery.types';
 import { app } from './app';
 import { SETTINGS } from './settings';
 import mongoose from 'mongoose';

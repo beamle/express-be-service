@@ -4,7 +4,7 @@ import { bearerAuthorizationValidator } from '../../authorization/middlewares/be
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import { postCommentContentValidator } from '../posts/posts.middlewares';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
-import container from './../composition-root';
+import container from '../../config/container';
 import { CommentsController } from './comments.controller';
 import { body } from 'express-validator';
 import { LikeStatus } from '../../app/db';

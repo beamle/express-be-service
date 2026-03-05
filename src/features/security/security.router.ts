@@ -1,6 +1,6 @@
 import { Router } from 'express';import 'reflect-metadata';
 import { refreshTokenValidator } from '../../authorization/middlewares/refreshTokenValidator';
-import container from '../composition-root';
+import container from '../../config/container';
 import { SecurityController } from './security.controller';
 
 const securityController = container.get(SecurityController);

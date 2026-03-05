@@ -3,7 +3,7 @@ import { RefreshTokenPayloadType } from './jwt-types';
 import { UserTypeViewModel } from '../../app/db';
 import { SETTINGS } from '../../app/settings';
 import { CustomError } from '../../helpers/CustomError';
-import { SessionErrors } from '../../routers/session/session.service';
+import { SessionErrors } from '../../features/session/session.service';
 
 export const JwtServiceErrors = {
   NO_CORRECT_TOKEN_PROVIDED: { message: 'Unauthorized. You have to pass correct jwt token', field: '', status: 401 },

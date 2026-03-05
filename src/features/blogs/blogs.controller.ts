@@ -2,18 +2,18 @@ import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Types } from 'mongoose';
-import { BlogType } from '../../../app/db';
-import { generateSortingDataObject } from '../../../helpers/objectGenerators';
-import { handleError } from '../../../helpers/validationHelpers';
+import { BlogType } from '../../app/db';
+import { generateSortingDataObject } from '../../helpers/objectGenerators';
+import { handleError } from '../../helpers/validationHelpers';
 import {
   RequestWithBody,
   RequestWithRouteParams,
   RequestWithRouteParamsAndBody,
   RoutePathWithIdParam,
-} from '../../RequestTypes';
-import { BlogsQueryRepository } from '../blogs.queryRepository';
-import { BlogsService } from '../blogs.service';
-import { BlogError, CreateBlogInput, CreateBlogOutput } from '../blogs.types';
+} from '../../common/types/RequestTypes';
+import { BlogsQueryRepository } from './blogs.queryRepository';
+import { BlogsService } from './blogs.service';
+import { BlogError, CreateBlogInput, CreateBlogOutput } from './blogs.types';
 
 @injectable()
 export class BlogsController {

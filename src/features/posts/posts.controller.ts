@@ -2,15 +2,15 @@ import { Request, Response } from 'express'; import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import { SortDirection } from 'mongodb';
 import { Types } from 'mongoose';
-import { PostType } from '../../../app/db';
-import { CustomError } from '../../../helpers/CustomError';
-import { handleError } from '../../../helpers/validationHelpers';
-import { BlogsRepository } from '../../blogs/blogs.repository';
-import { CommentsQueryRepository } from '../../comments/comments.queryRepository';
-import { RequestWithRouteParams, RequestWithRouteParamsAndBody, RoutePathWithIdParam } from '../../RequestTypes';
-import { PostErrors, PostsService } from '../posts.service';
-import { PostError, UpdatePostInput } from '../posts.types';
-import { PostsQueryRepository } from './../posts.queryRepository';
+import { PostType } from '../../app/db';
+import { CustomError } from '../../helpers/CustomError';
+import { handleError } from '../../helpers/validationHelpers';
+import { BlogsRepository } from '../blogs/blogs.repository';
+import { CommentsQueryRepository } from '../comments/comments.queryRepository';
+import { RequestWithRouteParams, RequestWithRouteParamsAndBody, RoutePathWithIdParam } from '../../common/types/RequestTypes';
+import { PostErrors, PostsService } from './posts.service';
+import { PostError, UpdatePostInput } from './posts.types';
+import { PostsQueryRepository } from './posts.queryRepository';
 
 //https://stackoverflow.com/questions/59117885/handling-errors-in-express-js-in-service-controller-layers
 //https://github.com/goldbergyoni/nodebestpractices

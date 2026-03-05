@@ -2,10 +2,10 @@ import { Router } from 'express';
 import 'reflect-metadata';
 import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
-import container from '../composition-root';
+import container from '../../config/container';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
 import { authValidators, newPasswordValidators, recoveryPasswordValidators } from './auth.middlewares';
-import { AuthController } from './controller/auth.controller';
+import { AuthController } from './auth.controller';
 
 export const authRouter = Router({});
 

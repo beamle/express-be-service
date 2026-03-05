@@ -1,16 +1,16 @@
 import cors from 'cors';
 import express from 'express';
-import { authRouter } from '../routers/auth/auth.router';
-import { blogsRouter } from '../routers/blogs/blogs.router';
-import { postsRouter } from '../routers/posts/posts.router';
-import { testingRouter } from '../routers/testing/testing.router';
-import { usersRouter } from '../routers/users/users.router';
+import { authRouter } from '../features/auth/auth.router';
+import { blogsRouter } from '../features/blogs/blogs.router';
+import { postsRouter } from '../features/posts/posts.router';
+import { testingRouter } from '../features/testing/testing.router';
+import { usersRouter } from '../features/users/users.router';
 import { SETTINGS } from './settings';
 
 import cookieParser from 'cookie-parser';
 import { NextFunction, Request, Response } from 'express';
-import { commentsRouter } from '../routers/comments/comments.router';
-import { securityRouter } from '../routers/security/security.router';
+import { commentsRouter } from '../features/comments/comments.router';
+import { securityRouter } from '../features/security/security.router';
 
 export function addContext(req: Request, res: Response, next: NextFunction) {
   req.context = { user: null };
