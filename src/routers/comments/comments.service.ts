@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { Types } from 'mongoose';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsRepository } from './comments.repository';
+import { CommentModel, CommentLikeModel } from './comments.schema';
 
 export const CommentsErrors = {
   NO_COMMENTS_FOUND: {
@@ -40,5 +41,35 @@ export class CommentsService {
     }
 
     return result;
+  }
+
+  async updateLikeStatus(commentId: Types.ObjectId, userId: string, status: string | 'None' | 'Like' | 'Dislike') {
+    const comment = await CommentModel.findOne({ _id: commentId }).lean();
+    if (!comment) {
+      throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND);
+    }
+
+    const likeStatusRecord = await CommentLikeModel.findOne({ commentId: commentId.toString(), userId: userId });
+
+    if (!likeStatusRecord) {
+      if (status !== 'None') {
+        const newLike = new CommentLikeModel({
+          commentId: commentId.toString(),
+          userId,
+          status: status as any,
+          addedAt: new Date()
+        });
+        await newLike.save();
+      }
+    } else {
+      if (status === 'None') {
+        await CommentLikeModel.deleteOne({ _id: likeStatusRecord._id });
+      } else if (likeStatusRecord.status !== status) {
+        likeStatusRecord.status = status as any;
+        await likeStatusRecord.save();
+      }
+    }
+
+    return true;
   }
 }

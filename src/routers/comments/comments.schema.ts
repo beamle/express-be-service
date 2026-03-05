@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { CommentDBType } from '../../app/db';
+import { CommentDBType, CommentLikeDBType, LikeStatus } from '../../app/db';
 
 export const commentSchema = new Schema<CommentDBType>({
     postId: { type: String, required: true },
@@ -15,3 +15,14 @@ export const commentSchema = new Schema<CommentDBType>({
 });
 
 export const CommentModel = mongoose.model<CommentDBType>('comments', commentSchema);
+
+export const commentLikeSchema = new Schema<CommentLikeDBType>({
+    userId: { type: String, required: true },
+    commentId: { type: String, required: true },
+    status: { type: String, enum: ['None', 'Like', 'Dislike'], required: true },
+    addedAt: { type: Date, required: true }
+}, {
+    versionKey: false
+});
+
+export const CommentLikeModel = mongoose.model<CommentLikeDBType>('comment-likes', commentLikeSchema);

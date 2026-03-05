@@ -18,8 +18,9 @@ export class CommentsController {
   }
   async getCommentById(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     const { id: searchableCommentId } = req.params;
+    const userId = req.context?.user?.userId;
     try {
-      const comment = await this.commentsQueryRepository.getCommentBy(new Types.ObjectId(searchableCommentId));
+      const comment = await this.commentsQueryRepository.getCommentBy(new Types.ObjectId(searchableCommentId), userId);
       res.status(200).json(comment);
       return;
     } catch (e) {
@@ -55,6 +56,20 @@ export class CommentsController {
 
       const deletingResult = await this.commentsService.deleteComment(new Types.ObjectId(commentIdToDelete));
       res.status(204).json(deletingResult);
+      return;
+    } catch (e) {
+      handleError(res, e);
+    }
+  }
+
+  async updateCommentLikeStatus(req: RequestWithRouteParams<{ id: string }>, res: Response): Promise<any> {
+    const { id: commentId } = req.params;
+    const { likeStatus } = req.body;
+    const userId = req.context.user?.userId;
+
+    try {
+      await this.commentsService.updateLikeStatus(new Types.ObjectId(commentId), userId!, likeStatus);
+      res.sendStatus(204);
       return;
     } catch (e) {
       handleError(res, e);

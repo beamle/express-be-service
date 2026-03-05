@@ -46,8 +46,8 @@ export class PostsQueryRepository {
     return post;
   }
 
-  async getPostCommentsByPostId(sortingData: PostsSortingData, searchablePostId: Types.ObjectId): Promise<any> {
-    const posts = await this.commentsQueryRepository.getCommentsByPostId(sortingData, searchablePostId.toString());
+  async getPostCommentsByPostId(sortingData: PostsSortingData, searchablePostId: Types.ObjectId, userId?: string): Promise<any> {
+    const posts = await this.commentsQueryRepository.getCommentsByPostId(sortingData, searchablePostId.toString(), userId);
 
     if (!posts) {
       throw new CustomError({ message: 'no error description', field: '', status: 400 });

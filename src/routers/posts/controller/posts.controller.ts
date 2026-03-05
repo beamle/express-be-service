@@ -177,6 +177,7 @@ export class PostsController {
     try {
       const post = await this.postsQueryRepository.getPostById(new Types.ObjectId(postId));
       let comments;
+      const userId = req.context?.user?.userId;
       if (post) {
         comments = await this.postsQueryRepository.getPostCommentsByPostId(
           {
@@ -186,6 +187,7 @@ export class PostsController {
             sortDirection,
           },
           new Types.ObjectId(postId),
+          userId
         );
       }
 

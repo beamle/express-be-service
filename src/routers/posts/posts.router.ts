@@ -1,4 +1,4 @@
-import { Router } from 'express';import 'reflect-metadata';
+import { Router } from 'express'; import 'reflect-metadata';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
 import { bearerAuthorizationValidator } from '../../authorization/middlewares/bearerAuthorizationValidator';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
@@ -53,8 +53,11 @@ postsRouter.post(
   postsController.createCommentForPost.bind(postsController),
 );
 
+import { optionalBearerAuthorizationValidator } from '../../authorization/middlewares/optionalBearerAuthorizationValidator';
+
 postsRouter.get(
   '/:postId/comments',
+  optionalBearerAuthorizationValidator,
   inputCheckErrorsFormatter,
   postsController.getCommentsByPostId.bind(postsController),
 );

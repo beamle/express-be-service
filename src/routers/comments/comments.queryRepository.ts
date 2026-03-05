@@ -4,10 +4,10 @@ import { PostsSortingData } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsErrors } from './comments.service';
 import { CommentType } from './comments.types';
-import { CommentModel } from './comments.schema';
+import { CommentModel, CommentLikeModel } from './comments.schema';
 
 export class CommentsQueryRepository {
-  async getCommentsByPostId(sortingData: PostsSortingData, postId: string): Promise<CommentType[] | boolean> {
+  async getCommentsByPostId(sortingData: PostsSortingData, postId: string, userId?: string): Promise<CommentType[] | boolean> {
     const comments = await CommentModel
       .find({ postId })
       .select('-postId -__v')
@@ -18,32 +18,50 @@ export class CommentsQueryRepository {
 
     if (!comments) return false;
 
-    return this.mapCommentsToCommentType(comments as unknown as CommentType[]);
+    const mappedComments: CommentType[] = [];
+    for (const comment of comments) {
+      mappedComments.push(await this.mapToCommentType(comment as unknown as CommentType, userId));
+    }
+
+    return mappedComments;
   }
 
-  async getLastCreatedCommentForPostBy(commentId: Types.ObjectId): Promise<CommentType> {
+  async getLastCreatedCommentForPostBy(commentId: Types.ObjectId, userId?: string): Promise<CommentType> {
     const comments = await CommentModel.find({ _id: commentId }).lean();
     if (!comments || comments.length === 0) throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND);
 
-    return this.mapToCommentType(comments[0] as unknown as CommentType);
+    return await this.mapToCommentType(comments[0] as unknown as CommentType, userId);
   }
 
-  async getCommentBy(commentId: Types.ObjectId): Promise<CommentType> {
+  async getCommentBy(commentId: Types.ObjectId, userId?: string): Promise<CommentType> {
     const comment = await CommentModel.findOne({ _id: commentId }).lean();
     if (!comment) throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND);
 
-    return this.mapToCommentType(comment as unknown as CommentType);
+    return await this.mapToCommentType(comment as unknown as CommentType, userId);
   }
 
-  private mapCommentsToCommentType(comments: CommentType[]) {
-    return comments.map((comment) => {
-      const { _id, ...rest } = comment;
-      return { ...rest, id: _id!.toString() };
-    });
-  }
-
-  private mapToCommentType(comment: CommentType) {
+  private async mapToCommentType(comment: CommentType, userId?: string) {
     const { postId, _id, ...rest } = comment;
-    return { ...rest, id: _id };
+
+    const likesCount = await CommentLikeModel.countDocuments({ commentId: _id!.toString(), status: 'Like' });
+    const dislikesCount = await CommentLikeModel.countDocuments({ commentId: _id!.toString(), status: 'Dislike' });
+
+    let myStatus = 'None';
+    if (userId) {
+      const userLike = await CommentLikeModel.findOne({ commentId: _id!.toString(), userId }).lean();
+      if (userLike) {
+        myStatus = userLike.status;
+      }
+    }
+
+    return {
+      ...rest,
+      id: _id!.toString(),
+      likesInfo: {
+        likesCount,
+        dislikesCount,
+        myStatus
+      }
+    } as any;
   }
 }

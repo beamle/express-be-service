@@ -51,7 +51,7 @@ export type UserCreationType = {
 export type CommentDBType = {
   _id?: Types.ObjectId;
   id?: any;
-  postId?: string;
+  postId: string;
   content: string;
   commentatorInfo: {
     userId: string;
@@ -60,10 +60,18 @@ export type CommentDBType = {
   createdAt: string;
 };
 
-export type SessionDBType = {
+export enum LikeStatus {
+  None = 'None',
+  Like = 'Like',
+  Dislike = 'Dislike'
+}
+
+export type CommentLikeDBType = {
   _id?: Types.ObjectId;
-  id?: any;
-  refreshToken: string;
+  userId: string;
+  commentId: string;
+  status: LikeStatus;
+  addedAt: Date;
 };
 
 export type RefreshTokenDBType = {

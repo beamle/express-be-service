@@ -22,7 +22,6 @@ export class PostsRepository {
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .lean();
 
-    console.log(posts);
     return posts;
   }
 

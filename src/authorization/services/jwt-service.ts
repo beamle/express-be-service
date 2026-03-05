@@ -12,14 +12,14 @@ export const JwtServiceErrors = {
 
 export class JwtService {
   async createAccessToken(user: UserTypeViewModel): Promise<string> {
-    return jwt.sign({ userId: user.id }, SETTINGS.JWT_SECRET, { expiresIn: '5m' });
+    return jwt.sign({ userId: user.id }, SETTINGS.JWT_SECRET, { expiresIn: '10m' });
   }
 
   async createRefreshToken(
     user: UserTypeViewModel,
     deviceId: string,
   ): Promise<{ refreshToken: string } & RefreshTokenPayloadType> {
-    const refreshToken = jwt.sign({ userId: user.id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '5m' });
+    const refreshToken = jwt.sign({ userId: user.id, deviceId }, SETTINGS.JWT_SECRET, { expiresIn: '20m' });
     const refreshTokenPayload = jwt.decode(refreshToken) as RefreshTokenPayloadType;
 
     return {

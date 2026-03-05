@@ -17,5 +17,16 @@ export type Comment = {
   };
   createdAt: string;
   id: string;
-  _id?: string
+  _id?: string;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+  }
+}
+
+export type LikesInfo = {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: string;
 }
