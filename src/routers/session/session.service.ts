@@ -1,4 +1,4 @@
-import { inject, injectable } from 'inversify';import 'reflect-metadata';
+import { inject, injectable } from 'inversify'; import 'reflect-metadata';
 import { SETTINGS } from '../../app/settings';
 import JwtService from '../../authorization/services/jwt-service';
 import { CustomError } from '../../helpers/CustomError';
@@ -115,7 +115,7 @@ export class SessionService {
 
   async createSession(sessionMeta: SessionMeta) {
     const result = await this.sessionRepository.create(sessionMeta);
-    return { id: result.insertedId.toString(), ...sessionMeta };
+    return { id: result._id.toString(), ...sessionMeta };
   }
 
   async getAllSessionsBy(userId: string, iat: number) {

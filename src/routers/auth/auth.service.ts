@@ -128,7 +128,7 @@ export class AuthService {
   }
 
   async passwordRecovery(email: string) {
-    const user = await this.usersService.findUserBy({ email });
+    const user = await this.usersRepository.findUserBy({ email });
     if (!user) return;
 
     const recoveryCode = uuid();
@@ -150,7 +150,7 @@ export class AuthService {
     const passwordRecovery = await passwordRecoveryRepository.findPasswordRecoveryByCode(recoveryCode);
 
     if (!passwordRecovery || passwordRecovery.expirationDate < new Date()) {
-      throw new CustomError(AuthErrors.EMAIL_CONFIRMATION_PROBLEM);
+      throw new CustomError(AuthErrors.PASSWORD_RECOVERY_CODE_INVALID);
     }
 
     const user = await this.usersService.findUserBy({ email: passwordRecovery.email });

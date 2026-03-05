@@ -1,10 +1,11 @@
 import { ObjectId } from 'mongodb';
-import { requestCasesMetadataCollection } from '../../app/db';
+import { RequestCasesModel } from '../request-cases/request-cases.schema';
 
 class RequestCasesLimiterManager {
   async create(metadataObj: { IP: string; baseURL: string; date: Date }): Promise<ObjectId> {
-    const result = await requestCasesMetadataCollection.insertOne(metadataObj);
-    return result.insertedId;
+    const newRequestCase = new RequestCasesModel(metadataObj);
+    const result = await newRequestCase.save();
+    return new ObjectId(result._id.toString());
   }
 }
 

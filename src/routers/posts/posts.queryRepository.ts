@@ -1,10 +1,13 @@
 import { inject, injectable } from 'inversify'; import 'reflect-metadata';
 import { ObjectId } from 'mongodb';
-import { commentsCollection, postsCollection, PostsSortingData, PostType } from '../../app/db';
+import { PostsSortingData, PostType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsQueryRepository } from '../comments/comments.queryRepository';
 import { PostsRepository } from './posts.repository';
 import { PostErrors } from './posts.service';
+import { PostModel } from './posts.schema';
+import { CommentModel } from '../comments/comments.schema';
+
 @injectable()
 export class PostsQueryRepository {
   constructor(
@@ -23,7 +26,7 @@ export class PostsQueryRepository {
       throw new CustomError({ message: 'no error description', field: '', status: 400 });
     }
 
-    const postsLength = await postsCollection.countDocuments(blogId ? { blogId: blogId.toString() } : {});
+    const postsLength = await PostModel.countDocuments(blogId ? { blogId: blogId.toString() } : {});
 
     return {
       pagesCount: Math.ceil(postsLength / sortingData.pageSize),
@@ -50,7 +53,7 @@ export class PostsQueryRepository {
       throw new CustomError({ message: 'no error description', field: '', status: 400 });
     }
 
-    const postsLength = await commentsCollection.countDocuments(
+    const postsLength = await CommentModel.countDocuments(
       searchablePostId ? { postId: searchablePostId.toString() } : {},
     );
 

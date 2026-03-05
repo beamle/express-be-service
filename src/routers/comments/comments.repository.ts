@@ -1,13 +1,13 @@
 import { ObjectId } from 'mongodb';
 import 'reflect-metadata';
-import { commentsCollection } from '../../app/db';
+import { CommentModel } from './comments.schema';
 
 export class CommentsRepository {
   async updateCommentById(content: string, commentId: ObjectId): Promise<boolean | number> {
-    const comment = await commentsCollection.findOne({ _id: commentId });
+    const comment = await CommentModel.findOne({ _id: commentId }).lean();
 
     if (!comment) return false;
-    const resultOfUpdatingComment = await commentsCollection.updateOne(
+    const resultOfUpdatingComment = await CommentModel.updateOne(
       { _id: commentId },
       {
         $set: {
@@ -20,13 +20,13 @@ export class CommentsRepository {
   }
 
   async deleteCommentById(commentId: ObjectId) {
-    const comment = await commentsCollection.findOne({ _id: commentId });
+    const comment = await CommentModel.findOne({ _id: commentId }).lean();
 
     if (!comment) {
       return false;
     }
-    const resultOfDeletingComment = await commentsCollection.deleteOne({ _id: commentId });
+    const resultOfDeletingComment = await CommentModel.deleteOne({ _id: commentId });
 
-    return resultOfDeletingComment.acknowledged;
+    return resultOfDeletingComment.deletedCount > 0;
   }
 }

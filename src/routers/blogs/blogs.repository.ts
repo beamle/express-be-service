@@ -1,47 +1,46 @@
 import { ObjectId } from 'mongodb';
 import 'reflect-metadata';
-import { blogsCollection, BlogsSortingData, BlogType, postsCollection } from '../../app/db';
+import { BlogsSortingData, BlogType } from '../../app/db';
 import { CreateBlogInput } from './blogs.types';
 import { injectable } from 'inversify';
+import { BlogModel } from './blogs.schema';
+import { PostModel } from '../posts/posts.schema';
 
 @injectable()
 export class BlogsRepository {
   async getBlogs({ pageNumber, pageSize, sortBy, sortDirection, searchNameTerm }: BlogsSortingData, filter: any) {
-    const blogs = await blogsCollection
-      .find(filter ? filter : {}, { projection: { _id: 0 } })
+    const blogs = await BlogModel
+      .find(filter ? filter : {})
+      .select('-_id -__v') // exclude _id and __v
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
-      .toArray();
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .lean();
 
     return blogs;
   }
 
   async create(input: CreateBlogInput): Promise<ObjectId> {
     const { name, description, websiteUrl } = input;
-    let newBlog: BlogType = {
+
+    const newBlog = new BlogModel({
       name,
       description,
       websiteUrl,
       createdAt: new Date().toISOString(),
       isMembership: false,
-    };
+    });
 
-    const result = await blogsCollection.insertOne(newBlog);
-    const updateId = await blogsCollection.updateOne(
-      { _id: result.insertedId },
-      {
-        $set: {
-          id: result.insertedId.toString(),
-        },
-      },
-    );
+    const result = await newBlog.save();
 
-    return result.insertedId;
+    result.id = result._id.toString();
+    await result.save();
+
+    return new ObjectId(result.id);
   }
 
   async findBy(searchableBlogId: ObjectId): Promise<BlogType | null> {
-    return await blogsCollection.findOne({ _id: searchableBlogId }, { projection: { _id: 0 } });
+    return await BlogModel.findOne({ _id: searchableBlogId }).select('-_id -__v').lean();
   }
 
   async updateBlog(dataForUpdate: CreateBlogInput, searchableBlogId: ObjectId): Promise<boolean | number> {
@@ -53,7 +52,7 @@ export class BlogsRepository {
       return false;
     }
 
-    const resultOfUpdatingBlog = await blogsCollection.updateOne(
+    const resultOfUpdatingBlog = await BlogModel.updateOne(
       { _id: searchableBlogId },
       {
         $set: {
@@ -68,17 +67,17 @@ export class BlogsRepository {
   }
 
   async delete(blogId: ObjectId): Promise<boolean> {
-    const blog = await blogsCollection.findOne({ _id: blogId });
+    const blog = await BlogModel.findOne({ _id: blogId });
     if (!blog) {
       return false;
     }
 
-    const deleteBlogResult = await blogsCollection.deleteOne({ _id: blogId });
+    const deleteBlogResult = await BlogModel.deleteOne({ _id: blogId });
     if (deleteBlogResult.deletedCount === 0) {
       return false;
     }
 
-    const deletePostsResult = await postsCollection.deleteMany({ blogId: blogId.toString() });
+    const deletePostsResult = await PostModel.deleteMany({ blogId: blogId.toString() });
     return deletePostsResult.acknowledged;
   }
 }

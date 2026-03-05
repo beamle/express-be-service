@@ -17,6 +17,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.10.0",
     "mongodb-memory-server": "^10.1.2",
+    "mongoose": "^9.2.4",
     "ngrok": "^5.0.0-beta.2",
     "nodemailer": "^6.10.0",
     "reflect-metadata": "^0.2.2",

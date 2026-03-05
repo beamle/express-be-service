@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient, ObjectId } from 'mongodb';
 import { PasswordRecoveryType } from '../routers/auth/password-recovery.types';
 import { app } from './app';
 import { SETTINGS } from './settings';
+import mongoose from 'mongoose';
 
 const { CollectionMongoClient, ServerApiVersion } = require('mongodb');
 
@@ -143,51 +144,22 @@ export type BlogsModelView = {
   items: BlogType[];
 };
 
-export let blogsCollection: Collection<BlogType>;
-export let postsCollection: Collection<PostType>;
-export let usersCollection: Collection<UserType>;
-export let commentsCollection: Collection<CommentDBType>;
-export let sessionsCollection: Collection<UserSessionDBType>;
-// export let sessionsMetadataCollection: Collection<UserSessionMetadataDBType>;
-export let requestCasesMetadataCollection: Collection<RequestCasesMetadataDBType>;
-export let refreshTokenBlacklistCollection: Collection<RefreshTokenDBType>;
-export let passwordRecoveryCollection: Collection<PasswordRecoveryType>;
-
 export let db: Db;
 
-export async function runDb(url: string) {
-  const client = new MongoClient(url, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    },
-  });
-
+export async function runDb() {
   try {
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    db = client.db(SETTINGS.DB_NAME as string);
-    await db.command({ ping: 1 });
-    console.log('Pinged your deployment. You successfully connected to MongoDB!');
+    // Determine the URI, fallback to empty to let mongoose handle error if undefined
+    const mongoUri = SETTINGS.MONGO_URI || (SETTINGS as any).MONGO_URL || "mongodb://localhost:27017";
+    await mongoose.connect(mongoUri, { dbName: SETTINGS.DB_NAME as string });
 
-    postsCollection = db.collection<PostType>(SETTINGS.PATH.POSTS);
-    blogsCollection = db.collection<BlogType>(SETTINGS.PATH.BLOGS);
-    usersCollection = db.collection<UserType>(SETTINGS.PATH.USERS);
-    commentsCollection = db.collection<CommentDBType>(SETTINGS.PATH.COMMENTS);
-    requestCasesMetadataCollection = db.collection<RequestCasesMetadataDBType>(SETTINGS.PATH.REQUEST_CASES);
-    refreshTokenBlacklistCollection = db.collection<RefreshTokenDBType>(SETTINGS.PATH.REFRESH_TOKEN_BLACKLIST);
-    sessionsCollection = db.collection<UserSessionDBType>(SETTINGS.PATH.SESSION);
-    passwordRecoveryCollection = db.collection<PasswordRecoveryType>(SETTINGS.PATH.AUTH);
-    // sessionsMetadataCollection = db.collection<UserSessionMetadataDBType>(
-    //   SETTINGS.PATH.SESSION_META
-    // );
+    console.log('✅ Connected to MongoDB via Mongoose');
 
-    console.log('Connected to collections!');
+    // Fallback: assign the raw MongoDB db object
+    db = mongoose.connection.db as unknown as Db;
 
     app.set('trust proxy', true);
   } catch (e) {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+    console.error('❌ MongoDB connection error', e);
+    await mongoose.disconnect();
   }
 }

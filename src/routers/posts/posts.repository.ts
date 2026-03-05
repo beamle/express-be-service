@@ -1,8 +1,10 @@
 import { ObjectId } from 'mongodb'; import 'reflect-metadata';
-import { commentsCollection, CommentsSortingData, postsCollection, PostsSortingData, PostType } from '../../app/db';
+import { CommentsSortingData, PostsSortingData, PostType } from '../../app/db';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { CommentatorInfo, CreatePostInput } from './posts.types';
 import { inject, injectable } from 'inversify';
+import { PostModel } from './posts.schema';
+import { CommentModel } from '../comments/comments.schema';
 
 @injectable()
 export class PostsRepository {
@@ -12,12 +14,13 @@ export class PostsRepository {
   async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
 
-    const posts = await postsCollection
-      .find(blogId ? { blogId: blogId.toString() } : {}, { projection: { _id: 0 } })
+    const posts = await PostModel
+      .find(blogId ? { blogId: blogId.toString() } : {})
+      .select('-_id -__v')
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
-      .toArray();
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .lean();
 
     console.log(posts);
     return posts;
@@ -26,12 +29,13 @@ export class PostsRepository {
   async getPostsByBlogId(blogId: ObjectId, sortingData: PostsSortingData) {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
 
-    return await postsCollection
-      .find({ blogId: blogId.toString() }, { projection: { _id: 0 } })
+    return await PostModel
+      .find({ blogId: blogId.toString() })
+      .select('-_id -__v')
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
-      .toArray();
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .lean();
   }
 
   async create(input: CreatePostInput, blogIdAsParam?: ObjectId): Promise<ObjectId | boolean> {
@@ -45,30 +49,24 @@ export class PostsRepository {
       return false;
     }
 
-    const newPost: PostType = {
+    const newPost = new PostModel({
       id: String(Math.floor(Math.random() * 223)),
       ...input,
       blogName: blog.name,
       blogId: input.blogId || String(blogIdAsParam),
       createdAt: new Date().toISOString(),
-    };
+    });
 
-    const resultOfCreatingNewPost = await postsCollection.insertOne(newPost);
+    const resultOfCreatingNewPost = await newPost.save();
 
-    const updatePostId = await postsCollection.updateOne(
-      { _id: resultOfCreatingNewPost.insertedId },
-      {
-        $set: {
-          id: resultOfCreatingNewPost.insertedId.toString(),
-        },
-      },
-    );
+    resultOfCreatingNewPost.id = resultOfCreatingNewPost._id.toString();
+    await resultOfCreatingNewPost.save();
 
-    return resultOfCreatingNewPost.insertedId;
+    return new ObjectId(resultOfCreatingNewPost.id);
   }
 
   async findBy(searchablePostId: ObjectId): Promise<PostType | null> {
-    const post = await postsCollection.findOne({ _id: searchablePostId }, { projection: { _id: 0 } });
+    const post = await PostModel.findOne({ _id: searchablePostId }).select('-_id -__v').lean();
     if (!post) {
       return null;
     }
@@ -92,47 +90,52 @@ export class PostsRepository {
       return false;
     }
 
-    const resultOfUpdatingPost = await postsCollection.updateOne(
+    const resultOfUpdatingPost = await PostModel.updateOne(
       { _id: searchablePostId },
       { $set: { ...dataForUpdate } },
     );
 
-    return resultOfUpdatingPost.acknowledged;
+    return resultOfUpdatingPost.modifiedCount > 0;
   }
 
   async delete(postId: ObjectId): Promise<boolean> {
-    const post = await postsCollection.findOne({ _id: postId });
+    const post = await PostModel.findOne({ _id: postId });
 
     if (!post) {
       return false;
     }
-    const resultOfDeletingPost = await postsCollection.deleteOne({ _id: postId });
+    const resultOfDeletingPost = await PostModel.deleteOne({ _id: postId });
 
-    return resultOfDeletingPost.acknowledged;
+    return resultOfDeletingPost.deletedCount > 0;
   }
 
   async createComment(postId: ObjectId, commentatorInfo: CommentatorInfo, content: string): Promise<ObjectId> {
-    const newComment = {
+    const newComment = new CommentModel({
       postId: postId.toString(),
       content: content,
       commentatorInfo: commentatorInfo,
       createdAt: new Date().toISOString(),
-    };
+    });
 
-    const createdComment = await commentsCollection.insertOne(newComment);
+    const createdComment = await newComment.save();
 
-    return createdComment.insertedId;
+    // As per the schema, we assign _id.toString() to id
+    createdComment.id = createdComment._id.toString();
+    await createdComment.save();
+
+    return new ObjectId(createdComment.id);
   }
 
   async getCommentsBy(postId: ObjectId, sortingData: CommentsSortingData = sortingBase): Promise<any> {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
 
-    return await commentsCollection
-      .find({ postId: postId.toString() }, { projection: { _id: 0 } })
+    return await CommentModel
+      .find({ postId: postId.toString() })
+      .select('-_id -__v')
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 'asc' : 'desc' })
-      .toArray();
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .lean();
   }
 }
 

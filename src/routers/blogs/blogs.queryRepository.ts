@@ -1,12 +1,14 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { ObjectId } from 'mongodb';
-import { blogsCollection, BlogsModelView, BlogsSortingData, BlogType } from '../../app/db';
+import { BlogsModelView, BlogsSortingData, BlogType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { createFilter } from '../../helpers/objectGenerators';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { PostErrors } from '../posts/posts.service';
 import { BlogErrors } from './blogs.service';
+import { BlogModel } from './blogs.schema';
+
 @injectable()
 export class BlogsQueryRepository {
   @inject(BlogsRepository) private blogsRepository: BlogsRepository;
@@ -16,7 +18,7 @@ export class BlogsQueryRepository {
   }
   async getBlogs(sortingData: BlogsSortingData, blogId?: string): Promise<BlogsModelView> {
     const filter: any = createFilter(sortingData);
-    const blogsLength = await blogsCollection.countDocuments(filter); // make aggregation?
+    const blogsLength = await BlogModel.countDocuments(filter); // make aggregation?
     const blogs = await this.blogsRepository.getBlogs(sortingData, filter);
 
     if (!blogs) {

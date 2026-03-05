@@ -1,4 +1,9 @@
 export const AuthErrors = {
+    PASSWORD_RECOVERY_CODE_INVALID: {
+        message: 'Recovery code is invalid or has expired',
+        field: 'recoveryCode',
+        status: 400,
+    },
     EMAIL_CONFIRMATION_PROBLEM: {
         message: 'Something wrong with email confirmation. Code is confirmed already or expirtationDate has expired',
         field: 'code',

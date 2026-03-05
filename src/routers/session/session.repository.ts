@@ -1,21 +1,21 @@
-import { InsertOneResult } from 'mongodb';import 'reflect-metadata';
-import { refreshTokenBlacklistCollection, sessionsCollection, UserSessionDBType } from '../../app/db';
+import { SessionModel, RefreshTokenBlacklistModel } from './session.schema';
 import { SessionMeta } from './session.types';
 
 export class SessionRepository {
   async addRefreshTokenToBlackList(refreshToken: string) {
-    return await refreshTokenBlacklistCollection.insertOne({ refreshToken });
+    const newBlacklistToken = new RefreshTokenBlacklistModel({ refreshToken });
+    return await newBlacklistToken.save();
   }
 
   async checkIfRefreshTokenInBlackList(refreshToken: string) {
-    const found = await refreshTokenBlacklistCollection.findOne({
+    const found = await RefreshTokenBlacklistModel.findOne({
       refreshToken,
-    });
+    }).lean();
     return !!found;
   }
 
   async updateSessionRefreshData(deviceId: string, iat: number) {
-    return await sessionsCollection.updateOne(
+    return await SessionModel.updateOne(
       { deviceId: deviceId },
       {
         $set: {
@@ -25,21 +25,19 @@ export class SessionRepository {
     );
   }
 
-  async create(sessionMeta: SessionMeta): Promise<InsertOneResult<UserSessionDBType>> {
-    return await sessionsCollection.insertOne(sessionMeta);
+  async create(sessionMeta: SessionMeta) {
+    const newSession = new SessionModel(sessionMeta);
+    return await newSession.save();
   }
 
-  // async findByDeviceId(deviceId: string): Promise<any | null> {},
-  // async updateIat(deviceId: string, newIat: Date): Promise<void> {},
-  // async deleteByDeviceId(deviceId: string): Promise<void> {},
   async findAllSessionsByUser(userId: string): Promise<SessionMeta[]> {
-    return await sessionsCollection.find({ userId: userId }, { projection: { _id: 0, userId: 0 } }).toArray();
+    return await SessionModel.find({ userId: userId }).select('-_id -userId -__v').lean() as unknown as SessionMeta[];
   }
   async findAllSessionsByDeviceId(deviceId: string): Promise<SessionMeta[]> {
-    return await sessionsCollection.find({ deviceId }, { projection: { _id: 0 } }).toArray();
+    return await SessionModel.find({ deviceId }).select('-_id -__v').lean() as unknown as SessionMeta[];
   }
   async deleteAllSessionsExceptDevice(userId: string, deviceId: string, iat: number) {
-    return await sessionsCollection.deleteMany({
+    return await SessionModel.deleteMany({
       userId: userId,
       $or: [
         { deviceId: { $ne: deviceId } }, // Different devices
@@ -48,15 +46,15 @@ export class SessionRepository {
     });
   }
   async findByUserAndDeviceMeta(userId: string, deviceName: string, deviceId?: string) {
-    return await sessionsCollection.findOne({
+    return await SessionModel.findOne({
       userId: userId,
       deviceName: deviceName,
-    });
+    }).lean();
   }
   async findSessionByDeviceId(deviceId: string) {
-    return await sessionsCollection.findOne({ deviceId: deviceId });
+    return await SessionModel.findOne({ deviceId: deviceId }).lean();
   }
   async deleteSessionByDeviceId(deviceId: string) {
-    return await sessionsCollection.deleteOne({ deviceId: deviceId });
+    return await SessionModel.deleteOne({ deviceId: deviceId });
   }
 }

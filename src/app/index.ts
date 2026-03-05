@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== 'production') {
   debugger;
   const startApp = async () => {
     try {
-      await runDb(SETTINGS.MONGO_URI);
+      await runDb();
       app.listen(SETTINGS.PORT, () => {
         console.log(`Server started on port ${SETTINGS.PORT}`);
       });

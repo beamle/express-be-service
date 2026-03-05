@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { requestCasesMetadataCollection } from '../../app/db';
 import requestCasesLimiterManager from './request-cases-limiter.manager';
+import { RequestCasesModel } from '../request-cases/request-cases.schema';
 
 const REQUEST_LIMIT = 5;
 
@@ -15,7 +15,7 @@ const requestLimiterMiddleware = async (req: Request, res: Response, next: NextF
 
     await requestCasesLimiterManager.create({ IP, baseURL: endpointUrl, date: now });
 
-    const recentRequestsCount = await requestCasesMetadataCollection.countDocuments({
+    const recentRequestsCount = await RequestCasesModel.countDocuments({
       IP: IP,
       baseURL: endpointUrl,
       date: { $gte: tenSecondsAgo },

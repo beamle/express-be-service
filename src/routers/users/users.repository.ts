@@ -1,5 +1,6 @@
-import { Filter, ObjectId } from 'mongodb';import 'reflect-metadata';
-import { usersCollection, UsersSortingData, UserType } from '../../app/db';
+import { Filter, ObjectId } from 'mongodb'; import 'reflect-metadata';
+import { UsersSortingData, UserType } from '../../app/db';
+import { UserModel } from './users.schema';
 
 type UserFilter = Partial<{
   _id?: ObjectId;
@@ -11,37 +12,37 @@ type UserFilterType = Filter<UserFilter>;
 
 export class UsersRepository {
   async getUsers(sortingData: UsersSortingData, filter: UsersSortingData) {
-    const users = await usersCollection
-      // .find(filter ? filter : {})
+    const users = await UserModel
       .find(filter)
       .skip((sortingData.pageNumber - 1) * sortingData.pageSize)
       .limit(sortingData.pageSize)
-      .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })
-      .toArray();
+      .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 1 : -1 })
+      .lean();
 
-    return users;
+    return users as unknown as UserType[];
   }
 
   async findUserBy(filter: UserFilterType): Promise<UserType | null> {
-    const user = await usersCollection.findOne(filter as Filter<any>); // to allow passing mongodb Query strings
+    const user = await UserModel.findOne(filter as any).lean();
 
-    return user;
+    return user as unknown as UserType | null;
   }
 
   async createUser(userData: UserType): Promise<ObjectId> {
-    const result = await usersCollection.insertOne(userData);
+    const newUser = new UserModel(userData);
+    const result = await newUser.save();
 
-    return result.insertedId;
+    return new ObjectId(result._id.toString());
   }
 
   async deleteUser(id: ObjectId): Promise<boolean> {
-    const result = await usersCollection.deleteOne({ _id: id });
+    const result = await UserModel.deleteOne({ _id: id });
 
-    return result.acknowledged;
+    return result.deletedCount > 0;
   }
 
   async updateUserConfirmationCode(id: ObjectId, code: string): Promise<boolean> {
-    const result = await usersCollection.updateOne(
+    const result = await UserModel.updateOne(
       { _id: id },
       { $set: { 'emailConfirmation.confirmationCode': code } },
     );
@@ -50,14 +51,14 @@ export class UsersRepository {
   }
 
   async updateConfirmation(id: ObjectId): Promise<boolean> {
-    let result = await usersCollection.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } });
+    let result = await UserModel.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } });
     return result.modifiedCount === 1;
   }
 
   async updateUserPassword(userId: string, newPasswordHash: string): Promise<boolean> {
-    const result = await usersCollection.updateOne(
+    const result = await UserModel.updateOne(
       { _id: new ObjectId(userId) },
-      { $set: { passwordHash: newPasswordHash } },
+      { $set: { password: newPasswordHash } },
     );
     return result.modifiedCount === 1;
   }

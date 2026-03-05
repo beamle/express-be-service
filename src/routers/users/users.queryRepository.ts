@@ -1,11 +1,13 @@
 import { inject, injectable } from 'inversify'; import 'reflect-metadata';
 import { ObjectId } from 'mongodb';
-import { usersCollection, UsersSortingData, UserType, UserTypeViewModel } from '../../app/db';
+import { UsersSortingData, UserType, UserTypeViewModel } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { createFilter } from '../../helpers/objectGenerators';
 import { UsersErrors } from './meta/Errors';
 import { UsersViewModel } from './meta/UsersTypes';
 import { UsersRepository } from './users.repository';
+import { UserModel } from './users.schema';
+
 @injectable()
 export class UsersQueryRepository {
   constructor(@inject(UsersRepository) private usersRepository: UsersRepository) {
@@ -14,7 +16,7 @@ export class UsersQueryRepository {
   async getUsers(sortingData: UsersSortingData): Promise<UsersViewModel> {
     const filter: any = createFilter(sortingData);
     const users = await this.usersRepository.getUsers(sortingData, filter);
-    const usersLength = await usersCollection.countDocuments(filter);
+    const usersLength = await UserModel.countDocuments(filter);
 
     if (!users) {
       throw new CustomError(UsersErrors.NO_USERS);

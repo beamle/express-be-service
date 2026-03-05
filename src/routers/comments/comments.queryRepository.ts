@@ -1,36 +1,38 @@
 import { ObjectId } from 'mongodb';
 import 'reflect-metadata';
-import { commentsCollection, PostsSortingData } from '../../app/db';
+import { PostsSortingData } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsErrors } from './comments.service';
 import { CommentType } from './comments.types';
+import { CommentModel } from './comments.schema';
 
 export class CommentsQueryRepository {
   async getCommentsByPostId(sortingData: PostsSortingData, postId: string): Promise<CommentType[] | boolean> {
-    const comments = await commentsCollection
-      .find({ postId }, { projection: { postId: 0 } })
+    const comments = await CommentModel
+      .find({ postId })
+      .select('-postId -__v')
       .skip((sortingData.pageNumber - 1) * sortingData.pageSize)
       .limit(sortingData.pageSize)
-      .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 'asc' : 'desc' })
-      .toArray();
+      .sort({ [sortingData.sortBy]: sortingData.sortDirection === 'asc' ? 1 : -1 })
+      .lean();
 
     if (!comments) return false;
 
-    return this.mapCommentsToCommentType(comments);
+    return this.mapCommentsToCommentType(comments as unknown as CommentType[]);
   }
 
   async getLastCreatedCommentForPostBy(commentId: ObjectId): Promise<CommentType> {
-    const comments = await commentsCollection.find({ _id: commentId }).toArray();
-    if (!comments) throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND);
+    const comments = await CommentModel.find({ _id: commentId }).lean();
+    if (!comments || comments.length === 0) throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND);
 
-    return this.mapToCommentType(comments[0]);
+    return this.mapToCommentType(comments[0] as unknown as CommentType);
   }
 
   async getCommentBy(commentId: ObjectId): Promise<CommentType> {
-    const comment = await commentsCollection.findOne({ _id: commentId });
+    const comment = await CommentModel.findOne({ _id: commentId }).lean();
     if (!comment) throw new CustomError(CommentsErrors.NO_COMMENTS_FOUND);
 
-    return this.mapToCommentType(comment);
+    return this.mapToCommentType(comment as unknown as CommentType);
   }
 
   private mapCommentsToCommentType(comments: CommentType[]) {
