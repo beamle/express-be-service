@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { BlogType } from '../../../app/db';
 import { generateSortingDataObject } from '../../../helpers/objectGenerators';
 import { handleError } from '../../../helpers/validationHelpers';
@@ -66,7 +66,7 @@ export class BlogsController {
 
   async updateBlog(req: RequestWithRouteParamsAndBody<RoutePathWithIdParam, CreateBlogInput>, res: Response) {
     try {
-      const updatedBlog = await this.blogsService.updateBlog({ ...req.body }, new ObjectId(req.params.id));
+      const updatedBlog = await this.blogsService.updateBlog({ ...req.body }, new Types.ObjectId(req.params.id));
       res.sendStatus(204);
       return;
     } catch (error) {
@@ -76,7 +76,7 @@ export class BlogsController {
 
   async deleteBlog(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     try {
-      const blog = await this.blogsService.deleteBlog(new ObjectId(req.params.id));
+      const blog = await this.blogsService.deleteBlog(new Types.ObjectId(req.params.id));
       res.sendStatus(204);
     } catch (error) {
       handleError(res, error);

@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { inject, injectable } from 'inversify';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import 'reflect-metadata';
 import { uuid } from 'uuidv4';
 import { UserTypeViewModel } from '../../app/db';
@@ -106,7 +106,7 @@ export class AuthService {
     }
 
     if (user.emailConfirmation.confirmationCode === code) {
-      return await this.usersRepository.updateConfirmation(new ObjectId(user._id!));
+      return await this.usersRepository.updateConfirmation(new Types.ObjectId(user._id!));
     } else {
       throw new CustomError(AuthErrors.ACCOUNT_ALREADY_CONFIRMED);
     }
@@ -118,7 +118,7 @@ export class AuthService {
 
     const newConfirmationCode = uuid();
 
-    await this.usersRepository.updateUserConfirmationCode(new ObjectId(user.id), newConfirmationCode);
+    await this.usersRepository.updateUserConfirmationCode(new Types.ObjectId(user.id), newConfirmationCode);
     const updatedUser = await this.usersService.findUserBy({ email });
     await emailManager.sendEmailConfirmationMessage(
       updatedUser,

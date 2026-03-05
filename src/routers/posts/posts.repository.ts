@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'; import 'reflect-metadata';
+import { Types } from 'mongoose'; import 'reflect-metadata';
 import { CommentsSortingData, PostsSortingData, PostType } from '../../app/db';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { CommentatorInfo, CreatePostInput } from './posts.types';
@@ -11,7 +11,7 @@ export class PostsRepository {
   constructor(@inject(BlogsRepository) private blogsRepository: BlogsRepository) {
     this.blogsRepository = blogsRepository;
   }
-  async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
+  async getPosts(sortingData: PostsSortingData, blogId?: Types.ObjectId) {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
 
     const posts = await PostModel
@@ -26,7 +26,7 @@ export class PostsRepository {
     return posts;
   }
 
-  async getPostsByBlogId(blogId: ObjectId, sortingData: PostsSortingData) {
+  async getPostsByBlogId(blogId: Types.ObjectId, sortingData: PostsSortingData) {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
 
     return await PostModel
@@ -38,12 +38,12 @@ export class PostsRepository {
       .lean();
   }
 
-  async create(input: CreatePostInput, blogIdAsParam?: ObjectId): Promise<ObjectId | boolean> {
+  async create(input: CreatePostInput, blogIdAsParam?: Types.ObjectId): Promise<Types.ObjectId | boolean> {
     let blog;
     if (blogIdAsParam) {
       blog = await this.blogsRepository.findBy(blogIdAsParam);
     } else {
-      blog = await this.blogsRepository.findBy(new ObjectId(input.blogId));
+      blog = await this.blogsRepository.findBy(new Types.ObjectId(input.blogId));
     }
     if (!blog) {
       return false;
@@ -62,10 +62,10 @@ export class PostsRepository {
     resultOfCreatingNewPost.id = resultOfCreatingNewPost._id.toString();
     await resultOfCreatingNewPost.save();
 
-    return new ObjectId(resultOfCreatingNewPost.id);
+    return new Types.ObjectId(resultOfCreatingNewPost.id);
   }
 
-  async findBy(searchablePostId: ObjectId): Promise<PostType | null> {
+  async findBy(searchablePostId: Types.ObjectId): Promise<PostType | null> {
     const post = await PostModel.findOne({ _id: searchablePostId }).select('-_id -__v').lean();
     if (!post) {
       return null;
@@ -82,7 +82,7 @@ export class PostsRepository {
       blogId: string;
       blogName: string;
     },
-    searchablePostId: ObjectId,
+    searchablePostId: Types.ObjectId,
   ) {
     const post = await this.findBy(searchablePostId);
 
@@ -98,7 +98,7 @@ export class PostsRepository {
     return resultOfUpdatingPost.modifiedCount > 0;
   }
 
-  async delete(postId: ObjectId): Promise<boolean> {
+  async delete(postId: Types.ObjectId): Promise<boolean> {
     const post = await PostModel.findOne({ _id: postId });
 
     if (!post) {
@@ -109,7 +109,7 @@ export class PostsRepository {
     return resultOfDeletingPost.deletedCount > 0;
   }
 
-  async createComment(postId: ObjectId, commentatorInfo: CommentatorInfo, content: string): Promise<ObjectId> {
+  async createComment(postId: Types.ObjectId, commentatorInfo: CommentatorInfo, content: string): Promise<Types.ObjectId> {
     const newComment = new CommentModel({
       postId: postId.toString(),
       content: content,
@@ -123,10 +123,10 @@ export class PostsRepository {
     createdComment.id = createdComment._id.toString();
     await createdComment.save();
 
-    return new ObjectId(createdComment.id);
+    return new Types.ObjectId(createdComment.id);
   }
 
-  async getCommentsBy(postId: ObjectId, sortingData: CommentsSortingData = sortingBase): Promise<any> {
+  async getCommentsBy(postId: Types.ObjectId, sortingData: CommentsSortingData = sortingBase): Promise<any> {
     const { pageNumber, pageSize, sortBy, sortDirection } = sortingData;
 
     return await CommentModel

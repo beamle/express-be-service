@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import 'reflect-metadata';
 import { BlogType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
@@ -20,7 +20,7 @@ export class BlogsService {
   async createBlog(blogCreatingInput: CreateBlogInput): Promise<BlogType> {
     const createdBlogId = await this.blogsRepository.create(blogCreatingInput); // TODO: vsju logiku po sozdaniju vynesti sjuda
 
-    if (!(createdBlogId instanceof ObjectId)) {
+    if (!(createdBlogId instanceof Types.ObjectId)) {
       throw new CustomError(BlogErrors.NO_BLOG_WITH_SUCH_ID);
     }
 
@@ -33,7 +33,7 @@ export class BlogsService {
     return createdBlog;
   }
 
-  async updateBlog(dataForUpdate: CreateBlogInput, blogId: ObjectId): Promise<boolean | number> {
+  async updateBlog(dataForUpdate: CreateBlogInput, blogId: Types.ObjectId): Promise<boolean | number> {
     const updatedBlog = await this.blogsRepository.updateBlog(dataForUpdate, blogId);
 
     if (!updatedBlog) {
@@ -43,7 +43,7 @@ export class BlogsService {
     return updatedBlog;
   }
 
-  async deleteBlog(blogId: ObjectId): Promise<boolean> {
+  async deleteBlog(blogId: Types.ObjectId): Promise<boolean> {
     const blog = await this.blogsRepository.delete(blogId);
 
     if (!blog) {

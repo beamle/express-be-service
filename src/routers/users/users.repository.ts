@@ -1,9 +1,10 @@
-import { Filter, ObjectId } from 'mongodb'; import 'reflect-metadata';
+import { Filter } from 'mongodb';
+import { Types } from 'mongoose'; import 'reflect-metadata';
 import { UsersSortingData, UserType } from '../../app/db';
 import { UserModel } from './users.schema';
 
 type UserFilter = Partial<{
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
   email?: string;
   login?: string;
 }>;
@@ -28,20 +29,20 @@ export class UsersRepository {
     return user as unknown as UserType | null;
   }
 
-  async createUser(userData: UserType): Promise<ObjectId> {
+  async createUser(userData: UserType): Promise<Types.ObjectId> {
     const newUser = new UserModel(userData);
     const result = await newUser.save();
 
-    return new ObjectId(result._id.toString());
+    return new Types.ObjectId(result._id.toString());
   }
 
-  async deleteUser(id: ObjectId): Promise<boolean> {
+  async deleteUser(id: Types.ObjectId): Promise<boolean> {
     const result = await UserModel.deleteOne({ _id: id });
 
     return result.deletedCount > 0;
   }
 
-  async updateUserConfirmationCode(id: ObjectId, code: string): Promise<boolean> {
+  async updateUserConfirmationCode(id: Types.ObjectId, code: string): Promise<boolean> {
     const result = await UserModel.updateOne(
       { _id: id },
       { $set: { 'emailConfirmation.confirmationCode': code } },
@@ -50,14 +51,14 @@ export class UsersRepository {
     return result.modifiedCount === 1;
   }
 
-  async updateConfirmation(id: ObjectId): Promise<boolean> {
+  async updateConfirmation(id: Types.ObjectId): Promise<boolean> {
     let result = await UserModel.updateOne({ _id: id }, { $set: { 'emailConfirmation.isConfirmed': true } });
     return result.modifiedCount === 1;
   }
 
   async updateUserPassword(userId: string, newPasswordHash: string): Promise<boolean> {
     const result = await UserModel.updateOne(
-      { _id: new ObjectId(userId) },
+      { _id: new Types.ObjectId(userId) },
       { $set: { password: newPasswordHash } },
     );
     return result.modifiedCount === 1;

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'; import 'reflect-metadata';
 import { add } from 'date-fns';
 import { inject, injectable } from 'inversify';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { uuid } from 'uuidv4';
 import { UserCreationType, UserType, UserTypeViewModel } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
@@ -26,7 +26,7 @@ export class UsersService {
   // TODO: change method. Currently by id it reutnr user but email and login checks for eixstence
   async getUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel | null> {
     if (id) {
-      const user = await this.usersRepository.findUserBy({ _id: new ObjectId(id) });
+      const user = await this.usersRepository.findUserBy({ _id: new Types.ObjectId(id) });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID);
 
       return this.mapUserWithId(user);
@@ -46,7 +46,7 @@ export class UsersService {
   async findUserBy({ email, login, id }: Partial<UserType>): Promise<UserTypeViewModel> {
     let user;
     if (id) {
-      user = await this.usersRepository.findUserBy({ _id: new ObjectId(id) });
+      user = await this.usersRepository.findUserBy({ _id: new Types.ObjectId(id) });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID);
 
       return this.mapUserWithId(user);
@@ -63,7 +63,7 @@ export class UsersService {
     throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_EMAIL_OR_LOGIN_OR_ID);
   }
 
-  async createUser(userData: UserCreationType, isConfirmed = false, createByAdmin = false): Promise<ObjectId> {
+  async createUser(userData: UserCreationType, isConfirmed = false, createByAdmin = false): Promise<Types.ObjectId> {
     const passwordHash = await this.generateHash(userData.password, 10);
 
     const newUser = {
@@ -89,7 +89,7 @@ export class UsersService {
   }
 
   async deleteUser(id: string): Promise<boolean> {
-    const result = await this.usersRepository.deleteUser(new ObjectId(id));
+    const result = await this.usersRepository.deleteUser(new Types.ObjectId(id));
 
     return result;
   }

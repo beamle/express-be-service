@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'; import 'reflect-metadata';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { UsersSortingData, UserType, UserTypeViewModel } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { createFilter } from '../../helpers/objectGenerators';
@@ -45,7 +45,7 @@ export class UsersQueryRepository {
 
   async findUserBy({ email, login, id }: Partial<UserType>): Promise<UserType | null> {
     if (id) {
-      const user = await this.usersRepository.findUserBy({ _id: new ObjectId(id) });
+      const user = await this.usersRepository.findUserBy({ _id: new Types.ObjectId(id) });
       if (user) return user;
 
       throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID);
@@ -70,7 +70,7 @@ export class UsersQueryRepository {
     id,
   }: Partial<UserType>): Promise<Omit<UserTypeViewModel, 'emailConfirmation'> | null> {
     if (id) {
-      const user = await this.usersRepository.findUserBy({ _id: new ObjectId(id) });
+      const user = await this.usersRepository.findUserBy({ _id: new Types.ObjectId(id) });
       if (!user) throw new CustomError(UsersErrors.NO_USER_WITH_SUCH_ID);
 
       return this.mapUserWithoutEmailConfirmation(user);

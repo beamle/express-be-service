@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';import 'reflect-metadata';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { PostsSortingData, PostType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { PostsRepository } from './posts.repository';
@@ -22,11 +22,11 @@ export class PostsService {
   async createPost(postCreatingInput: CreatePostInput): Promise<PostType> {
     const createdPostId = await this.postsRepository.create(postCreatingInput);
 
-    if (!(createdPostId instanceof ObjectId)) {
+    if (!(createdPostId instanceof Types.ObjectId)) {
       throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID);
     }
 
-    const createdPost = await this.postsRepository.findBy(new ObjectId(createdPostId));
+    const createdPost = await this.postsRepository.findBy(new Types.ObjectId(createdPostId));
 
     if (!createdPost) {
       throw new CustomError(PostErrors.POST_NOT_CREATED);
@@ -38,13 +38,13 @@ export class PostsService {
   async createPostForBlog(postCreatingInput: CreatePostInput, blogIdAsParam: string): Promise<PostType> {
     const createdPostId = await this.postsRepository.create(
       postCreatingInput,
-      blogIdAsParam ? new ObjectId(blogIdAsParam) : undefined,
+      blogIdAsParam ? new Types.ObjectId(blogIdAsParam) : undefined,
     );
-    if (!(createdPostId instanceof ObjectId)) {
+    if (!(createdPostId instanceof Types.ObjectId)) {
       throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID);
     }
 
-    const createdPost = await this.postsRepository.findBy(new ObjectId(createdPostId));
+    const createdPost = await this.postsRepository.findBy(new Types.ObjectId(createdPostId));
 
     if (!createdPost) {
       throw new CustomError(PostErrors.POST_NOT_CREATED);
@@ -61,7 +61,7 @@ export class PostsService {
       blogId: string;
       blogName: string;
     },
-    postId: ObjectId,
+    postId: Types.ObjectId,
   ): Promise<boolean | number> {
     const updatedPost = await this.postsRepository.updatePost(dataForUpdate, postId);
 
@@ -72,7 +72,7 @@ export class PostsService {
     return updatedPost;
   }
 
-  async deletePost(postId: ObjectId): Promise<boolean> {
+  async deletePost(postId: Types.ObjectId): Promise<boolean> {
     const post = await this.postsRepository.delete(postId);
 
     if (!post) {
@@ -82,7 +82,7 @@ export class PostsService {
     return post;
   }
 
-  async createCommentForPost(postId: ObjectId, commentatorInfo: CommentatorInfo, content: string): Promise<ObjectId> {
+  async createCommentForPost(postId: Types.ObjectId, commentatorInfo: CommentatorInfo, content: string): Promise<Types.ObjectId> {
     const createdCommentId = await this.postsRepository.createComment(postId, commentatorInfo, content);
 
     if (!createdCommentId) {
@@ -92,7 +92,7 @@ export class PostsService {
     return createdCommentId;
   }
   // TODO PROMISE ANY
-  async getCommentForPostBy(sortingData: PostsSortingData, postId: ObjectId): Promise<any> {
+  async getCommentForPostBy(sortingData: PostsSortingData, postId: Types.ObjectId): Promise<any> {
     const createdCommentId = await this.postsRepository.getCommentsBy(postId, sortingData);
 
     if (!createdCommentId) {

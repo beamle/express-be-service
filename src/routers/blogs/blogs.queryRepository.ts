@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { BlogsModelView, BlogsSortingData, BlogType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { createFilter } from '../../helpers/objectGenerators';
@@ -35,7 +35,7 @@ export class BlogsQueryRepository {
   }
 
   async getBlogById(searchablePostId: string): Promise<BlogType> {
-    const post = await this.blogsRepository.findBy(new ObjectId(searchablePostId));
+    const post = await this.blogsRepository.findBy(new Types.ObjectId(searchablePostId));
 
     if (!post) {
       throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID);

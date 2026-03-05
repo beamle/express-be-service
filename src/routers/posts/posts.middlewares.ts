@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { body } from 'express-validator';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { CustomError } from '../../helpers/CustomError';
 import { BlogsRepository } from '../blogs/blogs.repository';
 
@@ -29,7 +29,7 @@ export const postBlogIdAsForeignKeyIdInputValidator = body('blogId')
   .isHexadecimal()
   .withMessage('Blog ID must be a valid hexadecimal value!')
   .custom(async (blogId) => {
-    const blog = await new BlogsRepository().findBy(new ObjectId(blogId));
+    const blog = await new BlogsRepository().findBy(new Types.ObjectId(blogId));
     if (!blog) {
       throw new CustomError({ message: 'No blog with such id has been found!', field: 'blogId', status: 400 });
     }
@@ -40,7 +40,7 @@ export const postCommentContentValidator = body('content')
   .withMessage('Length of content must be at least 20 symbols up to 300 symbols');
 
 export const middlewareObjectIdChecker = (req: Request, res: Response, next: NextFunction) => {
-  // if(!ObjectId.isValid(req.params.id)){
+  // if(!Types.ObjectId.isValid(req.params.id)){
   //   res.status(404).json({message: "Not found", field: "id"})
   //   return
   // }

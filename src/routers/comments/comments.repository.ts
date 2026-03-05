@@ -1,9 +1,9 @@
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import 'reflect-metadata';
 import { CommentModel } from './comments.schema';
 
 export class CommentsRepository {
-  async updateCommentById(content: string, commentId: ObjectId): Promise<boolean | number> {
+  async updateCommentById(content: string, commentId: Types.ObjectId): Promise<boolean | number> {
     const comment = await CommentModel.findOne({ _id: commentId }).lean();
 
     if (!comment) return false;
@@ -19,7 +19,7 @@ export class CommentsRepository {
     return resultOfUpdatingComment.matchedCount;
   }
 
-  async deleteCommentById(commentId: ObjectId) {
+  async deleteCommentById(commentId: Types.ObjectId) {
     const comment = await CommentModel.findOne({ _id: commentId }).lean();
 
     if (!comment) {

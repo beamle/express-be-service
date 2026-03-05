@@ -1,4 +1,5 @@
-import { Collection, Db, MongoClient, ObjectId } from 'mongodb';
+import { Collection, Db, MongoClient } from 'mongodb';
+import { Types } from 'mongoose';
 import { PasswordRecoveryType } from '../routers/auth/password-recovery.types';
 import { app } from './app';
 import { SETTINGS } from './settings';
@@ -7,7 +8,7 @@ import mongoose from 'mongoose';
 const { CollectionMongoClient, ServerApiVersion } = require('mongodb');
 
 export type BlogType = {
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
   id?: string;
   name: string;
   description: string;
@@ -17,7 +18,7 @@ export type BlogType = {
 };
 
 export type PostType = {
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
   id?: string;
   title: string;
   shortDescription: string;
@@ -28,7 +29,7 @@ export type PostType = {
 };
 
 export type UserType = {
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
   id?: any; // TODO: remove id
   login: string;
   email: string;
@@ -48,7 +49,7 @@ export type UserCreationType = {
 };
 
 export type CommentDBType = {
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
   id?: any;
   postId?: string;
   content: string;
@@ -60,13 +61,13 @@ export type CommentDBType = {
 };
 
 export type SessionDBType = {
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
   id?: any;
   refreshToken: string;
 };
 
 export type RefreshTokenDBType = {
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
   id?: any;
   refreshToken: string;
 };
@@ -84,7 +85,7 @@ type WithId<T> = Omit<T, '_id'> & { id: string };
 export type UserSession = WithId<UserSessionDBType>;
 
 export type UserSessionDBType = {
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
   userId: string;
   // deviceName: string;
   deviceId: string;

@@ -25,6 +25,7 @@ export function handleError(res: Response, error: any) {
     res.status(error.status).json({ message: error.message, field: error.field });
     return
   } else {
+    console.error('INTERNAL SERVER ERROR:', error);
     res.status(500).json({ message: "Internal server error", field: "", status: 500 });
     return
   }
@@ -35,6 +36,7 @@ export function handleErrorAsArrayOfErrors(res: Response, error: any) {
     res.status(error.status).json({ errorsMessages: [{ message: error.message, field: error.field }] });
     return
   } else {
+    console.error('INTERNAL SERVER ERROR Array:', error);
     res.status(500).json({ message: "Internal server error", field: "", status: 500 });
     return
   }

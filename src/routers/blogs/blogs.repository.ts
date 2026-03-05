@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import 'reflect-metadata';
 import { BlogsSortingData, BlogType } from '../../app/db';
 import { CreateBlogInput } from './blogs.types';
@@ -20,7 +20,7 @@ export class BlogsRepository {
     return blogs;
   }
 
-  async create(input: CreateBlogInput): Promise<ObjectId> {
+  async create(input: CreateBlogInput): Promise<Types.ObjectId> {
     const { name, description, websiteUrl } = input;
 
     const newBlog = new BlogModel({
@@ -36,14 +36,14 @@ export class BlogsRepository {
     result.id = result._id.toString();
     await result.save();
 
-    return new ObjectId(result.id);
+    return new Types.ObjectId(result.id);
   }
 
-  async findBy(searchableBlogId: ObjectId): Promise<BlogType | null> {
+  async findBy(searchableBlogId: Types.ObjectId): Promise<BlogType | null> {
     return await BlogModel.findOne({ _id: searchableBlogId }).select('-_id -__v').lean();
   }
 
-  async updateBlog(dataForUpdate: CreateBlogInput, searchableBlogId: ObjectId): Promise<boolean | number> {
+  async updateBlog(dataForUpdate: CreateBlogInput, searchableBlogId: Types.ObjectId): Promise<boolean | number> {
     const { name, description, websiteUrl } = dataForUpdate;
     // TODO: chtoby proshe bylo debazhitj to vse perenesti v Service
     const blog = await this.findBy(searchableBlogId);
@@ -66,7 +66,7 @@ export class BlogsRepository {
     return resultOfUpdatingBlog.matchedCount;
   }
 
-  async delete(blogId: ObjectId): Promise<boolean> {
+  async delete(blogId: Types.ObjectId): Promise<boolean> {
     const blog = await BlogModel.findOne({ _id: blogId });
     if (!blog) {
       return false;

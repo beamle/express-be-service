@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsRepository } from './comments.repository';
 
@@ -22,7 +22,7 @@ export class CommentsService {
   constructor(@inject(CommentsRepository) private commentsRepository: CommentsRepository) {
     this.commentsRepository = commentsRepository;
   }
-  async updateComment(contentObj: { content: string }, commentId: ObjectId) {
+  async updateComment(contentObj: { content: string }, commentId: Types.ObjectId) {
     const result = await this.commentsRepository.updateCommentById(contentObj.content, commentId);
 
     if (!result) {
@@ -32,7 +32,7 @@ export class CommentsService {
     return result;
   }
 
-  async deleteComment(commentId: ObjectId) {
+  async deleteComment(commentId: Types.ObjectId) {
     const result = await this.commentsRepository.deleteCommentById(commentId);
 
     if (!result) {

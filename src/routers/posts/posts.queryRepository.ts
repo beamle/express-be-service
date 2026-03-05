@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'; import 'reflect-metadata';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { PostsSortingData, PostType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
 import { CommentsQueryRepository } from '../comments/comments.queryRepository';
@@ -17,7 +17,7 @@ export class PostsQueryRepository {
     this.postsRepository = postsRepository;
     this.commentsQueryRepository = commentsQueryRepository;
   }
-  async getPosts(sortingData: PostsSortingData, blogId?: ObjectId) {
+  async getPosts(sortingData: PostsSortingData, blogId?: Types.ObjectId) {
     const posts = blogId
       ? await this.postsRepository.getPosts(sortingData, blogId)
       : await this.postsRepository.getPosts(sortingData);
@@ -37,7 +37,7 @@ export class PostsQueryRepository {
     };
   }
 
-  async getPostById(searchablePostId: ObjectId): Promise<PostType> {
+  async getPostById(searchablePostId: Types.ObjectId): Promise<PostType> {
     const post = await this.postsRepository.findBy(searchablePostId);
     if (!post) {
       throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID);
@@ -46,7 +46,7 @@ export class PostsQueryRepository {
     return post;
   }
 
-  async getPostCommentsByPostId(sortingData: PostsSortingData, searchablePostId: ObjectId): Promise<any> {
+  async getPostCommentsByPostId(sortingData: PostsSortingData, searchablePostId: Types.ObjectId): Promise<any> {
     const posts = await this.commentsQueryRepository.getCommentsByPostId(sortingData, searchablePostId.toString());
 
     if (!posts) {

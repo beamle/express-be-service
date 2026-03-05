@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'; import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
-import { ObjectId, SortDirection } from 'mongodb';
+import { SortDirection } from 'mongodb';
+import { Types } from 'mongoose';
 import { PostType } from '../../../app/db';
 import { CustomError } from '../../../helpers/CustomError';
 import { handleError } from '../../../helpers/validationHelpers';
@@ -38,7 +39,7 @@ export class PostsController {
       req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
     try {
       if (blogId) {
-        const blog = await this.blogsRepository.findBy(new ObjectId(blogId)); // TODO: change to blogsQueryRepository
+        const blog = await this.blogsRepository.findBy(new Types.ObjectId(blogId)); // TODO: change to blogsQueryRepository
 
         if (!blog) {
           throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID);
@@ -51,7 +52,7 @@ export class PostsController {
           sortBy,
           sortDirection,
         },
-        blogId ? new ObjectId(blogId) : undefined,
+        blogId ? new Types.ObjectId(blogId) : undefined,
       );
       res.status(200).json(posts);
     } catch (error) {
@@ -92,7 +93,7 @@ export class PostsController {
             sortBy,
             sortDirection,
           },
-          new ObjectId(searchablePostId),
+          new Types.ObjectId(searchablePostId),
         );
         res.status(200).json(posts);
       } catch (e) {
@@ -101,7 +102,7 @@ export class PostsController {
     }
 
     try {
-      const post = await this.postsQueryRepository.getPostById(new ObjectId(searchablePostId));
+      const post = await this.postsQueryRepository.getPostById(new Types.ObjectId(searchablePostId));
       res.status(200).json(post);
       return;
     } catch (e) {
@@ -111,7 +112,7 @@ export class PostsController {
 
   async updatePost(req: RequestWithRouteParamsAndBody<RoutePathWithIdParam, UpdatePostInput>, res: Response) {
     try {
-      const postIdUpdated = await this.postsService.updatePost({ ...req.body }, new ObjectId(req.params.id));
+      const postIdUpdated = await this.postsService.updatePost({ ...req.body }, new Types.ObjectId(req.params.id));
       res.sendStatus(204);
       return;
     } catch (e) {
@@ -121,7 +122,7 @@ export class PostsController {
 
   async deletePost(req: RequestWithRouteParams<RoutePathWithIdParam>, res: Response) {
     try {
-      const postIsDeleted = await this.postsService.deletePost(new ObjectId(req.params.id));
+      const postIsDeleted = await this.postsService.deletePost(new Types.ObjectId(req.params.id));
       res.sendStatus(204);
       return;
     } catch (e) {
@@ -144,9 +145,9 @@ export class PostsController {
     const { userId, login } = req.context.user!;
 
     try {
-      const post = await this.postsQueryRepository.getPostById(new ObjectId(postId));
+      const post = await this.postsQueryRepository.getPostById(new Types.ObjectId(postId));
       const createdCommentId = await this.postsService.createCommentForPost(
-        new ObjectId(post.id!),
+        new Types.ObjectId(post.id!),
         {
           userId,
           userLogin: login,
@@ -154,7 +155,7 @@ export class PostsController {
         content,
       );
       const createdComment = await this.commentsQueryRepository.getLastCreatedCommentForPostBy(
-        new ObjectId(createdCommentId),
+        new Types.ObjectId(createdCommentId),
       );
 
       res.status(201).json(createdComment);
@@ -174,7 +175,7 @@ export class PostsController {
       req.query.sortDirection && String(req.query.sortDirection) === 'asc' ? 'asc' : 'desc';
 
     try {
-      const post = await this.postsQueryRepository.getPostById(new ObjectId(postId));
+      const post = await this.postsQueryRepository.getPostById(new Types.ObjectId(postId));
       let comments;
       if (post) {
         comments = await this.postsQueryRepository.getPostCommentsByPostId(
@@ -184,7 +185,7 @@ export class PostsController {
             sortBy,
             sortDirection,
           },
-          new ObjectId(postId),
+          new Types.ObjectId(postId),
         );
       }
 
