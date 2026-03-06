@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { PostType } from '../../app/db';
+import { PostLikeDBType, PostType } from '../../app/db';
 
 export const postSchema = new Schema<PostType>({
     title: { type: String, required: true },
@@ -14,3 +14,15 @@ export const postSchema = new Schema<PostType>({
 });
 
 export const PostModel = mongoose.model<PostType>('posts', postSchema);
+
+export const postLikeSchema = new Schema<PostLikeDBType>({
+    userId: { type: String, required: true },
+    login: { type: String, required: true },
+    postId: { type: String, required: true },
+    status: { type: String, required: true },
+    addedAt: { type: Date, required: true }
+}, {
+    versionKey: false
+});
+
+export const PostLikeModel = mongoose.model<PostLikeDBType>('postLikes', postLikeSchema);

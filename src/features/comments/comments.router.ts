@@ -7,7 +7,7 @@ import requestLimiterMiddleware from '../request-cases-limiter/request-cases.mid
 import container from '../../config/container';
 import { CommentsController } from './comments.controller';
 import { body } from 'express-validator';
-import { LikeStatus } from '../../app/db';
+import { LikeStatus } from '../../app/LikeStatus';
 
 const commentsController = container.get(CommentsController);
 

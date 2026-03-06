@@ -4,6 +4,7 @@ import { PasswordRecoveryType } from '../features/auth/password-recovery.types';
 import { app } from './app';
 import { SETTINGS } from './settings';
 import mongoose from 'mongoose';
+import { LikeStatus } from './LikeStatus';
 
 const { CollectionMongoClient, ServerApiVersion } = require('mongodb');
 
@@ -26,6 +27,16 @@ export type PostType = {
   blogId: string;
   blogName: string;
   createdAt: string;
+  extendedLikesInfo?: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: 'None' | 'Like' | 'Dislike';
+    newestLikes: Array<{
+      addedAt: string;
+      userId: string;
+      login: string;
+    }>;
+  };
 };
 
 export type UserType = {
@@ -60,16 +71,19 @@ export type CommentDBType = {
   createdAt: string;
 };
 
-export enum LikeStatus {
-  None = 'None',
-  Like = 'Like',
-  Dislike = 'Dislike'
-}
-
 export type CommentLikeDBType = {
   _id?: Types.ObjectId;
   userId: string;
   commentId: string;
+  status: LikeStatus;
+  addedAt: Date;
+};
+
+export type PostLikeDBType = {
+  _id?: Types.ObjectId;
+  userId: string;
+  login: string;
+  postId: string;
   status: LikeStatus;
   addedAt: Date;
 };

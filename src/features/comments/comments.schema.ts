@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
-import { CommentDBType, CommentLikeDBType, LikeStatus } from '../../app/db';
+import { CommentDBType, CommentLikeDBType } from '../../app/db';
+import { LikeStatus } from '../../app/LikeStatus';
 
 export const commentSchema = new Schema<CommentDBType>({
     postId: { type: String, required: true },

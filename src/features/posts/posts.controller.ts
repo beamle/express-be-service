@@ -45,6 +45,7 @@ export class PostsController {
           throw new CustomError(PostErrors.NO_BLOG_WITH_SUCH_ID);
         }
       }
+      const userId = (req as any).context?.user?.userId;
       const posts = await this.postsQueryRepository.getPosts(
         {
           pageNumber,
@@ -53,6 +54,7 @@ export class PostsController {
           sortDirection,
         },
         blogId ? new Types.ObjectId(blogId) : undefined,
+        userId
       );
       res.status(200).json(posts);
     } catch (error) {
@@ -69,7 +71,10 @@ export class PostsController {
       } else {
         createdPost = await this.postsService.createPost(req.body);
       }
-      res.status(201).json(createdPost);
+
+      const userId = (req as any).context?.user?.userId;
+      const mappedPost = await this.postsQueryRepository.getPostById(new Types.ObjectId(createdPost.id), userId);
+      res.status(201).json(mappedPost);
       return;
     } catch (error) {
       handleError(res, error);
@@ -86,6 +91,7 @@ export class PostsController {
 
     if (!searchablePostId) {
       try {
+        const userId = (req as any).context?.user?.userId;
         const posts = await this.postsQueryRepository.getPosts(
           {
             pageNumber,
@@ -94,6 +100,7 @@ export class PostsController {
             sortDirection,
           },
           new Types.ObjectId(searchablePostId),
+          userId
         );
         res.status(200).json(posts);
       } catch (e) {
@@ -102,7 +109,8 @@ export class PostsController {
     }
 
     try {
-      const post = await this.postsQueryRepository.getPostById(new Types.ObjectId(searchablePostId));
+      const userId = (req as any).context?.user?.userId;
+      const post = await this.postsQueryRepository.getPostById(new Types.ObjectId(searchablePostId), userId);
       res.status(200).json(post);
       return;
     } catch (e) {
