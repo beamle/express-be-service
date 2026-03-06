@@ -61,3 +61,18 @@ postsRouter.get(
   inputCheckErrorsFormatter,
   postsController.getCommentsByPostId.bind(postsController),
 );
+
+import { body } from 'express-validator';
+import { LikeStatus } from '../../app/LikeStatus';
+
+const likeStatusValidator = body('likeStatus')
+  .isString().withMessage('likeStatus must be a string')
+  .isIn([LikeStatus.None, LikeStatus.Like, LikeStatus.Dislike]).withMessage('likeStatus must be one of: None, Like, Dislike');
+
+postsRouter.put(
+  '/:id/like-status',
+  bearerAuthorizationValidator,
+  likeStatusValidator,
+  inputCheckErrorsFormatter,
+  postsController.updatePostLikeStatus.bind(postsController)
+);

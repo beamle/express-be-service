@@ -1,4 +1,4 @@
-import { inject, injectable } from 'inversify';import 'reflect-metadata';
+import { inject, injectable } from 'inversify'; import 'reflect-metadata';
 import { Types } from 'mongoose';
 import { PostsSortingData, PostType } from '../../app/db';
 import { CustomError } from '../../helpers/CustomError';
@@ -100,5 +100,14 @@ export class PostsService {
     }
 
     return createdCommentId;
+  }
+
+  async updateLikeStatus(postId: Types.ObjectId, userId: string, login: string, status: string | 'None' | 'Like' | 'Dislike') {
+    const post = await this.postsRepository.findBy(postId);
+    if (!post) {
+      throw new CustomError(PostErrors.NO_POST_WITH_SUCH_ID);
+    }
+    await this.postsRepository.updateLikeStatus(postId, userId, login, status);
+    return true;
   }
 }

@@ -3,8 +3,9 @@ import { CommentsSortingData, PostsSortingData, PostType } from '../../app/db';
 import { BlogsRepository } from '../blogs/blogs.repository';
 import { CommentatorInfo, CreatePostInput } from './posts.types';
 import { inject, injectable } from 'inversify';
-import { PostModel } from './posts.schema';
+import { PostModel, PostLikeModel } from './posts.schema';
 import { CommentModel } from '../comments/comments.schema';
+import { LikeStatus } from '../../app/LikeStatus';
 
 @injectable()
 export class PostsRepository {
@@ -135,6 +136,26 @@ export class PostsRepository {
       .limit(pageSize)
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .lean();
+  }
+
+  async updateLikeStatus(postId: Types.ObjectId, userId: string, login: string, status: string | 'None' | 'Like' | 'Dislike') {
+    const existingLike = await PostLikeModel.findOne({ postId: postId.toString(), userId });
+
+    if (existingLike) {
+      if (existingLike.status !== status) {
+        existingLike.status = status as LikeStatus;
+        existingLike.addedAt = new Date(); // Update addedAt on change to rank newest likes properly? The requirements usually want the latest 'Like' to be shown in newestLikes. Wait, if going from None to Like, we must update addedAt. 
+        await existingLike.save();
+      }
+    } else {
+      await PostLikeModel.create({
+        postId: postId.toString(),
+        userId,
+        login,
+        status: status as LikeStatus,
+        addedAt: new Date()
+      });
+    }
   }
 }
 

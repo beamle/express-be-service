@@ -205,4 +205,19 @@ export class PostsController {
       handleError(res, e);
     }
   }
+
+  async updatePostLikeStatus(req: RequestWithRouteParams<{ id: string }>, res: Response): Promise<any> {
+    const { id: postId } = req.params;
+    const { likeStatus } = req.body;
+    const userId = req.context.user?.userId;
+    const login = req.context.user?.login;
+
+    try {
+      await this.postsService.updateLikeStatus(new Types.ObjectId(postId), userId!, login!, likeStatus);
+      res.sendStatus(204);
+      return;
+    } catch (e) {
+      handleError(res, e);
+    }
+  }
 }
