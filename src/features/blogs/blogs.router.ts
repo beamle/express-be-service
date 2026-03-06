@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import 'reflect-metadata';
 import { authMiddleware } from '../../authorization/middlewares/authorization.middleware';
+import container from '../../config/container';
 import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import { PostsController } from '../posts/posts.controller';
 import {
@@ -9,9 +10,9 @@ import {
   postTitleInputValidator,
 } from '../posts/posts.middlewares';
 import requestLimiterMiddleware from '../request-cases-limiter/request-cases.middleware';
-import container from '../../config/container';
-import { blogIdAsParamValidator, blogInputValidators } from './blogs.middlewares';
 import { BlogsController } from './blogs.controller';
+import { blogIdAsParamValidator, blogInputValidators } from './blogs.middlewares';
+import { optionalBearerAuthorizationValidator } from '../../authorization/middlewares/optionalBearerAuthorizationValidator';
 
 export const blogsRouter = Router({ mergeParams: true });
 const blogsController = container.get(BlogsController);
@@ -26,6 +27,7 @@ blogsRouter.get('/test-cord', (req, res) => {
 blogsRouter.get(
   '/:blogId/posts',
   // authMiddleware,
+  optionalBearerAuthorizationValidator,
   requestLimiterMiddleware,
   blogIdAsParamValidator,
   inputCheckErrorsFormatter,

@@ -5,13 +5,15 @@ import { inputCheckErrorsFormatter } from '../../helpers/validationHelpers';
 import container from '../../config/container';
 import { PostsController } from './posts.controller';
 import { middlewareObjectIdChecker, postCommentContentValidator, postInputValidators } from './posts.middlewares';
+import { optionalBearerAuthorizationValidator } from '../../authorization/middlewares/optionalBearerAuthorizationValidator';
 
 const postsController = container.get(PostsController);
 export const postsRouter = Router({ mergeParams: true });
 
-postsRouter.get('/', postsController.getPosts.bind(postsController));
 
-postsRouter.get('/:id', postsController.getPostById.bind(postsController));
+postsRouter.get('/', optionalBearerAuthorizationValidator, postsController.getPosts.bind(postsController));
+
+postsRouter.get('/:id', optionalBearerAuthorizationValidator, postsController.getPostById.bind(postsController));
 
 postsRouter.post(
   '/',
@@ -52,8 +54,6 @@ postsRouter.post(
   inputCheckErrorsFormatter,
   postsController.createCommentForPost.bind(postsController),
 );
-
-import { optionalBearerAuthorizationValidator } from '../../authorization/middlewares/optionalBearerAuthorizationValidator';
 
 postsRouter.get(
   '/:postId/comments',
